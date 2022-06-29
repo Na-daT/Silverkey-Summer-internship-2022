@@ -692,4 +692,8 @@ coverage*[.json, .xml, .info]
 
 # Ionide (cross platform F# VS Code tools) working folder
 
+.vs/
+.vscode/
+database.json
+
 # End of https://www.toptal.com/developers/gitignore/api/vs,csharp,aspnetcore,dotnetcore
