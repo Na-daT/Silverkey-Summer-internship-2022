@@ -1,20 +1,18 @@
 ﻿namespace RecipesExercise1
 {
-    internal class FileHandler
+    internal static class FileHandler
     {
-        private static string _path = Path.Combine(Directory.GetCurrentDirectory(), "database.json");
-
-        public static async Task<FileStream> ReadFile()
+        public static async Task<string> ReadAsync(string fileName)
         {
-            FileStream openStream = File.OpenRead(_path);
+            string openStream = await File.ReadAllTextAsync(fileName);
             return openStream;
         }
 
-        public static async Task<bool> WriteFile(string? json)
+        public static async Task<bool> WriteAsync(string fileName, string? json)
         {
             try
             {
-                await File.WriteAllTextAsync(_path, json);
+                await File.WriteAllTextAsync(fileName, json);
                 return true;
             }
             catch (Exception e)
