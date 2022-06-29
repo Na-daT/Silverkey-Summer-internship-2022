@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RecipesExercise1
+﻿namespace RecipesExercise1
 {
     internal class FileHandler
     {
@@ -23,7 +17,7 @@ namespace RecipesExercise1
                 await File.WriteAllTextAsync(_path, json);
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return false;
