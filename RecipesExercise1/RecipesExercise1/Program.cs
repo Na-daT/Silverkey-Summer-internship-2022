@@ -186,7 +186,7 @@ namespace RecipesExercise1
                 case "Add recipe":
                     if (categories is not null && !categories.Any())
                     {
-                        AnsiConsole.Write(new Panel("[red]You need to add a category first[/] \n[grey]Press any key to return to main menu[/]"));
+                        AnsiConsole.Write(new Panel("[red]You need to add a category first![/] \n[grey]Press any key to return to main menu[/]"));
                     }
                     else
                     {
@@ -196,9 +196,9 @@ namespace RecipesExercise1
                         var pickedInstructions = GetList("instruction");
                         var pickedCategories = PickMulCategory(categories);
                         if (Recipe.AddRecipe(recipes, pickedName, pickedIngredients, pickedInstructions, pickedCategories))
-                            AnsiConsole.Write(new Panel("[green]Recipe added successfully[/] \n[grey]Press any key to return to main menu[/]"));
+                            AnsiConsole.Write(new Panel("[green]Recipe added successfully![/] \n[grey]Press any key to return to main menu[/]"));
                         else
-                            AnsiConsole.Write(new Panel("[red]a Recipe with the same name exists[/] \n[grey]Press any key to return to main menu[/]"));
+                            AnsiConsole.Write(new Panel("[red]a Recipe with the same name exists![/] \n[grey]Press any key to return to main menu[/]"));
                     }
                     AnsiConsole.Console.Input.ReadKey(true);
                     MainMenuPrompt(recipes, categories);
@@ -206,7 +206,7 @@ namespace RecipesExercise1
                 case "Remove recipe":
                     if (recipes is not null && !recipes.Any())
                     {
-                        AnsiConsole.Write(new Panel("[red]You need to add a recipy first[/] \n[grey]Press any key to return to main menu[/]"));
+                        AnsiConsole.Write(new Panel("[red]You need to add a recipy first[!/] \n[grey]Press any key to return to main menu[/]"));
                         AnsiConsole.Console.Input.ReadKey(true);
                         MainMenuPrompt(recipes, categories);
                     }
@@ -225,7 +225,7 @@ namespace RecipesExercise1
                 case "Update recipe":
                     if (recipes is not null && !recipes.Any())
                     {
-                        AnsiConsole.Write(new Panel("[red]You need to add a recipy first[/] \n[grey]Press any key to return to main menu[/]"));
+                        AnsiConsole.Write(new Panel("[red]You need to add a recipy first![/] \n[grey]Press any key to return to main menu[/]"));
                         AnsiConsole.Console.Input.ReadKey(true);
                         MainMenuPrompt(recipes, categories);
                     }
@@ -235,9 +235,9 @@ namespace RecipesExercise1
                         var recipeToUpdate = PickRecipe(recipes);
                         bool updateResult = UpdatePrompt(recipeToUpdate, recipes, categories);
                         if (updateResult)
-                            AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
+                            AnsiConsole.Write(new Panel("[green]Recipe updated successfully![/] \n[grey]Press any key to return to main menu[/]"));
                         else
-                            AnsiConsole.MarkupLine("[bold yellow]Canceled![/][grey]Press any key to return to main menu[/]");
+                            AnsiConsole.Write(new Panel("[Red]Cancelled![/] \n[grey]Press any key to return to main menu[/]"));
                         MainMenuPrompt(recipes, categories);
                     }
                     break;
@@ -245,9 +245,9 @@ namespace RecipesExercise1
                     AnsiConsole.Write(new Panel("[mediumpurple]Add Category[/]"));
                     var newName = AskNewName("category");
                     if (Category.AddCategory(categories, newName))
-                        AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
+                        AnsiConsole.Write(new Panel("[green]Category updated successfully![/] \n[grey]Press any key to return to main menu[/]"));
                     else
-                        AnsiConsole.MarkupLine("[bold yellow]Category already exists[/][grey]Press any key to return to main menu[/]");
+                        AnsiConsole.Write(new Panel("[Red]Category already exists![/] \n[grey]Press any key to return to main menu[/]"));
                     AnsiConsole.Console.Input.ReadKey(true);
                     MainMenuPrompt(recipes, categories);
                     break;
