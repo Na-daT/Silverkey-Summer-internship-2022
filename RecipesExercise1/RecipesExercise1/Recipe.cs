@@ -85,26 +85,5 @@ namespace RecipesExercise1
             recipesList.RemoveAll(x => x.Id == id);
             recipesList.Add(new Recipe(id, title, ingredients, instructions, categories));
         }
-
-        public static void List(List<Recipe>? recipesList)
-        {
-            var table = new Table();
-            table.Expand();
-            table.Border(TableBorder.Heavy);
-            table.AddColumns("[bold]Title[/]", "[bold]Ingredients[/]", "[bold]Instructions[/]", "[bold]Categories[/]");
-            if (recipesList is not null)
-            {
-                foreach (Recipe recipe in recipesList)
-                {
-                    List<string> CategoriesList = new List<string>();
-                    foreach (Category category in recipe.Categories)
-                    {
-                        CategoriesList.Add(category.Name);
-                    }
-                    table.AddRow("[blue]" + recipe.Title.ToString() + "[/]", string.Join("\n", recipe.Ingredients) + "\n", string.Join("\n", recipe.Instructions) + "\n", string.Join("\n", CategoriesList) + "\n");
-                }
-            }
-            AnsiConsole.Write(table);
-        }
     }
 }

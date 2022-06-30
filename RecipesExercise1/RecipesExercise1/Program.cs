@@ -133,6 +133,26 @@ namespace RecipesExercise1
             return true;
 
         }
+        public static void List(List<Recipe>? recipesList)
+        {
+            var table = new Table();
+            table.Expand();
+            table.Border(TableBorder.Heavy);
+            table.AddColumns("[bold]Title[/]", "[bold]Ingredients[/]", "[bold]Instructions[/]", "[bold]Categories[/]");
+            if (recipesList is not null)
+            {
+                foreach (Recipe recipe in recipesList)
+                {
+                    List<string> CategoriesList = new List<string>();
+                    foreach (Category category in recipe.Categories)
+                    {
+                        CategoriesList.Add(category.Name);
+                    }
+                    table.AddRow("[blue]" + recipe.Title.ToString() + "[/]", string.Join("\n", recipe.Ingredients) + "\n", string.Join("\n", recipe.Instructions) + "\n", string.Join("\n", CategoriesList) + "\n");
+                }
+            }
+            AnsiConsole.Write(table);
+        }
 
         private static void MainMenuPrompt(List<Recipe>? recipes, List<Category>? categories)
         {
@@ -160,7 +180,7 @@ namespace RecipesExercise1
             {
                 case "List recipes":
                     AnsiConsole.Write(new FigletText("List of recipes").Centered().Color(Color.Yellow));
-                    Recipe.List(recipes);
+                    List(recipes);
                     AnsiConsole.MarkupLine("[grey]Press any key to return to main menu[/]");
                     AnsiConsole.Console.Input.ReadKey(true);
                     MainMenuPrompt(recipes, categories);
