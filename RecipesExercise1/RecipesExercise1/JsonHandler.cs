@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RecipesExercise1
 {
@@ -15,7 +16,8 @@ namespace RecipesExercise1
                     var options = new JsonSerializerOptions
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        WriteIndented = true
+                        WriteIndented = true,
+                        ReferenceHandler = ReferenceHandler.Preserve,
                     };
 
                     await JsonSerializer.SerializeAsync(stream, obj, options);
@@ -41,7 +43,8 @@ namespace RecipesExercise1
                 using var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonText));
                 var options = new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
+                    PropertyNameCaseInsensitive = true,
+                    ReferenceHandler = ReferenceHandler.Preserve,
                 };
 
                 T? objects =
