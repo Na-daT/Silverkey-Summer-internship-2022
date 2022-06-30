@@ -30,7 +30,6 @@ namespace RecipesExercise1
         public static List<Category> PickMulCategory(List<Category>? givenCategories)
         {
             AnsiConsole.Clear();
-
             var list = new List<Category>();
             if (givenCategories is not null)
             {
@@ -47,7 +46,6 @@ namespace RecipesExercise1
                         list.Add(result);
                 }
             }
-
             AnsiConsole.MarkupLine("[grey]press any key to add another category, or press escape to continue[/]");
             return list;
         }
@@ -82,6 +80,7 @@ namespace RecipesExercise1
             }
             return null;
         }
+
         public static bool UpdatePrompt(Recipe? recipe, List<Recipe>? recipes, List<Category>? categories)
         {
             if (recipe is not null && recipes is not null && categories is not null)
@@ -135,6 +134,7 @@ namespace RecipesExercise1
             }
             return false;
         }
+
         public static void List(List<Recipe>? recipesList)
         {
             var table = new Table();
@@ -285,10 +285,12 @@ namespace RecipesExercise1
                     break;
             }
         }
+
         public static void Main()
         {
             MainAsync().GetAwaiter().GetResult();
         }
+
         private static async Task MainAsync()
         {
             var categories = await Category.Load();
