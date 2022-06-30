@@ -6,7 +6,7 @@ namespace RecipesExercise1
     public class Category
     {
         [JsonIgnore]
-        private static readonly string _fileName = "categories.json";
+        private static readonly string _fileName = "category.json";
         public Guid Id { get; set; }
         public string Name { get; set; }
 
@@ -27,7 +27,8 @@ namespace RecipesExercise1
             Id = Guid.NewGuid(); // Generate a unique ID for each category
             Name = name;
         }
-        public static async Task<List<Category>?> GetCategory()
+
+        public static async Task<List<Category>?> Load()
         {
             try
             {
@@ -41,11 +42,11 @@ namespace RecipesExercise1
             }
         }
 
-        public static async Task<bool> SaveCategory(List<Category> categories)
+        public static async Task<bool> Save(List<Category>? categories)
         {
             try
             {
-                var json = await JsonHandler.SerializeAsync<List<Category>>(categories);
+                var json = await JsonHandler.SerializeAsync(categories);
                 return await FileHandler.WriteAsync(_fileName, json);
             }
             catch (Exception e)
@@ -55,9 +56,16 @@ namespace RecipesExercise1
             }
         }
 
-        public static void EditCategory(Category category, string newName)
+        public static void EditCategory(Category? category, string newName)
         {
-            category.Name = newName;
+            if (category is not null)
+                category.Name = newName;
+        }
+
+        public static void AddCategory(List<Category>? categoriesList, string name)
+        {
+            if (categoriesList is not null)
+                categoriesList.Add(new Category(name));
         }
     }
 }
