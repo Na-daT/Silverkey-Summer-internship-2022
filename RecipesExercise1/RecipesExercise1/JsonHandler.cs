@@ -19,7 +19,6 @@ namespace RecipesExercise1
                         WriteIndented = true,
                         ReferenceHandler = ReferenceHandler.Preserve,
                     };
-
                     await JsonSerializer.SerializeAsync(stream, obj, options);
                     stream.Position = 0;
                     using (var reader = new StreamReader(stream))
@@ -45,7 +44,6 @@ namespace RecipesExercise1
                     PropertyNameCaseInsensitive = true,
                     ReferenceHandler = ReferenceHandler.Preserve,
                 };
-
                 T? objects =
                     await JsonSerializer.DeserializeAsync<T>(stream, options);
                 return objects;
@@ -55,6 +53,5 @@ namespace RecipesExercise1
                 return (T)new object();
             }
         }
-
     }
 }

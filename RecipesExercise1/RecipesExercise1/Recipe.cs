@@ -44,7 +44,6 @@ namespace RecipesExercise1
                         for (int j = 0; j < recipes[i].Categories.Count; j++)
                             recipes[i].Categories[j] = categories.First(y => y.Id == recipes[i].Categories[j].Id);
                 }
-
                 return recipes;
             }
             catch
