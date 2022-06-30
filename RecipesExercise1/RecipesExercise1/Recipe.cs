@@ -31,12 +31,21 @@ namespace RecipesExercise1
             Categories = categories;
         }
 
-        public static async Task<List<Recipe>?> GetRecipes()
+        public static async Task<List<Recipe>?> Load(List<Category>? categories)
         {
             try
             {
                 string text = await FileHandler.ReadAsync(_fileName);
-                return await JsonHandler.DeserializeAsync<List<Recipe>?>(text);
+                var recipes = await JsonHandler.DeserializeAsync<List<Recipe>?>(text);
+
+                if (recipes is not null && categories is not null)
+                {
+                    for (int i = 0; i < recipes.Count; i++)
+                        for (int j = 0; j < recipes[i].Categories.Count; j++)
+                            recipes[i].Categories[j] = categories.First(y => y.Id == recipes[i].Categories[j].Id);
+                }
+
+                return recipes;
             }
             catch (Exception e)
             {
@@ -45,11 +54,11 @@ namespace RecipesExercise1
             }
         }
 
-        public static async Task<bool> SaveRecipes(List<Recipe> recipes)
+        public static async Task<bool> Save(List<Recipe>? recipes)
         {
             try
             {
-                var json = await JsonHandler.SerializeAsync<List<Recipe>>(recipes);
+                var json = await JsonHandler.SerializeAsync(recipes);
                 return await FileHandler.WriteAsync(_fileName, json);
             }
             catch (Exception e)
@@ -59,36 +68,41 @@ namespace RecipesExercise1
             }
         }
 
-        public void AddRecipe(List<Recipe> RecipesList, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
+        public static void AddRecipe(List<Recipe>? recipesList, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
         {
-            RecipesList.Add(new Recipe(Guid.NewGuid(), title, ingredients, instructions, categories));
+            if (recipesList is not null)
+                recipesList.Add(new Recipe(Guid.NewGuid(), title, ingredients, instructions, categories));
         }
 
-        public void RemoveRecipe(List<Recipe> RecipesList, Guid id)
+        public static void RemoveRecipe(List<Recipe>? recipesList, Guid id)
         {
-            RecipesList.RemoveAll(x => x.Id == id);
+            if (recipesList is not null)
+                recipesList.RemoveAll(x => x.Id == id);
         }
 
-        public void UpdateRecipe(List<Recipe> RecipesList, Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
+        public static void UpdateRecipe(List<Recipe> recipesList, Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
         {
-            RecipesList.RemoveAll(x => x.Id == id);
-            RecipesList.Add(new Recipe(id, title, ingredients, instructions, categories));
+            recipesList.RemoveAll(x => x.Id == id);
+            recipesList.Add(new Recipe(id, title, ingredients, instructions, categories));
         }
 
-        public static void ListRecipes(List<Recipe> RecipesList)
+        public static void List(List<Recipe>? recipesList)
         {
             var table = new Table();
             table.Expand();
             table.Border(TableBorder.Heavy);
             table.AddColumns("[bold]Title[/]", "[bold]Ingredients[/]", "[bold]Instructions[/]", "[bold]Categories[/]");
-            foreach (Recipe recipe in RecipesList)
+            if (recipesList is not null)
             {
-                List<string> CategoriesList = new List<string>();
-                foreach (Category category in recipe.Categories)
+                foreach (Recipe recipe in recipesList)
                 {
-                    CategoriesList.Add(category.Name);
+                    List<string> CategoriesList = new List<string>();
+                    foreach (Category category in recipe.Categories)
+                    {
+                        CategoriesList.Add(category.Name);
+                    }
+                    table.AddRow("[blue]" + recipe.Title.ToString() + "[/]", string.Join("\n", recipe.Ingredients) + "\n", string.Join("\n", recipe.Instructions) + "\n", string.Join("\n", CategoriesList) + "\n");
                 }
-                table.AddRow("[blue]" + recipe.Title.ToString() + "[/]", string.Join("\n", recipe.Ingredients) + "\n", string.Join("\n", recipe.Instructions) + "\n", string.Join("\n", CategoriesList) + "\n");
             }
             AnsiConsole.Write(table);
         }
