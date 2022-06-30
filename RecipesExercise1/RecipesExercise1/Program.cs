@@ -9,7 +9,7 @@ namespace RecipesExercise1
     {
         public static string AskNewName(string type)
         {
-            var name = AnsiConsole.Ask<string>($"What would you like to call your [red]{type}[/]?");
+            var name = AnsiConsole.Ask<string>($"What would you like to call your [hotpink3]{type}[/]?");
             return name;
         }
 
@@ -20,7 +20,7 @@ namespace RecipesExercise1
             {
                 AnsiConsole.Clear();
                 list.Add(AnsiConsole.Prompt(
-                    new TextPrompt<string>($"enter an [red]{type}[/]:"))
+                    new TextPrompt<string>($"enter an [hotpink3]{type}[/]:"))
                 );
                 AnsiConsole.MarkupLine($"[grey]press any key to add another {type}, or press escape to continue[/]");
             } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
@@ -82,56 +82,58 @@ namespace RecipesExercise1
             }
             return null;
         }
-        public static bool UpdatePrompt(Recipe? recipe)
+        public static bool UpdatePrompt(Recipe? recipe, List<Recipe>? recipes, List<Category>? categories)
         {
-            AnsiConsole.Clear();
-            string choice = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                 .Title("[underline bold black on white]What would you like to update?[/]")
-                    .AddChoices(new[] {
+            if (recipe is not null && recipes is not null && categories is not null)
+            {
+                AnsiConsole.Clear();
+                string choice = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                     .Title("[underline bold black on white]What would you like to update?[/]")
+                        .AddChoices(new[] {
                         "Name",
                         "Add ingredients",
-                        "Remove ingredients",
+                        "Remove all ingredients",
                         "Add instructions",
-                        "Remove instructions",
-                        "Add categories",
-                        "Remove categories",
+                        "Remove all instructions",
+                        "Edit categories",
                         "Cancel"
-                    }));
+                        }));
 
-            switch (choice)
-            {
-                case "Name":
-                    string newName = AskNewName("recipe");
-                    break;
-                /*
-                case "Add ingredients":
-                    recipe.Ingredients.AddRange(GetList("ingredient"));
-                    break;
-                case "Remove ingredients":
-                    //recipe.Ingredients.RemoveAll(x => x == GetList("ingredient"));
-                    break;
-                case "Add instructions":
-                    recipe.Instructions.AddRange(GetList("instruction"));
-                    break;
-                case "Remove instructions":
-                    //recipe.Instructions.RemoveAll(x => x == GetList("instruction"));
-                    break;
-                case "Add categories":
-                    //recipe.Categories.AddRange(PickCategory(Recipe.Categories));
-                    break;
-                case "Remove categories":
-                    //recipe.Categories.RemoveAll(x => x == PickCategory(Recipe.Categories));
-                    break;
-                case "Cancel":
-                    AnsiConsole.Clear();
-                    return false;
-                */
-                default:
-                    return false;
+                switch (choice)
+                {
+                    case "Name":
+                        string newName = AskNewName("recipe");
+                        Recipe.UpdateRecipe(recipes, recipe.Id, false, false, newName);
+                        break;
+                    case "Add ingredients":
+                        var ingredients = GetList("ingredients");
+                        Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, ingredients);
+                        break;
+                    case "Remove all ingredients":
+                        Recipe.UpdateRecipe(recipes, recipe.Id, true, false);
+                        break;
+                    case "Add instructions":
+                        var instructions = GetList("instructions");
+                        Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, null, instructions);
+                        break;
+                    case "Remove all instructions":
+                        Recipe.UpdateRecipe(recipes, recipe.Id, false, true);
+                        break;
+                    case "Add categories":
+                        var UpdatedCategories = PickMulCategory(categories);
+                        Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, null, null, UpdatedCategories);
+                        break;
+                    case "Cancel":
+                        AnsiConsole.Clear();
+                        return false;
+
+                    default:
+                        return false;
+                }
+                return true;
             }
-            return true;
-
+            return false;
         }
         public static void List(List<Recipe>? recipesList)
         {
@@ -157,10 +159,10 @@ namespace RecipesExercise1
         private static void MainMenuPrompt(List<Recipe>? recipes, List<Category>? categories)
         {
             AnsiConsole.Clear();
-            AnsiConsole.Write(new Rule("[yellow]Main Menu[/]"));
+            AnsiConsole.Write(new FigletText("Main Menu").Centered().Color(Color.Plum1));
             string choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                 .Title("[underline bold black on white]What would you like to do?[/]")
+                 .Title("[bold white on black]What would you like to do?[/]")
                     .AddChoices(new[] {
                         "List recipes",
                         "Add recipe",
@@ -179,40 +181,71 @@ namespace RecipesExercise1
             switch (choice)
             {
                 case "List recipes":
-                    AnsiConsole.Write(new FigletText("List of recipes").Centered().Color(Color.Yellow));
+                    AnsiConsole.Write(new FigletText("List of recipes").Centered().Color(Color.LightSlateBlue));
                     List(recipes);
                     AnsiConsole.MarkupLine("[grey]Press any key to return to main menu[/]");
                     AnsiConsole.Console.Input.ReadKey(true);
                     MainMenuPrompt(recipes, categories);
                     break;
                 case "Add recipe":
-                    AnsiConsole.Write(new Rule("[bold blue on white]  Add new Recipe  [/]"));
-                    var pickedName = AskNewName("recipe");
-                    var pickedIngredients = GetList("ingredient");
-                    var pickedInstructions = GetList("instruction");
-                    var pickedCategories = PickMulCategory(categories);
-                    Recipe.AddRecipe(recipes, pickedName, pickedIngredients, pickedInstructions, pickedCategories);
-                    Console.Clear();
-                    AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
-                    AnsiConsole.Console.Input.ReadKey(true);
-                    MainMenuPrompt(recipes, categories);
+                    if (categories is not null && !categories.Any())
+                    {
+                        AnsiConsole.Write(new Panel("[red]You need to add a category first[/] \n[grey]Press any key to return to main menu[/]"));
+                        AnsiConsole.Console.Input.ReadKey(true);
+                        MainMenuPrompt(recipes, categories);
+                    }
+                    else
+                    {
+                        AnsiConsole.Write(new Panel("[mediumpurple]  Add new Recipe  [/]"));
+                        var pickedName = AskNewName("recipe");
+                        var pickedIngredients = GetList("ingredient");
+                        var pickedInstructions = GetList("instruction");
+                        var pickedCategories = PickMulCategory(categories);
+                        Recipe.AddRecipe(recipes, pickedName, pickedIngredients, pickedInstructions, pickedCategories);
+                        Console.Clear();
+                        AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
+                        AnsiConsole.Console.Input.ReadKey(true);
+                        MainMenuPrompt(recipes, categories);
+                    }
                     break;
                 case "Remove recipe":
-                    AnsiConsole.Write(new Rule("[bold blue on white]  Remove Recipe  [/]"));
-                    var pickedRecipe = PickRecipe(recipes);
-                    if (pickedRecipe is not null)
-                        Recipe.RemoveRecipe(recipes, pickedRecipe.Id);
+                    if (recipes is not null && !recipes.Any())
+                    {
+                        AnsiConsole.Write(new Panel("[red]You need to add a recipy first[/] \n[grey]Press any key to return to main menu[/]"));
+                        AnsiConsole.Console.Input.ReadKey(true);
+                        MainMenuPrompt(recipes, categories);
+                    }
+                    else
+                    {
+                        AnsiConsole.Write(new Panel("[mediumpurple]  Remove Recipe  [/]"));
+                        var pickedRecipe = PickRecipe(recipes);
+                        if (pickedRecipe is not null)
+                            Recipe.RemoveRecipe(recipes, pickedRecipe.Id);
+                        Console.Clear();
+                        AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
+                        AnsiConsole.Console.Input.ReadKey(true);
+                        MainMenuPrompt(recipes, categories);
+                    }
                     break;
                 case "Update recipe":
-                    AnsiConsole.Write(new Panel("[red]Update recipe[/]"));
-                    var recipeToUpdate = PickRecipe(recipes);
-                    bool updateResult = UpdatePrompt(recipeToUpdate);
-                    if (updateResult) { AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]"); }
-                    else { AnsiConsole.MarkupLine("[bold yellow]Canceled![/][grey]Press any key to return to main menu[/]"); }
-                    MainMenuPrompt(recipes, categories);
+                    if (recipes is not null && !recipes.Any())
+                    {
+                        AnsiConsole.Write(new Panel("[red]You need to add a recipy first[/] \n[grey]Press any key to return to main menu[/]"));
+                        AnsiConsole.Console.Input.ReadKey(true);
+                        MainMenuPrompt(recipes, categories);
+                    }
+                    else
+                    {
+                        AnsiConsole.Write(new Panel("[mediumpurple]  Update exisitng recipe  [/]"));
+                        var recipeToUpdate = PickRecipe(recipes);
+                        bool updateResult = UpdatePrompt(recipeToUpdate, recipes, categories);
+                        if (updateResult) { AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]"); }
+                        else { AnsiConsole.MarkupLine("[bold yellow]Canceled![/][grey]Press any key to return to main menu[/]"); }
+                        MainMenuPrompt(recipes, categories);
+                    }
                     break;
                 case "Add Category":
-                    AnsiConsole.Write(new Panel("[red]Add Category[/]"));
+                    AnsiConsole.Write(new Panel("[mediumpurple]Add Category[/]"));
                     var newName = AskNewName("category");
                     Category.AddCategory(categories, newName);
 
@@ -222,15 +255,24 @@ namespace RecipesExercise1
                     MainMenuPrompt(recipes, categories);
                     break;
                 case "Update Category":
-                    AnsiConsole.Write(new Panel("[red]Update Category[/]"));
-                    var categoryToUpdate = PickCategory(categories);
-                    var updatedCategoryName = AskNewName("category");
-                    Category.EditCategory(categoryToUpdate, updatedCategoryName);
+                    if (categories is not null && !categories.Any())
+                    {
+                        AnsiConsole.Write(new Panel("[red]You need to add a category first[/] \n[grey]Press any key to return to main menu[/]"));
+                        AnsiConsole.Console.Input.ReadKey(true);
+                        MainMenuPrompt(recipes, categories);
+                    }
+                    else
+                    {
+                        AnsiConsole.Write(new Panel("[mediumpurple]Update Category[/]"));
+                        var categoryToUpdate = PickCategory(categories);
+                        var updatedCategoryName = AskNewName("category");
+                        Category.EditCategory(categoryToUpdate, updatedCategoryName);
 
-                    Console.Clear();
-                    AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
-                    AnsiConsole.Console.Input.ReadKey(true);
-                    MainMenuPrompt(recipes, categories);
+                        Console.Clear();
+                        AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
+                        AnsiConsole.Console.Input.ReadKey(true);
+                        MainMenuPrompt(recipes, categories);
+                    }
                     break;
                 case "Exit":
                     AnsiConsole.Write(new Panel("[bold yellow on white]Saving...[/]"));
@@ -252,8 +294,8 @@ namespace RecipesExercise1
             var categories = await Category.Load();
             var recipes = await Recipe.Load(categories);
 
-            AnsiConsole.Write(new Rule("[yellow]Welcome[/]"));
-            AnsiConsole.Write(new Panel("welcome to Nada's recipes app!"));
+            AnsiConsole.Write(new FigletText("Welcome!").Centered().Color(Color.LightCoral));
+            AnsiConsole.Write(new FigletText("Nada's recipes app!").Centered().Color(Color.Plum1));
             AnsiConsole.MarkupLine("[grey]Press a key to continue[/]");
             AnsiConsole.Console.Input.ReadKey(true);
             MainMenuPrompt(recipes, categories);
