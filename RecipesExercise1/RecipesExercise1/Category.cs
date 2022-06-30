@@ -62,10 +62,16 @@ namespace RecipesExercise1
                 category.Name = newName;
         }
 
-        public static void AddCategory(List<Category>? categoriesList, string name)
+        public static bool AddCategory(List<Category>? categoriesList, string name)
         {
             if (categoriesList is not null)
+            {
+                if (categoriesList.Exists(x => x.Name == name))
+                    return false;
                 categoriesList.Add(new Category(name));
+                return true;
+            }
+            return false;
         }
     }
 }

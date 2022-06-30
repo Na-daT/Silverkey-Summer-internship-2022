@@ -35,7 +35,6 @@ namespace RecipesExercise1
             {
                 var availableCategoriesNames = (from Category category in givenCategories
                                                 select category.Name).ToList();
-
                 var categoryName = AnsiConsole.Prompt(
                     new MultiSelectionPrompt<string>().Title("Pick a category:").AddChoices(availableCategoriesNames)
                 );
@@ -53,7 +52,6 @@ namespace RecipesExercise1
         public static Recipe? PickRecipe(List<Recipe>? recipes)
         {
             AnsiConsole.Clear();
-
             if (recipes is not null)
             {
                 var availableRecipeNames = (from Recipe recipe in recipes
@@ -98,7 +96,6 @@ namespace RecipesExercise1
                         "Edit categories",
                         "Cancel"
                         }));
-
                 switch (choice)
                 {
                     case "Name":
@@ -126,7 +123,6 @@ namespace RecipesExercise1
                     case "Cancel":
                         AnsiConsole.Clear();
                         return false;
-
                     default:
                         return false;
                 }
@@ -191,8 +187,6 @@ namespace RecipesExercise1
                     if (categories is not null && !categories.Any())
                     {
                         AnsiConsole.Write(new Panel("[red]You need to add a category first[/] \n[grey]Press any key to return to main menu[/]"));
-                        AnsiConsole.Console.Input.ReadKey(true);
-                        MainMenuPrompt(recipes, categories);
                     }
                     else
                     {
@@ -201,12 +195,13 @@ namespace RecipesExercise1
                         var pickedIngredients = GetList("ingredient");
                         var pickedInstructions = GetList("instruction");
                         var pickedCategories = PickMulCategory(categories);
-                        Recipe.AddRecipe(recipes, pickedName, pickedIngredients, pickedInstructions, pickedCategories);
-                        Console.Clear();
-                        AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
-                        AnsiConsole.Console.Input.ReadKey(true);
-                        MainMenuPrompt(recipes, categories);
+                        if (Recipe.AddRecipe(recipes, pickedName, pickedIngredients, pickedInstructions, pickedCategories))
+                            AnsiConsole.Write(new Panel("[green]Recipe added successfully[/] \n[grey]Press any key to return to main menu[/]"));
+                        else
+                            AnsiConsole.Write(new Panel("[red]a Recipe with the same name exists[/] \n[grey]Press any key to return to main menu[/]"));
                     }
+                    AnsiConsole.Console.Input.ReadKey(true);
+                    MainMenuPrompt(recipes, categories);
                     break;
                 case "Remove recipe":
                     if (recipes is not null && !recipes.Any())
@@ -239,18 +234,20 @@ namespace RecipesExercise1
                         AnsiConsole.Write(new Panel("[mediumpurple]  Update exisitng recipe  [/]"));
                         var recipeToUpdate = PickRecipe(recipes);
                         bool updateResult = UpdatePrompt(recipeToUpdate, recipes, categories);
-                        if (updateResult) { AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]"); }
-                        else { AnsiConsole.MarkupLine("[bold yellow]Canceled![/][grey]Press any key to return to main menu[/]"); }
+                        if (updateResult)
+                            AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
+                        else
+                            AnsiConsole.MarkupLine("[bold yellow]Canceled![/][grey]Press any key to return to main menu[/]");
                         MainMenuPrompt(recipes, categories);
                     }
                     break;
                 case "Add Category":
                     AnsiConsole.Write(new Panel("[mediumpurple]Add Category[/]"));
                     var newName = AskNewName("category");
-                    Category.AddCategory(categories, newName);
-
-                    Console.Clear();
-                    AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
+                    if (Category.AddCategory(categories, newName))
+                        AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
+                    else
+                        AnsiConsole.MarkupLine("[bold yellow]Category already exists[/][grey]Press any key to return to main menu[/]");
                     AnsiConsole.Console.Input.ReadKey(true);
                     MainMenuPrompt(recipes, categories);
                     break;
@@ -267,7 +264,6 @@ namespace RecipesExercise1
                         var categoryToUpdate = PickCategory(categories);
                         var updatedCategoryName = AskNewName("category");
                         Category.EditCategory(categoryToUpdate, updatedCategoryName);
-
                         Console.Clear();
                         AnsiConsole.MarkupLine("[bold yellow]Success![/][grey]Press any key to return to main menu[/]");
                         AnsiConsole.Console.Input.ReadKey(true);
@@ -282,6 +278,8 @@ namespace RecipesExercise1
                         Task.Run(() => Category.Save(categories))
                     };
                     Task.WaitAll(tasks.ToArray());
+                    break;
+                default:
                     break;
             }
         }

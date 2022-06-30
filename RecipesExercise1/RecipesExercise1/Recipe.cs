@@ -68,10 +68,16 @@ namespace RecipesExercise1
             }
         }
 
-        public static void AddRecipe(List<Recipe>? recipesList, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
+        public static bool AddRecipe(List<Recipe>? recipesList, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
         {
             if (recipesList is not null)
+            {
+                if (recipesList.Find(x => x.Title == title) != null)
+                    return false;
                 recipesList.Add(new Recipe(Guid.NewGuid(), title, ingredients, instructions, categories));
+                return true;
+            }
+            return false;
         }
 
         public static void RemoveRecipe(List<Recipe>? recipesList, Guid id)
