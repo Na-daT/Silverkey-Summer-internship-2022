@@ -29,9 +29,8 @@ namespace RecipesExercise1
                 }
                 return json;
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
                 return String.Empty;
             }
         }
@@ -51,9 +50,8 @@ namespace RecipesExercise1
                     await JsonSerializer.DeserializeAsync<T>(stream, options);
                 return objects;
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
                 return (T)new object();
             }
         }

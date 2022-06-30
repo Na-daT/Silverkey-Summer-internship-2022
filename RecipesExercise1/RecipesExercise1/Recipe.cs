@@ -47,9 +47,8 @@ namespace RecipesExercise1
 
                 return recipes;
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
                 return new List<Recipe>();
             }
         }
@@ -61,9 +60,8 @@ namespace RecipesExercise1
                 var json = await JsonHandler.SerializeAsync(recipes);
                 return await FileHandler.WriteAsync(_fileName, json);
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
                 return false;
             }
         }

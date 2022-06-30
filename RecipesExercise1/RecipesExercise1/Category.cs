@@ -35,9 +35,8 @@ namespace RecipesExercise1
                 string text = await FileHandler.ReadAsync(_fileName);
                 return await JsonHandler.DeserializeAsync<List<Category>?>(text);
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
                 return new List<Category>();
             }
         }
@@ -49,9 +48,8 @@ namespace RecipesExercise1
                 var json = await JsonHandler.SerializeAsync(categories);
                 return await FileHandler.WriteAsync(_fileName, json);
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
                 return false;
             }
         }

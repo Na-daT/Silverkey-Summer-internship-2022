@@ -15,9 +15,8 @@
                 await File.WriteAllTextAsync(fileName, json);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
                 return false;
             }
         }
