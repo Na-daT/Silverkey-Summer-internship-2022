@@ -80,10 +80,24 @@ namespace RecipesExercise1
                 recipesList.RemoveAll(x => x.Id == id);
         }
 
-        public static void UpdateRecipe(List<Recipe> recipesList, Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
+        public static void UpdateRecipe(List<Recipe>? recipesList, Guid id, bool removeIngredients, bool removeInstructions, string? title = null, List<string>? ingredients = null, List<string>? instructions = null, List<Category>? categories = null)
         {
-            recipesList.RemoveAll(x => x.Id == id);
-            recipesList.Add(new Recipe(id, title, ingredients, instructions, categories));
+            if (recipesList is not null)
+            {
+                var recipe = recipesList.First(x => x.Id == id);
+
+                if (title is not null)
+                    recipe.Title = title;
+
+                if (ingredients is not null)
+                    recipe.Ingredients.AddRange(ingredients);
+
+                if (instructions is not null)
+                    recipe.Instructions.AddRange(instructions);
+
+                if (categories is not null)
+                    recipe.Categories = categories;
+            }
         }
     }
 }
