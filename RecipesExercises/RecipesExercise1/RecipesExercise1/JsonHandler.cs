@@ -41,6 +41,7 @@ namespace RecipesExercise1
                 using var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonText));
                 var options = new JsonSerializerOptions
                 {
+                    WriteIndented = true,
                     PropertyNameCaseInsensitive = true,
                     ReferenceHandler = ReferenceHandler.Preserve,
                 };
