@@ -696,4 +696,5 @@ coverage*[.json, .xml, .info]
 .vscode/
 recipe.json
 category.json
+*setting*.json
 # End of https://www.toptal.com/developers/gitignore/api/vs,csharp,aspnetcore,dotnetcore
