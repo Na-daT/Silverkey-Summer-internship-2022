@@ -102,6 +102,12 @@ namespace RecipesExercise1
 
             if (categories is not null)
                 recipe.Categories = categories;
+
+            if (removeIngredients)
+                recipe.Ingredients.Clear();
+
+            if (removeInstructions)
+                recipe.Instructions.Clear();
         }
     }
 }
