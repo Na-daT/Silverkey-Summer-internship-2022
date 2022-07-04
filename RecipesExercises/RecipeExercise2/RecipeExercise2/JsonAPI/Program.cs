@@ -8,8 +8,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
+// app.UseSwagger();
+// app.UseSwaggerUI();
 
 var options = new JsonSerializerOptions
 {
@@ -121,7 +122,7 @@ app.MapPut("api/json/updatecategory/{id}", async Task<bool> (Guid id, Category c
     }
 });
 
-app.Run();
+app.Run($"http://localhost:{port}");
 
 
 public record Recipe(Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories);
