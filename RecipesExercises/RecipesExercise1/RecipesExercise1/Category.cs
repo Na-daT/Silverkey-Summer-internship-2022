@@ -41,7 +41,7 @@ namespace RecipesExercise1
             }
         }
 
-        public static async Task<bool> Save(List<Category>? categories)
+        public static async Task<bool> Save(List<Category> categories)
         {
             try
             {
@@ -60,16 +60,14 @@ namespace RecipesExercise1
                 category.Name = newName;
         }
 
-        public static bool AddCategory(List<Category>? categoriesList, string name)
+        public static bool AddCategory(List<Category> categoriesList, string name)
         {
-            if (categoriesList is not null)
-            {
-                if (categoriesList.Exists(x => x.Name == name))
-                    return false;
-                categoriesList.Add(new Category(name));
-                return true;
-            }
-            return false;
+            ArgumentNullException.ThrowIfNull(categoriesList);
+
+            if (categoriesList.Exists(x => x.Name == name))
+                return false;
+            categoriesList.Add(new Category(name));
+            return true;
         }
     }
 }

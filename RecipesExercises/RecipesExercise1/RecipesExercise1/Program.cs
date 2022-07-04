@@ -29,21 +29,20 @@ namespace RecipesExercise1
 
         public static List<Category> PickMulCategory(List<Category>? givenCategories)
         {
+            ArgumentNullException.ThrowIfNull(givenCategories);
+
             AnsiConsole.Clear();
             var list = new List<Category>();
-            if (givenCategories is not null)
+            var availableCategoriesNames = (from Category category in givenCategories
+                                            select category.Name).ToList();
+            var categoryName = AnsiConsole.Prompt(
+                new MultiSelectionPrompt<string>().Title("Pick a category:").AddChoices(availableCategoriesNames)
+            );
+            foreach (string name in categoryName)
             {
-                var availableCategoriesNames = (from Category category in givenCategories
-                                                select category.Name).ToList();
-                var categoryName = AnsiConsole.Prompt(
-                    new MultiSelectionPrompt<string>().Title("Pick a category:").AddChoices(availableCategoriesNames)
-                );
-                foreach (string name in categoryName)
-                {
-                    var result = givenCategories.Find(x => x.Name == name);
-                    if (result is not null)
-                        list.Add(result);
-                }
+                var result = givenCategories.Find(x => x.Name == name);
+                if (result is not null)
+                    list.Add(result);
             }
             AnsiConsole.MarkupLine("[grey]press any key to add another category, or press escape to continue[/]");
             return list;
@@ -51,43 +50,41 @@ namespace RecipesExercise1
 
         public static Recipe? PickRecipe(List<Recipe>? recipes)
         {
+            ArgumentNullException.ThrowIfNull(recipes);
+
             AnsiConsole.Clear();
-            if (recipes is not null)
-            {
-                var availableRecipeNames = (from Recipe recipe in recipes
-                                            select recipe.Title).ToList();
-                var recipeName = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>().Title("Pick a recipe:").AddChoices(availableRecipeNames)
-                );
-                return recipes.Find(x => x.Title == recipeName);
-            }
-            return null;
+            var availableRecipeNames = (from Recipe recipe in recipes
+                                        select recipe.Title).ToList();
+            var recipeName = AnsiConsole.Prompt(
+                new SelectionPrompt<string>().Title("Pick a recipe:").AddChoices(availableRecipeNames)
+            );
+            return recipes.Find(x => x.Title == recipeName);
         }
 
         public static Category? PickCategory(List<Category>? categories)
         {
-            if (categories is not null)
-            {
-                var availableCategoriesNames = (from Category category in categories
-                                                select category.Name).ToList();
-                AnsiConsole.Clear();
-                var categoryName = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>().Title("Pick a category:").AddChoices(availableCategoriesNames)
-                );
-                return categories.Find(x => x.Name == categoryName);
-            }
-            return null;
+            ArgumentNullException.ThrowIfNull(categories);
+
+            var availableCategoriesNames = (from Category category in categories
+                                            select category.Name).ToList();
+            AnsiConsole.Clear();
+            var categoryName = AnsiConsole.Prompt(
+                new SelectionPrompt<string>().Title("Pick a category:").AddChoices(availableCategoriesNames)
+            );
+            return categories.Find(x => x.Name == categoryName);
         }
 
-        public static bool UpdatePrompt(Recipe? recipe, List<Recipe>? recipes, List<Category>? categories)
+        public static bool UpdatePrompt(Recipe? recipe, List<Recipe>? recipes, List<Category> categories)
         {
-            if (recipe is not null && recipes is not null && categories is not null)
-            {
-                AnsiConsole.Clear();
-                string choice = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>()
-                     .Title("[underline bold black on white]What would you like to update?[/]")
-                        .AddChoices(new[] {
+            ArgumentNullException.ThrowIfNull(recipe);
+            ArgumentNullException.ThrowIfNull(recipes);
+            ArgumentNullException.ThrowIfNull(categories);
+
+            AnsiConsole.Clear();
+            string choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                 .Title("[underline bold black on white]What would you like to update?[/]")
+                    .AddChoices(new[] {
                         "Name",
                         "Add ingredients",
                         "Remove all ingredients",
@@ -95,65 +92,65 @@ namespace RecipesExercise1
                         "Remove all instructions",
                         "Edit categories",
                         "Cancel"
-                        }));
-                switch (choice)
-                {
-                    case "Name":
-                        string newName = AskNewName("recipe");
-                        Recipe.UpdateRecipe(recipes, recipe.Id, false, false, newName);
-                        break;
-                    case "Add ingredients":
-                        var ingredients = GetList("ingredients");
-                        Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, ingredients);
-                        break;
-                    case "Remove all ingredients":
-                        Recipe.UpdateRecipe(recipes, recipe.Id, true, false);
-                        break;
-                    case "Add instructions":
-                        var instructions = GetList("instructions");
-                        Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, null, instructions);
-                        break;
-                    case "Remove all instructions":
-                        Recipe.UpdateRecipe(recipes, recipe.Id, false, true);
-                        break;
-                    case "Add categories":
-                        var UpdatedCategories = PickMulCategory(categories);
-                        Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, null, null, UpdatedCategories);
-                        break;
-                    case "Cancel":
-                        AnsiConsole.Clear();
-                        return false;
-                    default:
-                        return false;
-                }
-                return true;
+                    }));
+            switch (choice)
+            {
+                case "Name":
+                    string newName = AskNewName("recipe");
+                    Recipe.UpdateRecipe(recipes, recipe.Id, false, false, newName);
+                    break;
+                case "Add ingredients":
+                    var ingredients = GetList("ingredients");
+                    Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, ingredients);
+                    break;
+                case "Remove all ingredients":
+                    Recipe.UpdateRecipe(recipes, recipe.Id, true, false);
+                    break;
+                case "Add instructions":
+                    var instructions = GetList("instructions");
+                    Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, null, instructions);
+                    break;
+                case "Remove all instructions":
+                    Recipe.UpdateRecipe(recipes, recipe.Id, false, true);
+                    break;
+                case "Add categories":
+                    var UpdatedCategories = PickMulCategory(categories);
+                    Recipe.UpdateRecipe(recipes, recipe.Id, false, false, null, null, null, UpdatedCategories);
+                    break;
+                case "Cancel":
+                    AnsiConsole.Clear();
+                    return false;
+                default:
+                    return false;
             }
-            return false;
+            return true;
         }
 
-        public static void List(List<Recipe>? recipesList)
+        public static void List(List<Recipe> recipesList)
         {
+            ArgumentNullException.ThrowIfNull(recipesList);
+
             var table = new Table();
             table.Expand();
             table.Border(TableBorder.Heavy);
             table.AddColumns("[bold]Title[/]", "[bold]Ingredients[/]", "[bold]Instructions[/]", "[bold]Categories[/]");
-            if (recipesList is not null)
+            foreach (Recipe recipe in recipesList)
             {
-                foreach (Recipe recipe in recipesList)
+                List<string> CategoriesList = new List<string>();
+                foreach (Category category in recipe.Categories)
                 {
-                    List<string> CategoriesList = new List<string>();
-                    foreach (Category category in recipe.Categories)
-                    {
-                        CategoriesList.Add(category.Name);
-                    }
-                    table.AddRow("[blue]" + recipe.Title.ToString() + "[/]", string.Join("\n", recipe.Ingredients) + "\n", string.Join("\n", recipe.Instructions) + "\n", string.Join("\n", CategoriesList) + "\n");
+                    CategoriesList.Add(category.Name);
                 }
+                table.AddRow("[blue]" + recipe.Title.ToString() + "[/]", string.Join("\n", recipe.Ingredients) + "\n", string.Join("\n", recipe.Instructions) + "\n", string.Join("\n", CategoriesList) + "\n");
             }
             AnsiConsole.Write(table);
         }
 
         private static void MainMenuPrompt(List<Recipe>? recipes, List<Category>? categories)
         {
+            ArgumentNullException.ThrowIfNull(recipes);
+            ArgumentNullException.ThrowIfNull(categories);
+
             AnsiConsole.Clear();
             AnsiConsole.Write(new FigletText("Main Menu").Centered().Color(Color.Plum1));
             string choice = AnsiConsole.Prompt(
@@ -171,8 +168,12 @@ namespace RecipesExercise1
             Choices(choice, recipes, categories);
         }
 
-        private static void Choices(string choice, List<Recipe>? recipes, List<Category>? categories)
+        private static void Choices(string choice, List<Recipe> recipes, List<Category> categories)
         {
+            ArgumentNullException.ThrowIfNull(choice);
+            ArgumentNullException.ThrowIfNull(recipes);
+            ArgumentNullException.ThrowIfNull(categories);
+
             AnsiConsole.Clear();
             switch (choice)
             {

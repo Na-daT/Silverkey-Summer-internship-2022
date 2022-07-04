@@ -33,12 +33,13 @@ namespace RecipesExercise1
 
         public static async Task<List<Recipe>?> Load(List<Category>? categories)
         {
+            ArgumentNullException.ThrowIfNull(categories);
             try
             {
                 string text = await FileHandler.ReadAsync(_fileName);
                 var recipes = await JsonHandler.DeserializeAsync<List<Recipe>?>(text);
 
-                if (recipes is not null && categories is not null)
+                if (recipes is not null)
                 {
                     for (int i = 0; i < recipes.Count; i++)
                         for (int j = 0; j < recipes[i].Categories.Count; j++)
@@ -65,42 +66,42 @@ namespace RecipesExercise1
             }
         }
 
-        public static bool AddRecipe(List<Recipe>? recipesList, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
+        public static bool AddRecipe(List<Recipe> recipesList, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
         {
-            if (recipesList is not null)
-            {
-                if (recipesList.Find(x => x.Title == title) != null)
-                    return false;
-                recipesList.Add(new Recipe(Guid.NewGuid(), title, ingredients, instructions, categories));
-                return true;
-            }
-            return false;
+            ArgumentNullException.ThrowIfNull(recipesList);
+            ArgumentNullException.ThrowIfNull(title);
+            ArgumentNullException.ThrowIfNull(ingredients);
+            ArgumentNullException.ThrowIfNull(instructions);
+            ArgumentNullException.ThrowIfNull(categories);
+
+            if (recipesList.Any(x => x.Title == title))
+                return false;
+            recipesList.Add(new Recipe(Guid.NewGuid(), title, ingredients, instructions, categories));
+            return true;
         }
 
         public static void RemoveRecipe(List<Recipe>? recipesList, Guid id)
         {
-            if (recipesList is not null)
-                recipesList.RemoveAll(x => x.Id == id);
+            ArgumentNullException.ThrowIfNull(recipesList);
+            recipesList.RemoveAll(x => x.Id == id);
         }
 
-        public static void UpdateRecipe(List<Recipe>? recipesList, Guid id, bool removeIngredients, bool removeInstructions, string? title = null, List<string>? ingredients = null, List<string>? instructions = null, List<Category>? categories = null)
+        public static void UpdateRecipe(List<Recipe> recipesList, Guid id, bool removeIngredients, bool removeInstructions, string? title = null, List<string>? ingredients = null, List<string>? instructions = null, List<Category>? categories = null)
         {
-            if (recipesList is not null)
-            {
-                var recipe = recipesList.First(x => x.Id == id);
+            ArgumentNullException.ThrowIfNull(recipesList);
 
-                if (title is not null)
-                    recipe.Title = title;
+            var recipe = recipesList.First(x => x.Id == id);
+            if (title is not null)
+                recipe.Title = title;
 
-                if (ingredients is not null)
-                    recipe.Ingredients.AddRange(ingredients);
+            if (ingredients is not null)
+                recipe.Ingredients.AddRange(ingredients);
 
-                if (instructions is not null)
-                    recipe.Instructions.AddRange(instructions);
+            if (instructions is not null)
+                recipe.Instructions.AddRange(instructions);
 
-                if (categories is not null)
-                    recipe.Categories = categories;
-            }
+            if (categories is not null)
+                recipe.Categories = categories;
         }
     }
 }
