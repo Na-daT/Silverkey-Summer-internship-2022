@@ -246,7 +246,7 @@ namespace RecipesExercise1
                     AnsiConsole.Write(new Panel("[mediumpurple]Add Category[/]"));
                     var newName = AskNewName("category");
                     if (Category.AddCategory(categories, newName))
-                        AnsiConsole.Write(new Panel("[green]Category updated successfully![/] \n[grey]Press any key to return to main menu[/]"));
+                        AnsiConsole.Write(new Panel("[green]Category Added successfully![/] \n[grey]Press any key to return to main menu[/]"));
                     else
                         AnsiConsole.Write(new Panel("[Red]Category already exists![/] \n[grey]Press any key to return to main menu[/]"));
                     AnsiConsole.Console.Input.ReadKey(true);
