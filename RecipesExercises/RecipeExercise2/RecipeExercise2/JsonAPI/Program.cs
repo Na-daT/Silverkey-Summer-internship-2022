@@ -10,7 +10,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -115,7 +114,7 @@ app.MapPut("api/json/update-category", async ([FromBody] Category categoryToUpda
     }
 });
 
-app.Run($"http://localhost:{port}");
+app.Run();
 
 // public record Category(Guid id, string name);
 // public record Recipe(Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories);
