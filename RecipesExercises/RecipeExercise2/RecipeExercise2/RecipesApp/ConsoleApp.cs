@@ -5,7 +5,7 @@ using System.Text;
 using System.Net;
 using System;
 using System.Collections.Generic;
-
+using System.Configuration;
 
 namespace RecipesApp
 {
@@ -17,7 +17,7 @@ namespace RecipesApp
         public ConsoleApp()
         {
             httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri("http://localhost:3000/api/json/");
+            httpClient.BaseAddress = new Uri(System.Configuration.ConfigurationManager.AppSettings["url"]);
             ui = new UI();
         }
 
