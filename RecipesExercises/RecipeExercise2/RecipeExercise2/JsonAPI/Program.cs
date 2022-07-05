@@ -21,10 +21,10 @@ var options = new JsonSerializerOptions
     WriteIndented = true,
 };
 
-app.MapGet("api/json/{fileName}", async (string fileName) =>
+app.MapGet("api/json/{fileName}", async Task<string> (string fileName) =>
 {
-    var result = await File.ReadAllTextAsync(fileName + ".json");
-    return Results.Ok(result);
+    var jsonFile = fileName + ".json";
+    return await File.ReadAllTextAsync(jsonFile);
 });
 
 app.MapPost("api/json/add-recipe", async ([FromBody] Recipe recipeToPost) =>
@@ -38,31 +38,26 @@ app.MapPost("api/json/add-recipe", async ([FromBody] Recipe recipeToPost) =>
         await FileHandler.WriteAsync("recipe.json", json);
         return Results.Ok();
     }
-    catch (Exception e)
+    catch
     {
-        //Console.Log(e.Message);
         return Results.NotFound();
     }
 });
 
-app.MapPut("api/json/update-recipe/{id}", async ([FromBody] Recipe recipeToUpdate) =>
+app.MapPut("api/json/update-recipe", async ([FromBody] Recipe recipeToUpdate) =>
 {
     try
     {
         var recipes = await File.ReadAllTextAsync("recipe.json");
         var recipesList = JsonSerializer.Deserialize<List<Recipe>>(recipes, options);
         var recipe = recipesList.FirstOrDefault(x => x.Id == recipeToUpdate.Id);
-        if (recipe != null)
-        {
-            recipe = recipeToUpdate;
-        }
+        recipesList[recipesList.IndexOf(recipe)] = recipeToUpdate;
         var json = JsonSerializer.Serialize(recipesList, options);
         await File.WriteAllTextAsync("recipe.json", json);
         return Results.Ok();
     }
-    catch (Exception e)
+    catch
     {
-        //Console.WriteLine(e.Message);
         return Results.NotFound();
     }
 });
@@ -74,17 +69,13 @@ app.MapDelete("api/json/delete-recipe/{id}", async ([FromBody] Guid id) =>
         var recipes = await File.ReadAllTextAsync("recipe.json");
         var recipesList = JsonSerializer.Deserialize<List<Recipe>>(recipes, options);
         var recipe = recipesList.FirstOrDefault(x => x.Id == id);
-        if (recipe != null)
-        {
-            recipesList.Remove(recipe);
-        }
+        recipesList.Remove(recipe);
         var json = JsonSerializer.Serialize(recipesList, options);
         await File.WriteAllTextAsync("recipe.json", json);
         return Results.Ok();
     }
-    catch (Exception e)
+    catch
     {
-        Console.WriteLine(e.Message);
         return Results.NotFound();
     }
 });
@@ -100,31 +91,26 @@ app.MapPost("api/json/add-category", async ([FromBody] Category categoryToPost) 
         await File.WriteAllTextAsync("category.json", json);
         return Results.Ok();
     }
-    catch (Exception e)
+    catch
     {
-        Console.WriteLine(e.Message);
         return Results.NotFound();
     }
 });
 
-app.MapPut("api/json/update-category/{id}", async ([FromBody] Category categoryToUpdate) =>
+app.MapPut("api/json/update-category", async ([FromBody] Category categoryToUpdate) =>
 {
     try
     {
         var categories = await File.ReadAllTextAsync("category.json");
         var categoriesList = JsonSerializer.Deserialize<List<Category>>(categories, options);
         var category = categoriesList.FirstOrDefault(x => x.Id == categoryToUpdate.Id);
-        if (category != null)
-        {
-            category = categoryToUpdate;
-        }
+        category.Name = categoryToUpdate.Name;
         var json = JsonSerializer.Serialize(categoriesList, options);
         await File.WriteAllTextAsync("category.json", json);
         return Results.Ok();
     }
-    catch (Exception e)
+    catch
     {
-        //Console.WriteLine(e.Message);
         return Results.NotFound();
     }
 });
