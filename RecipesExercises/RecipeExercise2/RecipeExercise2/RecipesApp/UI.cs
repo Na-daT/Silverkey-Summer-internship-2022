@@ -183,6 +183,8 @@ namespace RecipesApp
 
         public Recipe? UpdateRecipe(Recipe? recipe, List<Category>? categories)
         {
+            ArgumentNullException.ThrowIfNull(recipe);
+            ArgumentNullException.ThrowIfNull(categories);
             AnsiConsole.Write(new Panel("[mediumpurple]  Update exisitng recipe  [/]"));
             return UpdatePrompt(recipe, categories);
         }

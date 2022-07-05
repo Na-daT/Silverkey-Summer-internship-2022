@@ -29,6 +29,7 @@ namespace RecipesApp
         public static List<Recipe>? Load(List<Category>? categories, List<Recipe>? recipes)
         {
             ArgumentNullException.ThrowIfNull(categories);
+            ArgumentNullException.ThrowIfNull(recipes);
 
             for (int i = 0; i < recipes.Count; i++)
                 for (int j = 0; j < recipes[i].Categories.Count; j++)
