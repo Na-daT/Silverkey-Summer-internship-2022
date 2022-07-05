@@ -15,7 +15,6 @@ public static class JsonHandler
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     WriteIndented = true,
-                    ReferenceHandler = ReferenceHandler.Preserve,
                 };
                 await JsonSerializer.SerializeAsync(stream, obj, options);
                 stream.Position = 0;
@@ -41,7 +40,7 @@ public static class JsonHandler
             {
                 WriteIndented = true,
                 PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
             T? objects =
                 await JsonSerializer.DeserializeAsync<T>(stream, options);
