@@ -17,7 +17,7 @@ namespace RecipesApp
         public ConsoleApp()
         {
             httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(System.Configuration.ConfigurationManager.AppSettings["url"]);
+            httpClient.BaseAddress = new Uri("http://localhost:3000/api/json/");
             ui = new UI();
         }
 
