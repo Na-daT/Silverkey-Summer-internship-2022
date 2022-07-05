@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using System;
+using System.Collections.Generic;
+//using System.Web.Http.Results;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -9,82 +11,85 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
-// app.UseSwagger();
-// app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 var options = new JsonSerializerOptions
 {
     PropertyNameCaseInsensitive = true,
     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     WriteIndented = true,
-    ReferenceHandler = ReferenceHandler.Preserve,
 };
 
-app.MapGet("api/json/{fileName}", async Task<string> (string fileName) =>
+app.MapGet("api/json/{fileName}", async (string fileName) =>
 {
-    return await File.ReadAllTextAsync(fileName + ".json");
+    var result = await File.ReadAllTextAsync(fileName + ".json");
+    return Results.Ok(result);
 });
 
-app.MapPost("api/json/addrecipe", async Task<bool> (Recipe recipeToPost) =>
+app.MapPost("api/json/add-recipe", async ([FromBody] Recipe recipeToPost) =>
 {
     try
     {
-        var recipes = await File.ReadAllTextAsync("recipe.json");
-        var recipesList = JsonSerializer.Deserialize<List<Recipe>>(recipes, options);
+        var recipes = await FileHandler.ReadAsync("recipe.json");
+        var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         recipesList.Add(recipeToPost);
-        var json = JsonSerializer.Serialize(recipesList, options);
-        await File.WriteAllTextAsync("recipe.json", json);
-        return true;
+        var json = await JsonHandler.SerializeAsync(recipesList);
+        await FileHandler.WriteAsync("recipe.json", json);
+        return Results.Ok();
     }
-    catch
+    catch (Exception e)
     {
-        return false;
+        //Console.Log(e.Message);
+        return Results.NotFound();
     }
 });
 
-app.MapPut("api/json/updaterecipe/{id}", async Task<bool> (Guid id, Recipe recipeToUpdate) =>
+app.MapPut("api/json/update-recipe/{id}", async ([FromBody] Recipe recipeToUpdate) =>
 {
     try
     {
         var recipes = await File.ReadAllTextAsync("recipe.json");
         var recipesList = JsonSerializer.Deserialize<List<Recipe>>(recipes, options);
-        var recipe = recipesList.FirstOrDefault(x => x.id == id);
+        var recipe = recipesList.FirstOrDefault(x => x.Id == recipeToUpdate.Id);
         if (recipe != null)
         {
             recipe = recipeToUpdate;
         }
         var json = JsonSerializer.Serialize(recipesList, options);
         await File.WriteAllTextAsync("recipe.json", json);
-        return true;
+        return Results.Ok();
     }
-    catch
+    catch (Exception e)
     {
-        return false;
+        //Console.WriteLine(e.Message);
+        return Results.NotFound();
     }
 });
 
-app.MapDelete("api/json/deleterecipe/{id}", async Task<bool> (Guid id) =>
+app.MapDelete("api/json/delete-recipe/{id}", async ([FromBody] Guid id) =>
 {
     try
     {
         var recipes = await File.ReadAllTextAsync("recipe.json");
         var recipesList = JsonSerializer.Deserialize<List<Recipe>>(recipes, options);
-        var recipe = recipesList.FirstOrDefault(x => x.id == id);
+        var recipe = recipesList.FirstOrDefault(x => x.Id == id);
         if (recipe != null)
         {
             recipesList.Remove(recipe);
         }
         var json = JsonSerializer.Serialize(recipesList, options);
         await File.WriteAllTextAsync("recipe.json", json);
-        return true;
+        return Results.Ok();
     }
-    catch
+    catch (Exception e)
     {
-        return false;
+        Console.WriteLine(e.Message);
+        return Results.NotFound();
     }
 });
 
-app.MapPost("api/json/addcategory", async Task<bool> (Category categoryToPost) =>
+app.MapPost("api/json/add-category", async ([FromBody] Category categoryToPost) =>
 {
     try
     {
@@ -93,37 +98,38 @@ app.MapPost("api/json/addcategory", async Task<bool> (Category categoryToPost) =
         categoriesList.Add(categoryToPost);
         var json = JsonSerializer.Serialize(categoriesList, options);
         await File.WriteAllTextAsync("category.json", json);
-        return true;
+        return Results.Ok();
     }
-    catch
+    catch (Exception e)
     {
-        return false;
+        Console.WriteLine(e.Message);
+        return Results.NotFound();
     }
 });
 
-app.MapPut("api/json/updatecategory/{id}", async Task<bool> (Guid id, Category categoryToUpdate) =>
+app.MapPut("api/json/update-category/{id}", async ([FromBody] Category categoryToUpdate) =>
 {
     try
     {
         var categories = await File.ReadAllTextAsync("category.json");
         var categoriesList = JsonSerializer.Deserialize<List<Category>>(categories, options);
-        var category = categoriesList.FirstOrDefault(x => x.id == id);
+        var category = categoriesList.FirstOrDefault(x => x.Id == categoryToUpdate.Id);
         if (category != null)
         {
             category = categoryToUpdate;
         }
         var json = JsonSerializer.Serialize(categoriesList, options);
         await File.WriteAllTextAsync("category.json", json);
-        return true;
+        return Results.Ok();
     }
-    catch
+    catch (Exception e)
     {
-        return false;
+        //Console.WriteLine(e.Message);
+        return Results.NotFound();
     }
 });
 
 app.Run($"http://localhost:{port}");
 
-
-public record Recipe(Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories);
-public record Category(Guid id, string name);
+// public record Category(Guid id, string name);
+// public record Recipe(Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories);
