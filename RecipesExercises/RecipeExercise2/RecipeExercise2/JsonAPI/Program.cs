@@ -4,14 +4,12 @@ using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Web.Http;
-//using System.Web.Http.Results;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 builder.Logging.AddConsole();
-
 
 var app = builder.Build();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
@@ -28,7 +26,7 @@ var options = new JsonSerializerOptions
 app.MapGet("api/json/{fileName}", async Task<string> (string fileName) =>
 {
     var jsonFile = fileName + ".json";
-    return await File.ReadAllTextAsync(jsonFile);
+    return await FileHandler.ReadAsync(jsonFile);
 });
 
 app.MapPost("api/json/add-recipe", async ([FromBody] Recipe recipeToPost) =>
@@ -79,6 +77,10 @@ app.MapDelete("api/json/delete-recipe/{id}", async (Guid id) =>
         var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         var recipe = recipesList.FirstOrDefault(x => x.Id == id);
+        if (recipe == null)
+        {
+            return Results.StatusCode(404);
+        }
         recipesList.Remove(recipe);
         var json = await JsonHandler.SerializeAsync(recipesList);
         await FileHandler.WriteAsync("recipe.json", json);
@@ -129,6 +131,3 @@ app.MapPut("api/json/update-category", async ([FromBody] Category categoryToUpda
 });
 
 app.Run($"http://localhost:{port}");
-
-// public record Category(Guid id, string name);
-// public record Recipe(Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories);
