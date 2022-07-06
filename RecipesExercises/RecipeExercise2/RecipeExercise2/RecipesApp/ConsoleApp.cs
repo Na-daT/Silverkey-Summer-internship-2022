@@ -33,11 +33,14 @@ namespace RecipesApp
 
         public async Task<List<Category>?> GetCategoriesAsync() => await httpClient.GetFromJsonAsync<List<Category>>("category");
 
-        public async Task<List<Recipe>?> GetRecipesAsync()
+        public async Task<List<Recipe>> GetRecipesAsync()
         {
             var categoriesList = await GetCategoriesAsync();
             var recipesList = await httpClient.GetFromJsonAsync<List<Recipe>>("recipe");
-            return Recipe.Load(categoriesList, recipesList);
+            var recipes = Recipe.Load(categoriesList, recipesList);
+            if (recipes is null)
+                ArgumentNullException.ThrowIfNull(recipes);
+            return recipes;
         }
 
         public async Task RunMain()
@@ -56,9 +59,9 @@ namespace RecipesApp
                         break;
                     case "Add recipe":
                         categoriesList = await GetCategoriesAsync();
-                        if (categoriesList.Any())
+                        if (categoriesList!.Any())
                         {
-                            Recipe recipeToBeAdded = ui.AddRecipe(categoriesList);
+                            Recipe recipeToBeAdded = ui.AddRecipe(categoriesList!);
                             var response = await AddRecipeAsync(recipeToBeAdded);
                             if (response.IsSuccessStatusCode)
                             {
@@ -112,7 +115,7 @@ namespace RecipesApp
                         break;
                     case "Add Category":
                         Category categoryTobeAdded = ui.AddCategory();
-                        if (categoriesList.Any(x => x.Name == categoryTobeAdded.Name))
+                        if (categoriesList!.Any(x => x.Name == categoryTobeAdded.Name))
                             ui.ErrorMessage("Category already exists!");
                         else
                         {
@@ -129,9 +132,9 @@ namespace RecipesApp
                         break;
                     case "Update Category":
                         categoriesList = await GetCategoriesAsync();
-                        if (categoriesList.Any())
+                        if (categoriesList!.Any())
                         {
-                            Category categoryToBeUpdated = ui.PickCategory(categoriesList);
+                            Category categoryToBeUpdated = ui.PickCategory(categoriesList!);
                             categoryToBeUpdated = ui.UpdateCategory(categoryToBeUpdated);
                             var response = await UpdateCategoryAsync(categoryToBeUpdated);
                             if (response.IsSuccessStatusCode)

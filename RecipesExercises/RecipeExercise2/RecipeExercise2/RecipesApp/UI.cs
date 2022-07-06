@@ -58,19 +58,18 @@ namespace RecipesApp
             return;
         }
 
-        public Recipe? PickRecipe(List<Recipe> recipes)
+        public Recipe PickRecipe(List<Recipe> recipes)
         {
             ArgumentNullException.ThrowIfNull(recipes);
-
             AnsiConsole.Clear();
             string choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                  .Title("[bold white on black]Pick a recipe[/]")
                     .AddChoices(recipes.Select(r => r.Title.ToString())));
-            return recipes.FirstOrDefault(r => r.Title.ToString() == choice);
+            return recipes.FirstOrDefault(r => r.Title.ToString() == choice)!;
         }
 
-        public Category? PickCategory(List<Category> categories)
+        public Category PickCategory(List<Category> categories)
         {
             ArgumentNullException.ThrowIfNull(categories);
 
@@ -80,7 +79,7 @@ namespace RecipesApp
             var categoryName = AnsiConsole.Prompt(
                 new SelectionPrompt<string>().Title("Pick a category:").AddChoices(availableCategoriesNames)
             );
-            return categories.Find(x => x.Name == categoryName);
+            return categories.Find(x => x.Name == categoryName)!;
         }
 
         private List<Category> PickMulCategory(List<Category> givenCategories)
@@ -192,7 +191,7 @@ namespace RecipesApp
             return new Recipe(Guid.NewGuid(), pickedName, pickedIngredients, pickedInstructions, pickedCategories);
         }
 
-        public Recipe? UpdateRecipe(Recipe? recipe, List<Category>? categories)
+        public Recipe UpdateRecipe(Recipe? recipe, List<Category>? categories)
         {
             ArgumentNullException.ThrowIfNull(recipe);
             ArgumentNullException.ThrowIfNull(categories);
