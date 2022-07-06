@@ -6,10 +6,8 @@ public static class FileHandler
         if (!File.Exists(fileName) || new FileInfo(fileName).Length == 0)
         {
             await File.WriteAllTextAsync(fileName, "[]");
-            return "[]";
         }
-        string openStream = await File.ReadAllTextAsync(fileName);
-        return openStream;
+        return await File.ReadAllTextAsync(fileName);
     }
 
     public static async Task<bool> WriteAsync(string fileName, string? json)
