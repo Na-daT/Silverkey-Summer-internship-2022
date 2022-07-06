@@ -3,7 +3,7 @@ public static class FileHandler
 {
     public static async Task<string> ReadAsync(string fileName)
     {
-        if (!File.Exists(fileName))
+        if (!File.Exists(fileName) || new FileInfo(fileName).Length == 0)
         {
             await File.WriteAllTextAsync(fileName, "[]");
             return "[]";
