@@ -1,6 +1,4 @@
 using Spectre.Console;
-using System;
-using System.Linq;
 
 namespace RecipesApp;
 public class UI
