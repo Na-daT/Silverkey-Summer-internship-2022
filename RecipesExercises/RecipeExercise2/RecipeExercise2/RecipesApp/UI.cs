@@ -1,5 +1,6 @@
 using Spectre.Console;
 using System;
+using System.Linq;
 
 namespace RecipesApp
 {
@@ -36,9 +37,8 @@ namespace RecipesApp
         public void ListRecipes(List<Recipe>? recipesList)
         {
             ArgumentNullException.ThrowIfNull(recipesList);
-
+            AnsiConsole.Clear();
             AnsiConsole.Write(new FigletText("List of recipes").Centered().Color(Color.LightSlateBlue));
-
             var table = new Table();
             table.Expand();
             table.Border(TableBorder.Heavy);
@@ -58,8 +58,11 @@ namespace RecipesApp
             return;
         }
 
-        public Recipe? PickRecipe(List<Recipe>? recipes)
+        public Recipe? PickRecipe(List<Recipe> recipes)
         {
+            ArgumentNullException.ThrowIfNull(recipes);
+
+            AnsiConsole.Clear();
             string choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                  .Title("[bold white on black]Pick a recipe[/]")
@@ -120,22 +123,21 @@ namespace RecipesApp
             return list;
         }
 
-        public Recipe UpdatePrompt(Recipe? recipe, List<Category> categories)
+        public Recipe UpdatePrompt(Recipe recipe, List<Category> categories)
         {
             ArgumentNullException.ThrowIfNull(recipe);
             ArgumentNullException.ThrowIfNull(categories);
-
             AnsiConsole.Clear();
             string choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                 .Title("[underline bold black on white]What would you like to update?[/]")
+                 .Title("What would you like to [hotpink3]update?[/]")
                     .AddChoices(new[] {
                         "Name",
                         "Add ingredients",
                         "Remove all ingredients",
                         "Add instructions",
                         "Remove all instructions",
-                        "Edit categories",
+                        "Add categories",
                         "Cancel"
                     }));
             switch (choice)
@@ -159,8 +161,16 @@ namespace RecipesApp
                     recipe.Instructions.Clear();
                     break;
                 case "Add categories":
-                    var UpdatedCategories = PickMulCategory(categories);
-                    recipe.Categories.AddRange(UpdatedCategories);
+                    var RestOfCategories = new List<Category>();
+                    foreach (Category category in categories)
+                    {
+                        if (recipe.Categories.FirstOrDefault(x => x.Id == category.Id) is null)
+                            RestOfCategories.Add(category);
+                    }
+                    AnsiConsole.Write(new Panel("RestOfCategories: " + RestOfCategories.Count));
+                    AnsiConsole.Console.Input.ReadKey(true);
+                    var categoriesToAdd = PickMulCategory(RestOfCategories);
+                    recipe.Categories.AddRange(categoriesToAdd);
                     break;
                 case "Cancel":
                     AnsiConsole.Clear();
@@ -173,6 +183,7 @@ namespace RecipesApp
 
         public Recipe AddRecipe(List<Category> categories)
         {
+            AnsiConsole.Clear();
             AnsiConsole.Write(new Panel("[mediumpurple]  Add new Recipe  [/]"));
             var pickedName = AskNewName("recipe");
             var pickedIngredients = GetList("ingredient");
@@ -185,12 +196,15 @@ namespace RecipesApp
         {
             ArgumentNullException.ThrowIfNull(recipe);
             ArgumentNullException.ThrowIfNull(categories);
+            AnsiConsole.Clear();
             AnsiConsole.Write(new Panel("[mediumpurple]  Update exisitng recipe  [/]"));
-            return UpdatePrompt(recipe, categories);
+            var updatedRecipe = UpdatePrompt(recipe, categories);
+            return updatedRecipe;
         }
 
         public Category AddCategory()
         {
+            AnsiConsole.Clear();
             AnsiConsole.Write(new Panel("[mediumpurple]  Add new Category  [/]"));
             var pickedName = AskNewName("category");
             return new Category(pickedName);
@@ -198,6 +212,7 @@ namespace RecipesApp
 
         public Category UpdateCategory(Category category)
         {
+            AnsiConsole.Clear();
             AnsiConsole.Write(new Panel("[mediumpurple]Update Category[/]"));
             var newName = AskNewName("category");
             category.Name = newName;
@@ -206,6 +221,7 @@ namespace RecipesApp
 
         public void EndScreen()
         {
+            AnsiConsole.Clear();
             AnsiConsole.Write(new Panel("[bold yellow on white]Goodbye![/]"));
             AnsiConsole.Console.Input.ReadKey(true);
         }
