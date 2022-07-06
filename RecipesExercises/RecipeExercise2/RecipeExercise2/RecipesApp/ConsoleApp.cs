@@ -21,21 +21,21 @@ namespace RecipesApp
             ui = new UI();
         }
 
-        public async Task<HttpResponseMessage> AddRecipe(Recipe recipe) => await httpClient.PostAsJsonAsync("add-recipe", recipe);
+        public async Task<HttpResponseMessage> AddRecipeAsync(Recipe recipe) => await httpClient.PostAsJsonAsync("add-recipe", recipe);
 
-        public async Task<HttpResponseMessage> UpdateRecipe(Recipe recipe) => await httpClient.PutAsJsonAsync($"update-recipe", recipe);
+        public async Task<HttpResponseMessage> UpdateRecipeAsync(Recipe recipe) => await httpClient.PutAsJsonAsync($"update-recipe", recipe);
 
-        public async Task<HttpResponseMessage> DeleteRecipe(Guid id) => await httpClient.DeleteAsync($"delete-recipe/{id}");
+        public async Task<HttpResponseMessage> DeleteRecipeAsync(Guid id) => await httpClient.DeleteAsync($"delete-recipe/{id}");
 
-        public async Task<HttpResponseMessage> AddCategory(Category category) => await httpClient.PostAsJsonAsync("add-category", category);
+        public async Task<HttpResponseMessage> AddCategoryAsync(Category category) => await httpClient.PostAsJsonAsync("add-category", category);
 
-        public async Task<HttpResponseMessage> UpdateCategory(Category category) => await httpClient.PutAsJsonAsync($"update-category", category);
+        public async Task<HttpResponseMessage> UpdateCategoryAsync(Category category) => await httpClient.PutAsJsonAsync($"update-category", category);
 
-        public async Task<List<Category>?> GetCategories() => await httpClient.GetFromJsonAsync<List<Category>>("category");
+        public async Task<List<Category>?> GetCategoriesAsync() => await httpClient.GetFromJsonAsync<List<Category>>("category");
 
-        public async Task<List<Recipe>?> GetRecipes()
+        public async Task<List<Recipe>?> GetRecipesAsync()
         {
-            var categoriesList = await GetCategories();
+            var categoriesList = await GetCategoriesAsync();
             var recipesList = await httpClient.GetFromJsonAsync<List<Recipe>>("recipe");
             return Recipe.Load(categoriesList, recipesList);
         }
@@ -51,15 +51,15 @@ namespace RecipesApp
                 switch (choice)
                 {
                     case "List recipes":
-                        recipesList = await GetRecipes();
+                        recipesList = await GetRecipesAsync();
                         ui.ListRecipes(recipesList);
                         break;
                     case "Add recipe":
-                        categoriesList = await GetCategories();
+                        categoriesList = await GetCategoriesAsync();
                         if (categoriesList.Any())
                         {
                             Recipe recipeToBeAdded = ui.AddRecipe(categoriesList);
-                            var response = await AddRecipe(recipeToBeAdded);
+                            var response = await AddRecipeAsync(recipeToBeAdded);
                             if (response.IsSuccessStatusCode)
                             {
                                 ui.SuccessMessage("Recipe added successfully");
@@ -73,11 +73,11 @@ namespace RecipesApp
                         { ui.ErrorMessage("You need to add a Category first!"); }
                         break;
                     case "Remove recipe":
-                        recipesList = await GetRecipes();
+                        recipesList = await GetRecipesAsync();
                         if (recipesList.Any())
                         {
                             Guid idToBeRemoved = ui.PickRecipe(recipesList).Id;
-                            HttpResponseMessage response = await DeleteRecipe(idToBeRemoved);
+                            HttpResponseMessage response = await DeleteRecipeAsync(idToBeRemoved);
                             if (response.IsSuccessStatusCode)
                             {
                                 ui.SuccessMessage("Recipe removed successfully");
@@ -91,13 +91,13 @@ namespace RecipesApp
                         { ui.ErrorMessage("You need to add a recipe first!"); }
                         break;
                     case "Update recipe":
-                        recipesList = await GetRecipes();
-                        categoriesList = await GetCategories();
+                        recipesList = await GetRecipesAsync();
+                        categoriesList = await GetCategoriesAsync();
                         if (recipesList.Any())
                         {
                             Recipe recipeToBeUpdated = ui.PickRecipe(recipesList);
                             recipeToBeUpdated = ui.UpdateRecipe(recipeToBeUpdated, categoriesList);
-                            var response = await UpdateRecipe(recipeToBeUpdated);
+                            var response = await UpdateRecipeAsync(recipeToBeUpdated);
                             if (response.IsSuccessStatusCode)
                             {
                                 ui.SuccessMessage("Recipe updated successfully");
@@ -116,7 +116,7 @@ namespace RecipesApp
                             ui.ErrorMessage("Category already exists!");
                         else
                         {
-                            var response = await AddCategory(categoryTobeAdded);
+                            var response = await AddCategoryAsync(categoryTobeAdded);
                             if (response.IsSuccessStatusCode)
                             {
                                 ui.SuccessMessage("Category added successfully");
@@ -128,12 +128,12 @@ namespace RecipesApp
                         }
                         break;
                     case "Update Category":
-                        categoriesList = await GetCategories();
+                        categoriesList = await GetCategoriesAsync();
                         if (categoriesList.Any())
                         {
                             Category categoryToBeUpdated = ui.PickCategory(categoriesList);
                             categoryToBeUpdated = ui.UpdateCategory(categoryToBeUpdated);
-                            var response = await UpdateCategory(categoryToBeUpdated);
+                            var response = await UpdateCategoryAsync(categoryToBeUpdated);
                             if (response.IsSuccessStatusCode)
                             {
                                 ui.SuccessMessage("Category updated successfully");
