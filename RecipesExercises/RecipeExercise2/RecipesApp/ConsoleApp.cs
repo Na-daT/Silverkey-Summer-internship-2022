@@ -38,8 +38,7 @@ namespace RecipesApp
             var categoriesList = await GetCategoriesAsync();
             var recipesList = await httpClient.GetFromJsonAsync<List<Recipe>>("recipe");
             var recipes = Recipe.Load(categoriesList, recipesList);
-            if (recipes is null)
-                ArgumentNullException.ThrowIfNull(recipes);
+            ArgumentNullException.ThrowIfNull(recipes);
             return recipes;
         }
 
@@ -59,7 +58,8 @@ namespace RecipesApp
                         break;
                     case "Add recipe":
                         categoriesList = await GetCategoriesAsync();
-                        if (categoriesList!.Any())
+                        ArgumentNullException.ThrowIfNull(categoriesList);
+                        if (categoriesList.Any())
                         {
                             Recipe recipeToBeAdded = ui.AddRecipe(categoriesList!);
                             var response = await AddRecipeAsync(recipeToBeAdded);
@@ -115,7 +115,9 @@ namespace RecipesApp
                         break;
                     case "Add Category":
                         Category categoryTobeAdded = ui.AddCategory();
-                        if (categoriesList!.Any(x => x.Name == categoryTobeAdded.Name))
+                        categoriesList = await GetCategoriesAsync();
+                        ArgumentNullException.ThrowIfNull(categoriesList);
+                        if (categoriesList.Any(x => x.Name == categoryTobeAdded.Name))
                             ui.ErrorMessage("Category already exists!");
                         else
                         {
@@ -132,7 +134,8 @@ namespace RecipesApp
                         break;
                     case "Update Category":
                         categoriesList = await GetCategoriesAsync();
-                        if (categoriesList!.Any())
+                        ArgumentNullException.ThrowIfNull(categoriesList);
+                        if (categoriesList.Any())
                         {
                             Category categoryToBeUpdated = ui.PickCategory(categoriesList!);
                             categoryToBeUpdated = ui.UpdateCategory(categoryToBeUpdated);
