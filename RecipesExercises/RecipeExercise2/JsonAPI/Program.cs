@@ -28,9 +28,8 @@ app.MapPost("api/json/add-recipe", async ([FromBody] Recipe recipeToPost) =>
     {
         var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
-        ArgumentNullException.ThrowIfNull(recipesList);
-        recipesList.Add(recipeToPost);
-        var json = await JsonHandler.SerializeAsync(recipesList);
+        recipesList!.Add(recipeToPost);
+        var json = await JsonHandler.SerializeAsync(recipesList!);
         await FileHandler.WriteAsync("recipe.json", json);
         return Results.Ok();
     }
@@ -47,12 +46,11 @@ app.MapPut("api/json/update-recipe", async ([FromBody] Recipe recipeToUpdate) =>
     {
         var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
-        ArgumentNullException.ThrowIfNull(recipesList);
-        var recipe = recipesList.FirstOrDefault(x => x.Id == recipeToUpdate.Id);
+        var recipe = recipesList!.FirstOrDefault(x => x.Id == recipeToUpdate.Id);
         if (recipe is null)
             return Results.StatusCode(404);
-        recipesList[recipesList.IndexOf(recipe)] = recipeToUpdate;
-        var json = await JsonHandler.SerializeAsync(recipesList);
+        recipesList![recipesList.IndexOf(recipe)] = recipeToUpdate;
+        var json = await JsonHandler.SerializeAsync(recipesList!);
         await FileHandler.WriteAsync("recipe.json", json);
         return Results.Ok();
     }
@@ -69,11 +67,10 @@ app.MapDelete("api/json/delete-recipe/{id}", async (Guid id) =>
     {
         var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
-        ArgumentNullException.ThrowIfNull(recipesList);
-        var recipe = recipesList.FirstOrDefault(x => x.Id == id);
+        var recipe = recipesList!.FirstOrDefault(x => x.Id == id);
         if (recipe is null)
             return Results.StatusCode(404);
-        recipesList.Remove(recipe);
+        recipesList!.Remove(recipe);
         var json = await JsonHandler.SerializeAsync(recipesList);
         await FileHandler.WriteAsync("recipe.json", json);
         return Results.Ok();
@@ -91,8 +88,7 @@ app.MapPost("api/json/add-category", async ([FromBody] Category categoryToPost) 
     {
         var categories = await FileHandler.ReadAsync("category.json");
         var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
-        ArgumentNullException.ThrowIfNull(categoriesList);
-        categoriesList.Add(categoryToPost);
+        categoriesList!.Add(categoryToPost);
         var json = await JsonHandler.SerializeAsync(categoriesList);
         await FileHandler.WriteAsync("category.json", json);
         return Results.Ok();
@@ -110,8 +106,7 @@ app.MapPut("api/json/update-category", async ([FromBody] Category categoryToUpda
     {
         var categories = await FileHandler.ReadAsync("category.json");
         var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
-        ArgumentNullException.ThrowIfNull(categoriesList);
-        var category = categoriesList.FirstOrDefault(x => x.Id == categoryToUpdate.Id);
+        var category = categoriesList!.FirstOrDefault(x => x.Id == categoryToUpdate.Id);
         if (category is null)
             return Results.StatusCode(404);
         category.Name = categoryToUpdate.Name;

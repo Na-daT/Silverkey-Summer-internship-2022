@@ -1,4 +1,3 @@
-
 public static class FileHandler
 {
     public static async Task<string> ReadAsync(string fileName)

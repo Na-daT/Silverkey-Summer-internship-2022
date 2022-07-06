@@ -4,14 +4,13 @@ using System.Web.Http;
 using System.Text;
 using System.Net.Http.Json;
 
-namespace RecipesApp
+namespace RecipesApp;
+class Program
 {
-    class Program
+    static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
-        {
-            var app = new ConsoleApp();
-            await app.RunMain();
-        }
+        var app = new ConsoleApp();
+        await app.RunMain();
     }
 }
+

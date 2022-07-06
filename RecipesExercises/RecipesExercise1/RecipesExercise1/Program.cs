@@ -293,7 +293,7 @@ namespace RecipesExercise1
         private static async Task MainAsync()
         {
             var categories = await Category.Load();
-            var recipes = await Recipe.Load(categories);
+            var recipes = await Recipe.Load(categories!);
 
             AnsiConsole.Write(new FigletText("Welcome!").Centered().Color(Color.LightCoral));
             AnsiConsole.Write(new FigletText("Nada's recipes app!").Centered().Color(Color.Plum1));

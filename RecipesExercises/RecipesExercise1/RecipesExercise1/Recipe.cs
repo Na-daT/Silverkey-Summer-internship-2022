@@ -9,17 +9,14 @@ namespace RecipesExercise1
         private static readonly string _fileName = "recipe.json";
         public Guid Id { get; set; }
         public string Title { get; set; }
-        public List<string> Ingredients { get; set; }
-        public List<string> Instructions { get; set; }
+        public List<string> Ingredients { get; set; } = new List<string>();
+        public List<string> Instructions { get; set; } = new List<string>();
         public List<Category> Categories { get; set; } = new List<Category>();
 
         public Recipe()
         {
             Id = Guid.NewGuid(); // Generate a unique ID for each recipe
             Title = string.Empty;
-            Ingredients = new List<string>();
-            Instructions = new List<string>();
-            Categories = new List<Category>();
         }
 
         public Recipe(Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
@@ -31,7 +28,7 @@ namespace RecipesExercise1
             Categories = categories;
         }
 
-        public static async Task<List<Recipe>?> Load(List<Category>? categories)
+        public static async Task<List<Recipe>?> Load(List<Category> categories)
         {
             ArgumentNullException.ThrowIfNull(categories);
             try
