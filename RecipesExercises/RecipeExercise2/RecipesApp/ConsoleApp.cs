@@ -31,9 +31,13 @@ public class ConsoleApp
     public async Task<List<Recipe>> GetRecipesAsync()
     {
         var categoriesList = await GetCategoriesAsync();
+        if (categoriesList is null)
+            throw new Exception("Could not get categories");
         var recipesList = await _httpClient.GetFromJsonAsync<List<Recipe>>("recipe");
-        var recipes = Recipe.Load(categoriesList!, recipesList!);
-        return recipes!;
+        if (recipesList is null)
+            throw new Exception("Could not deserialize recipes list");
+        var recipes = Recipe.Load(categoriesList, recipesList);
+        return recipes;
     }
 
     public async Task RunMain()
@@ -52,9 +56,11 @@ public class ConsoleApp
                     break;
                 case "Add recipe":
                     categoriesList = await GetCategoriesAsync();
-                    if (categoriesList!.Any())
+                    if (categoriesList is null)
+                        _ui.ErrorMessage("Could not get categories, please try again");
+                    else if (categoriesList.Any())
                     {
-                        Recipe recipeToBeAdded = _ui.AddRecipe(categoriesList!);
+                        Recipe recipeToBeAdded = _ui.AddRecipe(categoriesList);
                         var response = await AddRecipeAsync(recipeToBeAdded);
                         if (response.IsSuccessStatusCode)
                         {
@@ -109,7 +115,9 @@ public class ConsoleApp
                 case "Add Category":
                     Category categoryTobeAdded = _ui.AddCategory();
                     categoriesList = await GetCategoriesAsync();
-                    if (categoriesList!.Any(x => x.Name == categoryTobeAdded.Name))
+                    if (categoriesList is null)
+                        _ui.ErrorMessage("Could not get categories please try again later");
+                    else if (categoriesList.Any(x => x.Name == categoryTobeAdded.Name))
                         _ui.ErrorMessage("Category already exists!");
                     else
                     {
@@ -126,9 +134,11 @@ public class ConsoleApp
                     break;
                 case "Update Category":
                     categoriesList = await GetCategoriesAsync();
-                    if (categoriesList!.Any())
+                    if (categoriesList is null)
+                        _ui.ErrorMessage("Could not get categories please try again later");
+                    else if (categoriesList.Any())
                     {
-                        Category categoryToBeUpdated = _ui.PickCategory(categoriesList!);
+                        Category categoryToBeUpdated = _ui.PickCategory(categoriesList);
                         categoryToBeUpdated = _ui.UpdateCategory(categoryToBeUpdated);
                         var response = await UpdateCategoryAsync(categoryToBeUpdated);
                         if (response.IsSuccessStatusCode)
