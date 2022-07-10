@@ -22,17 +22,17 @@ app.MapGet("api/json/{fileName}", async Task<string> (string fileName) =>
     return await FileHandler.ReadAsync(jsonFile);
 });
 
-app.MapPost("api/json/add-recipe", async ([FromBody] Recipe recipeToPost) =>
+app.MapPost("api/json/recipes", async ([FromBody] Recipe recipeToPost) =>
 {
     try
     {
-        var recipes = await FileHandler.ReadAsync("recipe.json");
+        var recipes = await FileHandler.ReadAsync("recipes.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
             throw new Exception("Could not deserialize recipes list");
         recipesList.Add(recipeToPost);
         var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipe.json", json);
+        await FileHandler.WriteAsync("recipes.json", json);
         return Results.Ok();
     }
     catch (Exception e)
@@ -42,11 +42,11 @@ app.MapPost("api/json/add-recipe", async ([FromBody] Recipe recipeToPost) =>
     }
 });
 
-app.MapPut("api/json/update-recipe", async ([FromBody] Recipe recipeToUpdate) =>
+app.MapPut("api/json/recipes", async ([FromBody] Recipe recipeToUpdate) =>
 {
     try
     {
-        var recipes = await FileHandler.ReadAsync("recipe.json");
+        var recipes = await FileHandler.ReadAsync("recipes.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
             throw new Exception("Could not deserialize recipes list");
@@ -55,7 +55,7 @@ app.MapPut("api/json/update-recipe", async ([FromBody] Recipe recipeToUpdate) =>
             return Results.StatusCode(404);
         recipesList[recipesList.IndexOf(recipe)] = recipeToUpdate;
         var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipe.json", json);
+        await FileHandler.WriteAsync("recipes.json", json);
         return Results.Ok();
     }
     catch (Exception e)
@@ -65,11 +65,11 @@ app.MapPut("api/json/update-recipe", async ([FromBody] Recipe recipeToUpdate) =>
     }
 });
 
-app.MapDelete("api/json/delete-recipe/{id}", async (Guid id) =>
+app.MapDelete("api/json/recipes/{id}", async (Guid id) =>
 {
     try
     {
-        var recipes = await FileHandler.ReadAsync("recipe.json");
+        var recipes = await FileHandler.ReadAsync("recipes.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
             throw new Exception("Could not deserialize recipes list");
@@ -78,7 +78,7 @@ app.MapDelete("api/json/delete-recipe/{id}", async (Guid id) =>
             return Results.StatusCode(404);
         recipesList.Remove(recipe);
         var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipe.json", json);
+        await FileHandler.WriteAsync("recipes.json", json);
         return Results.Ok();
     }
     catch (Exception e)
@@ -88,17 +88,17 @@ app.MapDelete("api/json/delete-recipe/{id}", async (Guid id) =>
     }
 });
 
-app.MapPost("api/json/add-category", async ([FromBody] Category categoryToPost) =>
+app.MapPost("api/json/categories", async ([FromBody] Category categoryToPost) =>
 {
     try
     {
-        var categories = await FileHandler.ReadAsync("category.json");
+        var categories = await FileHandler.ReadAsync("categories.json");
         var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
         if (categoriesList is null)
             throw new Exception("Could not deserialize categories list");
         categoriesList.Add(categoryToPost);
         var json = await JsonHandler.SerializeAsync(categoriesList);
-        await FileHandler.WriteAsync("category.json", json);
+        await FileHandler.WriteAsync("categories.json", json);
         return Results.Ok();
     }
     catch (Exception e)
@@ -108,11 +108,11 @@ app.MapPost("api/json/add-category", async ([FromBody] Category categoryToPost) 
     }
 });
 
-app.MapPut("api/json/update-category", async ([FromBody] Category categoryToUpdate) =>
+app.MapPut("api/json/categories", async ([FromBody] Category categoryToUpdate) =>
 {
     try
     {
-        var categories = await FileHandler.ReadAsync("category.json");
+        var categories = await FileHandler.ReadAsync("categories.json");
         var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
         if (categoriesList is null)
             throw new Exception("Could not deserialize categories list");
@@ -121,7 +121,7 @@ app.MapPut("api/json/update-category", async ([FromBody] Category categoryToUpda
             return Results.StatusCode(404);
         category.Name = categoryToUpdate.Name;
         var json = await JsonHandler.SerializeAsync(categoriesList);
-        await FileHandler.WriteAsync("category.json", json);
+        await FileHandler.WriteAsync("categories.json", json);
         return Results.Ok();
     }
     catch (Exception e)

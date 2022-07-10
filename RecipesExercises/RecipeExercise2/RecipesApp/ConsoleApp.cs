@@ -16,17 +16,17 @@ public class ConsoleApp
         _ui = new UI();
     }
 
-    public async Task<HttpResponseMessage> AddRecipeAsync(Recipe recipe) => await _httpClient.PostAsJsonAsync("add-recipe", recipe);
+    public async Task<HttpResponseMessage> AddRecipeAsync(Recipe recipe) => await _httpClient.PostAsJsonAsync("recipes", recipe);
 
-    public async Task<HttpResponseMessage> UpdateRecipeAsync(Recipe recipe) => await _httpClient.PutAsJsonAsync($"update-recipe", recipe);
+    public async Task<HttpResponseMessage> UpdateRecipeAsync(Recipe recipe) => await _httpClient.PutAsJsonAsync("recipes", recipe);
 
-    public async Task<HttpResponseMessage> DeleteRecipeAsync(Guid id) => await _httpClient.DeleteAsync($"delete-recipe/{id}");
+    public async Task<HttpResponseMessage> DeleteRecipeAsync(Guid id) => await _httpClient.DeleteAsync($"recipes/{id}");
 
-    public async Task<HttpResponseMessage> AddCategoryAsync(Category category) => await _httpClient.PostAsJsonAsync("add-category", category);
+    public async Task<HttpResponseMessage> AddCategoryAsync(Category category) => await _httpClient.PostAsJsonAsync("categories", category);
 
-    public async Task<HttpResponseMessage> UpdateCategoryAsync(Category category) => await _httpClient.PutAsJsonAsync($"update-category", category);
+    public async Task<HttpResponseMessage> UpdateCategoryAsync(Category category) => await _httpClient.PutAsJsonAsync($"categories", category);
 
-    public async Task<List<Category>?> GetCategoriesAsync() => await _httpClient.GetFromJsonAsync<List<Category>>("category");
+    public async Task<List<Category>?> GetCategoriesAsync() => await _httpClient.GetFromJsonAsync<List<Category>>("categories");
 
     public async Task<List<Recipe>> GetRecipesAsync()
     {
