@@ -26,7 +26,7 @@ public class ConsoleApp
 
     public async Task<HttpResponseMessage> UpdateCategoryAsync(Category category) => await _httpClient.PutAsJsonAsync($"categories", category);
 
-    public async Task<List<Category>?> GetCategoriesAsync() => await _httpClient.GetFromJsonAsync<List<Category>>("categories");
+    public async Task<List<Category>?> GetCategoriesAsync() => await _httpClient.GetFromJsonAsync<List<Category>>("category");
 
     public async Task<List<Recipe>> GetRecipesAsync()
     {

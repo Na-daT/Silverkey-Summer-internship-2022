@@ -26,13 +26,13 @@ app.MapPost("api/json/recipes", async ([FromBody] Recipe recipeToPost) =>
 {
     try
     {
-        var recipes = await FileHandler.ReadAsync("recipes.json");
+        var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
             throw new Exception("Could not deserialize recipes list");
         recipesList.Add(recipeToPost);
         var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipes.json", json);
+        await FileHandler.WriteAsync("recipe.json", json);
         return Results.Ok();
     }
     catch (Exception e)
@@ -46,7 +46,7 @@ app.MapPut("api/json/recipes", async ([FromBody] Recipe recipeToUpdate) =>
 {
     try
     {
-        var recipes = await FileHandler.ReadAsync("recipes.json");
+        var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
             throw new Exception("Could not deserialize recipes list");
@@ -55,7 +55,7 @@ app.MapPut("api/json/recipes", async ([FromBody] Recipe recipeToUpdate) =>
             return Results.StatusCode(404);
         recipesList[recipesList.IndexOf(recipe)] = recipeToUpdate;
         var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipes.json", json);
+        await FileHandler.WriteAsync("recipe.json", json);
         return Results.Ok();
     }
     catch (Exception e)
@@ -69,7 +69,7 @@ app.MapDelete("api/json/recipes/{id}", async (Guid id) =>
 {
     try
     {
-        var recipes = await FileHandler.ReadAsync("recipes.json");
+        var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
             throw new Exception("Could not deserialize recipes list");
@@ -78,7 +78,7 @@ app.MapDelete("api/json/recipes/{id}", async (Guid id) =>
             return Results.StatusCode(404);
         recipesList.Remove(recipe);
         var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipes.json", json);
+        await FileHandler.WriteAsync("recipe.json", json);
         return Results.Ok();
     }
     catch (Exception e)
@@ -92,13 +92,13 @@ app.MapPost("api/json/categories", async ([FromBody] Category categoryToPost) =>
 {
     try
     {
-        var categories = await FileHandler.ReadAsync("categories.json");
+        var categories = await FileHandler.ReadAsync("category.json");
         var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
         if (categoriesList is null)
             throw new Exception("Could not deserialize categories list");
         categoriesList.Add(categoryToPost);
         var json = await JsonHandler.SerializeAsync(categoriesList);
-        await FileHandler.WriteAsync("categories.json", json);
+        await FileHandler.WriteAsync("category.json", json);
         return Results.Ok();
     }
     catch (Exception e)
@@ -112,7 +112,7 @@ app.MapPut("api/json/categories", async ([FromBody] Category categoryToUpdate) =
 {
     try
     {
-        var categories = await FileHandler.ReadAsync("categories.json");
+        var categories = await FileHandler.ReadAsync("category.json");
         var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
         if (categoriesList is null)
             throw new Exception("Could not deserialize categories list");
@@ -121,7 +121,7 @@ app.MapPut("api/json/categories", async ([FromBody] Category categoryToUpdate) =
             return Results.StatusCode(404);
         category.Name = categoryToUpdate.Name;
         var json = await JsonHandler.SerializeAsync(categoriesList);
-        await FileHandler.WriteAsync("categories.json", json);
+        await FileHandler.WriteAsync("category.json", json);
         return Results.Ok();
     }
     catch (Exception e)
