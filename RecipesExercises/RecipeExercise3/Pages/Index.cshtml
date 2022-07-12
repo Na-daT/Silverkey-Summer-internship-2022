@@ -4,7 +4,36 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="text-center container">
+    <div class="text-center">
+        <h1 class="display-1">Nada's Recipes</h1>
+        <h2 class="display-4">What would you like to do today?</h2>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row row-cols-sm-2">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <img src="/Images/recipes-min.jpg" class="card-img-top" alt="a sample food image">
+                    <div class="card-body">
+                        <h5 class="card-title">Recipes</h5>
+                        <p class="card-text">View, edit and add your favourite recipes!</p>
+                        <a asp-page="/Recipes" class="btn btn-dark">Recipes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow-sm">
+                    <img src="..." class="card-img-top" alt="sample categories image">
+                    <div class="card-body">
+                        <h5 class="card-title">Categories</h5>
+                        <p class="card-text">View, edit and add different categories!</p>
+                        <a asp-page="/Categories" class="btn btn-dark">Categories</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
