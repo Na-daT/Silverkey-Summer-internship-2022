@@ -30,13 +30,12 @@
                                 Recipes
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-                                <li><a class="dropdown-item" href="#">View recipes</a></li>
-                                <li><a class="dropdown-item" href="#">Edit recipes</a></li>
-                                <li><a class="dropdown-item" href="#">Add new recipe</a></li>
+                                <li><a class="dropdown-item" asp-page="/Recipes/List">View recipes</a></li>
+                                <li><a class="dropdown-item" asp-page="/Recipes/Create">Add new recipe</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-page="/Categories/List">Categories</a>
                         </li>
                     </ul>
                 </div>
