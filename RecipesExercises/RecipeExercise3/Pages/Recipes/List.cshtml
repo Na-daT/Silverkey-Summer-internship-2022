@@ -1,0 +1,77 @@
+@page
+@model RecipesModel
+@{
+    ViewData["Title"] = "Recipes";
+}
+
+<section class="text-center container">
+    <h1 class="display-1">Our Recipes</h1>
+</section>
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            @foreach (var recipe in Model.Recipes)
+            {
+                int index = Model.Recipes.IndexOf(recipe);
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@recipe.Title</h5>
+                            <p class="card-text">Description</p>
+                            <button type="button" class="btn btn-dark" data-bs-toggle="modal"
+                            data-bs-target="#recipe_@index">View</button>
+                            <button type="button" class="btn btn-outline-dark">Edit</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="recipe_@index" tabindex="-1" aria-labelledby="MyModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class=" modal-header">
+                                <h5 class="modal-title" id="MyModalLabel">@recipe.Title</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:10%">#</th>
+                                            <th>Ingredient</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var ingredient in recipe.Ingredients)
+                                        {
+                                            <tr>
+                                                <th>@(recipe.Ingredients.IndexOf(ingredient) + 1)</th>
+                                                <td>@ingredient</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:10%">Step</th>
+                                            <th>Instruction</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var instruction in recipe.Instructions)
+
+                                        {
+                                            <tr>
+                                                <th>@(recipe.Instructions.IndexOf(instruction) + 1)</th>
+                                                <td>@instruction</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
