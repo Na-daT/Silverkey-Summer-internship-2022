@@ -25,6 +25,8 @@ public class CategoriesEditModel : PageModel
         if (categoriesList is null)
             throw new Exception("Could not get categories");
         UpdatedCategory = categoriesList.Find(c => c.Id.ToString() == id);
+        if (UpdatedCategory is null)
+            throw new Exception("Could not find category");
     }
 
     public async Task<IActionResult> OnPostAsync(string id)

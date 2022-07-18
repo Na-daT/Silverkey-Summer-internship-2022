@@ -34,8 +34,15 @@
                                 <li><a class="dropdown-item" asp-page="/Recipes/Create">Add new recipe</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/Categories/List">Categories</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="CategoriesDropDown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="CategoriesDropDown">
+                                <li><a class="dropdown-item" asp-page="/Categroies/List">View categories</a></li>
+                                <li><a class="dropdown-item" asp-page="/Categories/Create">Add new category</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

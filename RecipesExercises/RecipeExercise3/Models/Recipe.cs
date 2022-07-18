@@ -6,7 +6,7 @@ public class Recipe
     [Key]
     public Guid Id { get; set; }
     [Required]
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
     public List<string> Ingredients { get; set; } = new();
     public List<string> Instructions { get; set; } = new();
     [Required]

@@ -31,6 +31,8 @@ namespace RecipeExercise3.Pages
             if (recipesList is null)
                 throw new Exception("Could not get categories");
             UpdatedRecipe = recipesList.Find(c => c.Id.ToString() == id);
+            if (UpdatedRecipe is null)
+                throw new Exception("Could not find recipe");
             var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
             if (categoriesList is null)
                 throw new Exception("Could not get categories");
@@ -41,6 +43,8 @@ namespace RecipeExercise3.Pages
         {
             var httpClient = _httpClientFactory.CreateClient("recipeClient");
             var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
+            if (categoriesList is null)
+                throw new Exception("Could not get categories");
             UpdatedRecipe = Recipe.MatchCategory(UpdatedRecipe, categoriesList, CategoriesIds);
             var recipeToUpdate = new Recipe { Id = Guid.Parse(id), Title = UpdatedRecipe.Title, Instructions = UpdatedRecipe.Instructions, Ingredients = UpdatedRecipe.Ingredients, Categories = UpdatedRecipe.Categories };
             var result = await httpClient.PutAsJsonAsync("recipes", recipeToUpdate);

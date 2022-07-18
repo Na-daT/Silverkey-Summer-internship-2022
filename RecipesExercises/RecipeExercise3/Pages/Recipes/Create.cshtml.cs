@@ -12,7 +12,7 @@ public class CreateModel : PageModel
     public List<Category> Categories { get; set; } = new();
 
     [BindProperty]
-    public Recipe NewRecipe { get; set; }
+    public Recipe NewRecipe { get; set; } = new();
 
     [BindProperty]
     public List<Guid> CategoriesIds { get; set; } = new();
@@ -29,10 +29,7 @@ public class CreateModel : PageModel
         var httpClient = _httpClientFactory.CreateClient("recipeClient");
         var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
         if (categoriesList is null)
-        {
             throw new Exception("Could not get categories");
-            _logger.LogError("Could not get categories");
-        }
         Categories = categoriesList;
     }
 
@@ -43,6 +40,8 @@ public class CreateModel : PageModel
         _logger.LogInformation("Creating recipe");
         var httpClient = _httpClientFactory.CreateClient("recipeClient");
         var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
+        if (categoriesList is null)
+            throw new Exception("Could not get categories");
         NewRecipe = Models.Recipe.MatchCategory(NewRecipe, categoriesList, CategoriesIds);
         var result = await httpClient.PostAsJsonAsync("recipes", NewRecipe);
         if (!result.IsSuccessStatusCode)
