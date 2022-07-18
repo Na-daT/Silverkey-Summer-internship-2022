@@ -1,0 +1,128 @@
+@page
+@model EditRecipeModel
+@{
+    ViewData["Title"] = "Edit Recipe";
+}
+
+<section class="text-center container">
+    <h1>Edit Recipe</h1>
+</section>
+<div class="container bg-light p-4">
+    <div class="row g-5">
+        <div class="col-md-7 col-lg-8">
+            <h4 class="mb-3">Recipe's details</h4>
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-sm-12">
+                        <label for="staticName" class="form-label fs-4">Current title</label>
+                        <div class="col-sm-10">
+                            <input type="text" readonly class="form-control-plaintext" id="staticName"
+                                value="@Model.UpdatedRecipe.Title">
+                            <input type="hidden" name="id" value="@Model.UpdatedRecipe.Id">
+                        </div>
+                        <div class="col-sm-12 py-2">
+                            <label for="recipeName" class="form-label fs-4">New title</label>
+                            <input asp-for="UpdatedRecipe!.Title" type="text" class="form-control" id="recipeName"
+                                placeholder="New title">
+                        </div>
+                        <div class="col-sm-12 py-2">
+                            <label for="Ingredients" class="form-label fs-4">Ingredients</label>
+                            <button type="button" class="btn btn-dark" id="addIngredient">Add ingredient</button>
+                            @foreach (var item in Model.UpdatedRecipe.Ingredients)
+                            {
+                                var count = Model.UpdatedRecipe.Ingredients.IndexOf(item);
+                                <div class="col-sm-12 py-1" id="ingredient_@count">
+                                    <input type="text" class="form-control" id="@item" value="@item"
+                                    asp-for="UpdatedRecipe!.Ingredients">
+                                    <button type="button" class="btn btn-danger btn-sm" id="removeExistingIng"
+                                    value="@count">Remove</button>
+                                </div>
+                            }
+                            <div id="newRowIng">
+                                <input type="hidden" id="ingredientsCount" value="0">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 py-2">
+                            <label for="Instructions" class="form-label fs-4">Instructions</label>
+                            <button type="button" class="btn btn-dark" id="addInstructions">Add instruction</button>
+                            @foreach (var instruction in Model.UpdatedRecipe.Instructions)
+                            {
+                                <div class="col-sm-12 py-1">
+                                    <input type="text" id="@instruction" class="form-control" value="@instruction"
+                                    asp-for="UpdatedRecipe!.Instructions">
+                                    <button type="button" class="btn btn-danger btn-sm" id="removeExistingInstruction"
+                                    value="@instruction">Remove</button>
+                                </div>
+                            }
+                            <div id="newRowInstruction">
+                                <input type="hidden" id="InstructionsCount" value="0">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="Categories" class="form-label fs-4">Categories</label>
+                            <select class="select" aria-label="Default select example" asp-for="@Model.CategoriesIds"
+                                multiple>
+                                @foreach (var item in Model.Categories)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="py-2">
+                        <input type="submit" class="btn btn-dark" value="Post">
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+<script>
+    $("#addIngredient").click(function () {
+        var total = $("#ingredientsCount").val();
+        total++;
+        $("#ingredientsCount").val(total);
+        var newRows = '<div id="div ' + (total) + '" class="py-2">'
+            + '<input type="text" id="ingredient' + (total) + '" class="form-control" placeholder="Ingredient" data-val="true" name="UpdatedRecipe.Ingredients" value>'
+            + '<button type="button" class="btn btn-danger btn-sm" id="removeIngredient">Remove</button>'
+            + '</div>';
+        $("#newRowIng").append(newRows);
+    });
+    $(document).on('click', '#removeIngredient', function () {
+        var total = $("#ingredientsCount").val();
+        total--;
+        $("#ingredientsCount").val(total);
+        $(this).parent().remove();
+    });
+</script>
+<script>
+    $(document).on('click', '#removeExistingIng', function () {
+        $(this).parent().remove();
+    });
+</script>
+<script>
+    $(document).on('click', '#removeExistingInstruction', function () {
+        $(this).parent().remove();
+    });
+</script>
+<script>
+    $("#addInstructions").click(function () {
+        var total = $("#InstructionsCount").val();
+        total++;
+        $("#InstructionsCount").val(total);
+        var newRows = '<div id="div ' + (total) + '" class="py-2">'
+            + '<input type="text" id="Instructions' + (total) + '" class="form-control" placeholder="Instruction" data-val="true" name="UpdatedRecipe.Instructions" value>'
+            + '<button type="button" class="btn btn-danger btn-sm" id="removeInstruction">Remove</button>'
+            + '</div>';
+        $("#newRowInstruction").append(newRows);
+    });
+    $(document).on('click', '#removeInstruction', function () {
+        var total = $("#InstructionsCount").val();
+        total--;
+        $("#InstructionsCount").val(total);
+        $(this).parent().remove();
+    });
+</script>
+}
