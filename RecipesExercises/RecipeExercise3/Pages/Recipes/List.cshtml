@@ -20,7 +20,13 @@
                             <p class="card-text">Description</p>
                             <button type="button" class="btn btn-dark" data-bs-toggle="modal"
                             data-bs-target="#recipe_@index">View</button>
-                            <button type="button" class="btn btn-outline-dark">Edit</button>
+                            <a type="button" class="btn btn-outline-dark" asp-page="/Recipes/Edit"
+                            asp-route-id="@recipe.Id.ToString()">Edit</a>
+                            <div class="py-2">
+                                <form method="post" asp-page-handler="Delete" asp-route-id="@recipe.Id">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -75,3 +81,6 @@
         </div>
     </div>
 </section>
+<div class="container py-2">
+    <a class="btn btn-dark" asp-page="/Recipes/Create">Add new Recipe</a>
+</div>

@@ -19,13 +19,22 @@ public class RecipesModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var HttpClient = _httpClientFactory.CreateClient("recipeClient");
-        var categoriesList = await HttpClient.GetFromJsonAsync<List<Category>>("category");
+        var httpClient = _httpClientFactory.CreateClient("recipeClient");
+        var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
         if (categoriesList is null)
             throw new Exception("Could not get categories");
-        var recipesList = await HttpClient.GetFromJsonAsync<List<Recipe>>("recipe");
+        var recipesList = await httpClient.GetFromJsonAsync<List<Recipe>>("recipe");
         if (recipesList is null)
             throw new Exception("Could not deserialize recipes list");
         Recipes = Recipe.Load(categoriesList, recipesList);
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(string id)
+    {
+        var HttpClient = _httpClientFactory.CreateClient("recipeClient");
+        var result = await HttpClient.DeleteAsync($"recipes/{id}");
+        if (result.IsSuccessStatusCode)
+            return RedirectToPage("/Recipes/List");
+        throw new Exception("Could not delete recipe");
     }
 }
