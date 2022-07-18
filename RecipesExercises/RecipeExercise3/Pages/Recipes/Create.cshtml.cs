@@ -7,10 +7,15 @@ public class CreateModel : PageModel
 {
     private readonly ILogger<CreateModel> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
-    public List<Category> categoriesList { get; set; } = new();
 
     [BindProperty]
-    public Recipe recipe { get; set; }
+    public List<Category> Categories { get; set; } = new();
+
+    [BindProperty]
+    public Recipe NewRecipe { get; set; }
+
+    [BindProperty]
+    public List<Guid> CategoriesIds { get; set; } = new();
 
     public CreateModel(ILogger<CreateModel> logger, IHttpClientFactory httpClientFactory)
     {
@@ -20,22 +25,32 @@ public class CreateModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var HttpClient = _httpClientFactory.CreateClient("recipeClient");
-        var categoriesList = await HttpClient.GetFromJsonAsync<List<Category>>("category");
+        _logger.LogInformation("Getting categories");
+        var httpClient = _httpClientFactory.CreateClient("recipeClient");
+        var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
         if (categoriesList is null)
+        {
             throw new Exception("Could not get categories");
+            _logger.LogError("Could not get categories");
+        }
+        Categories = categoriesList;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
-        {
             return Page();
-        }
-        var HttpClient = _httpClientFactory.CreateClient("recipeClient");
-        var result = await HttpClient.PostAsJsonAsync("recipes", recipe);
+        _logger.LogInformation("Creating recipe");
+        var httpClient = _httpClientFactory.CreateClient("recipeClient");
+        var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
+        NewRecipe = Models.Recipe.MatchCategory(NewRecipe, categoriesList, CategoriesIds);
+        var result = await httpClient.PostAsJsonAsync("recipes", NewRecipe);
         if (!result.IsSuccessStatusCode)
+        {
+            _logger.LogError($"Could not create recipe: {NewRecipe.Title}");
             throw new Exception("Could not add recipe");
-        return RedirectToPage("./Index");
+        }
+        _logger.LogInformation($"Created recipe: {NewRecipe.Title}");
+        return RedirectToPage("/Index");
     }
 }

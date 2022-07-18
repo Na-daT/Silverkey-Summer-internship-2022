@@ -3,14 +3,89 @@
 @{
     ViewData["Title"] = "Create recipe";
 }
-<section class="text-center container">
-    <h1 class="display-1">Add recipe</h1>
-</section>
-<div class="container-sm g-5">
-    <form class>
-        <div class="form-floating mb-3">
-            <input asp-for="recipe!.Title" type="text" class="form-control" id="recipeName">
-            <label for="recipeName">Title</label>
-        </div>
-    </form>
+<div class="py-5 text-center">
+    <h1 class="display-1">New recipe</h1>
 </div>
+<div class="container bg-light p-4">
+    <div class="row g-5">
+        <div class="col-md-7 col-lg-8">
+            <h4 class="mb-3">Recipe's details</h4>
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-sm-12">
+                        <label for="recipeName" class="form-label fs-4">Recipe name</label>
+                        <input asp-for="NewRecipe!.Title" type="text" class="form-control" id="recipeName"
+                            placeholder="Title">
+                    </div>
+                    <div class="col-sm-12">
+                        <label for="Ingredients" class="form-label fs-4">Ingredients</label>
+                        <button type="button" class="btn btn-dark" id="addIngredient">Add ingredient</button>
+                        <div id="newRowIng">
+                            <input type="hidden" id="ingredientsCount" value="0">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <label for="Instructions" class="form-label fs-4">Instructions</label>
+                        <button type="button" class="btn btn-dark" id="addInstructions">Add instruction</button>
+                        <div id="newRowInstruction">
+                            <input type="hidden" id="InstructionsCount" value="0">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="Categories" class="form-label fs-4">Categories</label>
+                        <select class="select" aria-label="Default select example" asp-for="@Model.CategoriesIds"
+                            multiple>
+                            @foreach (var item in Model.Categories)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="py-2">
+                    <input type="submit" class="btn btn-dark" value="Post">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+<script>
+    $("#addIngredient").click(function () {
+        var total = $("#ingredientsCount").val();
+        total++;
+        $("#ingredientsCount").val(total);
+        var newRows = '<div id="div ' + (total) + '" class="py-2">'
+            + '<input type="text" class="form-control" id="ingredient' + (total) + '" placeholder="Ingredient" data-val="true" name="NewRecipe.Ingredients" value>'
+            + '<button type="button" class="btn btn-danger" id="removeIngredient">Remove</button>'
+            + '</div>';
+        $("#newRowIng").append(newRows);
+    });
+    $(document).on('click', '#removeIngredient', function () {
+        var total = $("#ingredientsCount").val();
+        total--;
+        $("#ingredientsCount").val(total);
+        $(this).parent().remove();
+    });
+</script>
+<script>
+    $("#addInstructions").click(function () {
+        var total = $("#InstructionsCount").val();
+        total++;
+        $("#InstructionsCount").val(total);
+        var newRows = '<div id="div ' + (total) + '" class="py-2">'
+            + '<input type="text" class="form-control" id="Instructions' + (total) + '" placeholder="Instruction" data-val="true" name="NewRecipe.Instructions" value>'
+            + '<button type="button" class="btn btn-danger" id="removeInstruction">Remove</button>'
+            + '</div>';
+        $("#newRowInstruction").append(newRows);
+    });
+    $(document).on('click', '#removeInstruction', function () {
+        var total = $("#InstructionsCount").val();
+        total--;
+        $("#InstructionsCount").val(total);
+        $(this).parent().remove();
+    });
+</script>
+}
