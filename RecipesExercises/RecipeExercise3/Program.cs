@@ -5,7 +5,7 @@ builder.Services.AddRazorPages();
 var appName = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("api")["url"];
 builder.Services.AddHttpClient("recipeClient", httpClient =>
 {
-    httpClient.BaseAddress = new Uri(AppName);
+    httpClient.BaseAddress = new Uri(appName);
 });
 var app = builder.Build();
 
