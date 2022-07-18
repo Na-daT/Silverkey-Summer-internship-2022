@@ -1,14 +1,18 @@
 using System.ComponentModel.DataAnnotations;
-namespace RecipeExercise3.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
+namespace RecipeExercise3.Models;
 public class Recipe
 {
     [Key]
     public Guid Id { get; set; }
+
+    [StringLength(60, MinimumLength = 3, ErrorMessage = "Name length must be between 3 and 60 characters")]
     [Required]
     public string Title { get; set; } = string.Empty;
     public List<string> Ingredients { get; set; } = new();
     public List<string> Instructions { get; set; } = new();
+
     [Required]
     public List<Category> Categories { get; set; } = new();
 
