@@ -2,7 +2,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-var AppName = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("api")["url"];
+var appName = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("api")["url"];
 builder.Services.AddHttpClient("recipeClient", httpClient =>
 {
     httpClient.BaseAddress = new Uri(AppName);
