@@ -16,6 +16,7 @@
                         <label for="recipeName" class="form-label fs-4">Recipe name</label>
                         <input asp-for="NewRecipe!.Title" type="text" class="form-control" id="recipeName"
                             placeholder="Title">
+                        <span asp-validation-for="@Model.NewRecipe.Title" class="text-danger"></span>
                     </div>
                     <div class="col-sm-12">
                         <label for="Ingredients" class="form-label fs-4">Ingredients</label>
@@ -35,11 +36,13 @@
                         <label for="Categories" class="form-label fs-4">Categories</label>
                         <select class="select" aria-label="Default select example" asp-for="@Model.CategoriesIds"
                             multiple>
+                            <span asp-validation-for="@Model.NewRecipe.Categories" class="text-danger"></span>
                             @foreach (var item in Model.Categories)
                             {
                                 <option value="@item.Id">@item.Name</option>
                             }
                         </select>
+                        <label for="categorySelect">Choose minimum 1</label>
                     </div>
                 </div>
                 <div class="py-2">
@@ -52,6 +55,7 @@
 
 @section Scripts
 {
+<partial name="_ValidationScriptsPartial" />
 <script>
     $("#addIngredient").click(function () {
         var total = $("#ingredientsCount").val();
@@ -59,6 +63,7 @@
         $("#ingredientsCount").val(total);
         var newRows = '<div id="div ' + (total) + '" class="py-2">'
             + '<input type="text" class="form-control" id="ingredient' + (total) + '" placeholder="Ingredient" data-val="true" name="NewRecipe.Ingredients" value>'
+            + '<span asp-validation-for="@Model.NewRecipe.Ingredients" class="text-danger"></span>'
             + '<button type="button" class="btn btn-danger" id="removeIngredient">Remove</button>'
             + '</div>';
         $("#newRowIng").append(newRows);
@@ -77,6 +82,7 @@
         $("#InstructionsCount").val(total);
         var newRows = '<div id="div ' + (total) + '" class="py-2">'
             + '<input type="text" class="form-control" id="Instructions' + (total) + '" placeholder="Instruction" data-val="true" name="NewRecipe.Instructions" value>'
+            + '<span asp-validation-for="@Model.NewRecipe.Instructions" class="text-danger"></span>'
             + '<button type="button" class="btn btn-danger" id="removeInstruction">Remove</button>'
             + '</div>';
         $("#newRowInstruction").append(newRows);

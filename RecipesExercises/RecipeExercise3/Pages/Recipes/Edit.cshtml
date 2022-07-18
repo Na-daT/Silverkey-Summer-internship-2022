@@ -24,6 +24,7 @@
                             <label for="recipeName" class="form-label fs-4">New title</label>
                             <input asp-for="UpdatedRecipe!.Title" type="text" class="form-control" id="recipeName"
                                 placeholder="New title">
+                            <span asp-validation-for="@Model.UpdatedRecipe.Title" class="text-danger"></span>
                         </div>
                         <div class="col-sm-12 py-2">
                             <label for="Ingredients" class="form-label fs-4">Ingredients</label>
@@ -61,12 +62,14 @@
                         <div class="col-md-5">
                             <label for="Categories" class="form-label fs-4">Categories</label>
                             <select class="select" aria-label="Default select example" asp-for="@Model.CategoriesIds"
-                                multiple>
+                                id="categorySelect" multiple>
+                                <span asp-validation-for="@Model.UpdatedRecipe.Categories" class="text-danger"></span>
                                 @foreach (var item in Model.Categories)
                                 {
                                     <option value="@item.Id">@item.Name</option>
                                 }
                             </select>
+                            <label for="categorySelect">Choose minimum 1</label>
                         </div>
                     </div>
                     <div class="py-2">
@@ -79,6 +82,7 @@
 
 @section Scripts
 {
+<partial name="_ValidationScriptsPartial" />
 <script>
     $("#addIngredient").click(function () {
         var total = $("#ingredientsCount").val();

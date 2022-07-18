@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Add category";
 }
-
 <section class="text-center container">
     <h1 class="display-1">New Category</h1>
 </section>
@@ -11,10 +10,12 @@
     <div class="row g-5">
         <div class="col-md-7 col-lg-8">
             <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="row g-3">
                     <div class="col-sm-12">
                         <label for="categoryName" class="form-label fs-4">Category name</label>
                         <input type="text" id="categoryName" class="form-control" asp-for="@Model.NewCategory.Name" />
+                        <span asp-validation-for="@Model.NewCategory.Name" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="py-2">
@@ -24,3 +25,7 @@
         </div>
     </div>
 </div>
+
+@section scripts{
+<partial name="_ValidationScriptsPartial" />
+}
