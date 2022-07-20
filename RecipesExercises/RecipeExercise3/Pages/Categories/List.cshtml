@@ -3,27 +3,31 @@
 @{
     ViewData["Title"] = "Categories page";
 }
-<section class="text-center container">
-    <h1 class="display-1">Our categories</h1>
-</section>
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-            @foreach (var category in Model.Categories)
-            {
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">@category.Name</h5>
-                            <a type="button" class="btn btn-outline-dark" asp-page="/Categories/Edit"
-                            asp-route-id="@category.Id.ToString()">Edit</a>
+
+<body background="/images/background.jpg" class="bg">
+
+    <section class="text-center container">
+        <h1 class="display-1 py-1">Our categories</h1>
+    </section>
+    <section class="py-5 bg-light shadow-lg">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                @foreach (var category in Model.Categories)
+                {
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">@category.Name</h5>
+                                <a type="button" class="btn btn-outline-dark" asp-page="/Categories/Edit"
+                                asp-route-id="@category.Id.ToString()">Edit</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
+    </section>
+    <div class="container py-2">
+        <a class="btn btn-dark" asp-page="/Categories/Create">Add new category</a>
     </div>
-</section>
-<div class="container py-2">
-    <a class="btn btn-dark" asp-page="/Categories/Create">Add new category</a>
-</div>
+</body>

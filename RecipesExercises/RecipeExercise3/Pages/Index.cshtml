@@ -4,31 +4,23 @@
     ViewData["Title"] = "Home page";
 }
 
-<section class="text-center container">
-    <div class="text-center">
-        <h1 class="display-1">Nada's Recipes</h1>
-        <h2 class="display-4">What would you like to do today?</h2>
-    </div>
-</section>
-<div class="p-2 row row-cols-2 bg-light">
-    <div class="col">
-        <div class="card shadow-sm">
-            <img src="/images/recipes-min.jpg" class="card-img-top" alt="a sample food image">
-            <div class="card-body">
-                <h5 class="card-title">Recipes</h5>
-                <p class="card-text">View, edit and add your favourite recipes!</p>
-                <a asp-page="/Recipes/List" class="btn btn-dark">Recipes</a>
+<body background="/images/background.jpg" class="bg">
+    <div class="container col-xxl-8 px-4 py-5">
+        <div class="row flex-lg-row-reverse align-items-center py-3 px-2 shadow-lg bg-light">
+            <div class="col-10 col-sm-8 col-lg-6">
+                <img src="/images/recipes-min.jpg" class=" d-block mx-lg-auto img-fluid rounded-3" width="700"
+                    height="500" loading="lazy">
+            </div>
+            <div class="col-lg-6">
+                <h1 class="display-5 fw-bold lh-1 mb-3">Welcome! to Nada's Recipes App</h1>
+                <p class="lead">
+                    This is a simple recipes app that allows you to create, edit, and delete recipes.
+                </p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <a asp-page="/Recipes/List" class="btn btn-dark">Recipes</a>
+                    <a asp-page="/Categories/List" class="btn btn-dark">Categories</a>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col">
-        <div class="card shadow-sm">
-            <img src="images/categories.jpg" class="card-img-top" alt="sample categories image">
-            <div class="card-body">
-                <h5 class="card-title">Categories</h5>
-                <p class="card-text">View, edit and add different categories!</p>
-                <a asp-page="/Categories/List" class="btn btn-dark">Categories</a>
-            </div>
-        </div>
-    </div>
-</div>
+</body>

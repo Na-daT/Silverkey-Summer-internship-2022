@@ -4,65 +4,93 @@
     ViewData["Title"] = "Edit Recipe";
 }
 
-<section class="text-center container">
-    <h1>Edit Recipe</h1>
-</section>
-<div class="container bg-light p-4">
-    <div class="row g-5">
-        <div class="col-md-7 col-lg-8">
-            <h4 class="mb-3">Recipe's details</h4>
-            <form method="post">
-                <div class="row g-3">
+<body background="/images/background.jpg" class="bg">
+    <div class="text-center py-1">
+        <h1 class="display-1 py-1">Edit Recipe</h1>
+    </div>
+    <div class="container bg-light col-xxl-6 px-4 py-5 shadow-lg">
+        <h4 class="mb-3">Recipe's details</h4>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3">
+                <div class="col-sm-12">
+                    <label for="staticName" class="form-label fs-4">Current title</label>
                     <div class="col-sm-12">
-                        <label for="staticName" class="form-label fs-4">Current title</label>
-                        <div class="col-sm-10">
-                            <input type="text" readonly class="form-control-plaintext" id="staticName"
-                                value="@Model.UpdatedRecipe.Title">
-                            <input type="hidden" name="id" value="@Model.UpdatedRecipe.Id">
-                        </div>
-                        <div class="col-sm-12 py-2">
-                            <label for="recipeName" class="form-label fs-4">New title</label>
-                            <input asp-for="UpdatedRecipe!.Title" type="text" class="form-control" id="recipeName"
-                                placeholder="New title">
-                            <span asp-validation-for="@Model.UpdatedRecipe.Title" class="text-danger"></span>
-                        </div>
-                        <div class="col-sm-12 py-2">
-                            <label for="Ingredients" class="form-label fs-4">Ingredients</label>
-                            <button type="button" class="btn btn-dark" id="addIngredient">Add ingredient</button>
-                            @foreach (var item in Model.UpdatedRecipe.Ingredients)
-                            {
-                                var count = Model.UpdatedRecipe.Ingredients.IndexOf(item);
-                                <div class="col-sm-12 py-1" id="ingredient_@count">
-                                    <input type="text" class="form-control" id="@item" value="@item"
-                                    asp-for="UpdatedRecipe!.Ingredients">
-                                    <button type="button" class="btn btn-danger btn-sm" id="removeExistingIng"
-                                    value="@count">Remove</button>
-                                </div>
-                            }
-                            <div id="newRowIng">
-                                <input type="hidden" id="ingredientsCount" value="0">
+                        <input type="text" readonly class="form-control-plaintext" id="staticName"
+                            value="@Model.UpdatedRecipe.Title">
+                        <input type="hidden" name="id" value="@Model.UpdatedRecipe.Id">
+                    </div>
+                    <div class="col-sm-12 py-2">
+                        <label for="recipeName" class="form-label fs-4">New title</label>
+                        <input asp-for="UpdatedRecipe!.Title" type="text" class="form-control" id="recipeName"
+                            placeholder="New title">
+                        <span asp-validation-for="@Model.UpdatedRecipe.Title" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-12 py-2">
+                        <label for="Ingredients" class="form-label fs-4">Ingredients</label>
+                        <button type="button" class="btn btn-primary btn-sm mx-3" id="addIngredients">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                    0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                    0 1 8 2Z">
+                                </path>
+                            </svg>
+                        </button>
+                        @foreach (var item in Model.UpdatedRecipe.Ingredients)
+                        {
+                            <div class="input-group col-sm-12 py-1">
+                                <input type="text" class="form-control" id="@item" value="@item"
+                                asp-for="UpdatedRecipe!.Ingredients">
+                                <button type="button" class="btn btn-danger" id="removeExistingIng">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                        <path
+                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                        </path>
+                                    </svg>
+                                </button>
                             </div>
+                        }
+                        <div id="newRowIng">
+                            <input type="hidden" id="ingredientsCount" value="0">
                         </div>
-                        <div class="col-sm-12 py-2">
-                            <label for="Instructions" class="form-label fs-4">Instructions</label>
-                            <button type="button" class="btn btn-dark" id="addInstructions">Add instruction</button>
-                            @foreach (var instruction in Model.UpdatedRecipe.Instructions)
-                            {
-                                <div class="col-sm-12 py-1">
-                                    <input type="text" id="@instruction" class="form-control" value="@instruction"
-                                    asp-for="UpdatedRecipe!.Instructions">
-                                    <button type="button" class="btn btn-danger btn-sm" id="removeExistingInstruction"
-                                    value="@instruction">Remove</button>
-                                </div>
-                            }
-                            <div id="newRowInstruction">
-                                <input type="hidden" id="InstructionsCount" value="0">
+                    </div>
+                    <div class="col-sm-12 py-2">
+                        <label for="Instructions" class="form-label fs-4">Instructions</label>
+                        <button type="button" class="btn btn-primary btn-sm mx-3" id="addInstructions">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                    0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                    0 1 8 2Z">
+                                </path>
+                            </svg>
+                        </button>
+                        @foreach (var instruction in Model.UpdatedRecipe.Instructions)
+                        {
+                            <div class="input-group col-sm-12 py-1">
+                                <input type="text" id="@instruction" class="form-control" value="@instruction"
+                                asp-for="UpdatedRecipe!.Instructions">
+                                <button type="button" class="btn btn-danger" id="removeExistingInstruction">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                        <path
+                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                        </path>
+                                    </svg>
+                                </button>
                             </div>
+                        }
+                        <div id="newRowInstruction">
+                            <input type="hidden" id="InstructionsCount" value="0">
                         </div>
-                        <div class="col-md-5">
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
                             <label for="Categories" class="form-label fs-4">Categories</label>
-                            <select class="select" aria-label="Default select example" asp-for="@Model.CategoriesIds"
-                                id="categorySelect" multiple>
+                            <select id="categoriesDropdown" asp-for="@Model.CategoriesIds" multiple="multiple"
+                                class="form-control">
                                 <span asp-validation-for="@Model.UpdatedRecipe.Categories" class="text-danger"></span>
                                 @foreach (var item in Model.Categories)
                                 {
@@ -72,25 +100,31 @@
                             <label for="categorySelect">Choose minimum 1</label>
                         </div>
                     </div>
-                    <div class="py-2">
-                        <input type="submit" class="btn btn-dark" value="Submit">
-                    </div>
-            </form>
-        </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <input type="submit" class="btn btn-dark" value="Update recipe">
+                    <a type="button" class="btn btn-outline-danger" asp-page="/Recipes/List">Cancel</a>
+                </div>
+            </div>
+        </form>
     </div>
-</div>
-
+</body>
 @section Scripts
 {
 <partial name="_ValidationScriptsPartial" />
 <script>
-    $("#addIngredient").click(function () {
+    $("#addIngredients").click(function () {
         var total = $("#ingredientsCount").val();
         total++;
         $("#ingredientsCount").val(total);
-        var newRows = '<div id="div ' + (total) + '" class="py-2">'
-            + '<input type="text" id="ingredient' + (total) + '" class="form-control" placeholder="Ingredient" data-val="true" name="UpdatedRecipe.Ingredients" value>'
-            + '<button type="button" class="btn btn-danger btn-sm" id="removeIngredient">Remove</button>'
+        var newRows = '<div class="input-group col-sm-12 py-1" id="div ' + (total) + '">'
+            + '<input type="text" class="form-control" id="Ingredients' + (total) + '" placeholder="Ingredient" data-val="true" name="UpdatedRecipe.Ingredients" value>'
+            + '<button type="button" class="btn btn-danger" id="removeIngredient">'
+            + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">'
+            + '<path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">'
+            + '</path>'
+            + '</svg>'
+            + '</button>'
             + '</div>';
         $("#newRowIng").append(newRows);
     });
@@ -116,9 +150,14 @@
         var total = $("#InstructionsCount").val();
         total++;
         $("#InstructionsCount").val(total);
-        var newRows = '<div id="div ' + (total) + '" class="py-2">'
-            + '<input type="text" id="Instructions' + (total) + '" class="form-control" placeholder="Instruction" data-val="true" name="UpdatedRecipe.Instructions" value>'
-            + '<button type="button" class="btn btn-danger btn-sm" id="removeInstruction">Remove</button>'
+        var newRows = '<div class="input-group col-sm-12 py-1" id="div ' + (total) + '">'
+            + '<input type="text" class="form-control" id="Instructions' + (total) + '" placeholder="Instruction" data-val="true" name="UpdatedRecipe.Instructions" value>'
+            + '<button type="button" class="btn btn-danger" id="removeInstruction">'
+            + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">'
+            + '<path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">'
+            + '</path>'
+            + '</svg>'
+            + '</button>'
             + '</div>';
         $("#newRowInstruction").append(newRows);
     });

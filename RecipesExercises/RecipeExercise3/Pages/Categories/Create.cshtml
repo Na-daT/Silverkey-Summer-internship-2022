@@ -3,29 +3,29 @@
 @{
     ViewData["Title"] = "Add category";
 }
-<section class="text-center container">
-    <h1 class="display-1">New Category</h1>
-</section>
-<div class="container bg-light p-4">
-    <div class="row g-5">
-        <div class="col-md-7 col-lg-8">
-            <form method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="row g-3">
-                    <div class="col-sm-12">
-                        <label for="categoryName" class="form-label fs-4">Category name</label>
-                        <input type="text" id="categoryName" class="form-control" asp-for="@Model.NewCategory.Name" />
-                        <span asp-validation-for="@Model.NewCategory.Name" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="py-2">
-                    <input type="submit" class="btn btn-dark" value="Create category">
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
+<body background="/images/background.jpg" class="bg">
+
+    <section class="text-center container">
+        <h1 class="display-1 py-1">New Category</h1>
+    </section>
+    <div class="container bg-light col-xxl-6 px-4 py-5 shadow-lg">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3">
+                <div class="col-sm-12">
+                    <label for="categoryName" class="form-label fs-4">Category name</label>
+                    <input type="text" id="categoryName" class="form-control" asp-for="@Model.NewCategory.Name" />
+                    <span asp-validation-for="@Model.NewCategory.Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center pt-4">
+                <input type="submit" class="btn btn-dark" value="Create category">
+                <a type="button" class="btn btn-outline-danger" asp-page="/Categories/List">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
 @section scripts{
 <partial name="_ValidationScriptsPartial" />
 }
