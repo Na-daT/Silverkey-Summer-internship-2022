@@ -50,6 +50,6 @@ public class CreateModel : PageModel
             throw new Exception("Could not add recipe");
         }
         _logger.LogInformation($"Created recipe: {NewRecipe.Title}");
-        return RedirectToPage("/Index");
+        return RedirectToPage("/Recipes/List");
     }
 }
