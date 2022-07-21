@@ -1,3 +1,6 @@
+using CurrieTechnologies.Razor.SweetAlert2;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +9,12 @@ var appName = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build()
 builder.Services.AddHttpClient("recipeClient", httpClient =>
 {
     httpClient.BaseAddress = new Uri(appName);
+});
+builder.Services.AddSweetAlert2();
+builder.Services.AddFluentValidation(options =>
+{
+    options.RegisterValidatorsFromAssemblyContaining(typeof(Program));
+    options.ImplicitlyValidateChildProperties = true;
 });
 var app = builder.Build();
 
