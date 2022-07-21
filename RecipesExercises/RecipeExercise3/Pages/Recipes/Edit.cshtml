@@ -1,5 +1,6 @@
 @page
 @model EditRecipeModel
+@inject SweetAlertService Swal;
 @{
     ViewData["Title"] = "Edit Recipe";
 }
@@ -10,7 +11,7 @@
     </div>
     <div class="container bg-light col-xxl-6 px-4 py-5 shadow-lg">
         <h4 class="mb-3">Recipe's details</h4>
-        <form method="post">
+        <form method="post" id="updateRecipeForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row g-3">
                 <div class="col-sm-12">
@@ -102,7 +103,7 @@
                     </div>
                 </div>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <input type="submit" class="btn btn-dark" value="Update recipe">
+                    <button type="button" class="btn btn-dark" onclick="return confirmUpdate();">Update recipe</button>
                     <a type="button" class="btn btn-outline-danger" asp-page="/Recipes/List">Cancel</a>
                 </div>
             </div>
@@ -111,6 +112,23 @@
 </body>
 @section Scripts
 {
+<script type="text/javascript">
+    function confirmUpdate() {
+        Swal.fire(
+            {
+                title: 'Confirm new updates?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.value) {
+                    $('#updateRecipeForm').submit();
+                }
+            });
+    }
+</script>
 <partial name="_ValidationScriptsPartial" />
 <script>
     $("#addIngredients").click(function () {
