@@ -1,19 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 namespace RecipeExercise3.Models;
 public class Recipe
 {
     [Key]
     public Guid Id { get; set; }
-
-    [StringLength(60, MinimumLength = 3, ErrorMessage = "Name length must be between 3 and 60 characters")]
-    [Required]
     public string Title { get; set; } = string.Empty;
     public List<string> Ingredients { get; set; } = new();
     public List<string> Instructions { get; set; } = new();
-
-    [Required]
     public List<Category> Categories { get; set; } = new();
 
     public Recipe()
@@ -45,5 +42,14 @@ public class Recipe
             recipe.Categories.Add(category);
         }
         return recipe;
+    }
+}
+
+public class RecipeValidator : AbstractValidator<Recipe>
+{
+    public RecipeValidator()
+    {
+        RuleFor(_ => _.Title).NotNull().Length(3, 50);
+        RuleFor(_ => _.Categories).NotNull().WithMessage("Please pick a category");
     }
 }
