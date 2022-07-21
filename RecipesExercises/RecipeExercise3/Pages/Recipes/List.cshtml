@@ -13,21 +13,22 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                 @foreach (var recipe in Model.Recipes)
                 {
+                    var OrderedCategories = recipe.Categories.OrderBy(x => x.Name);
                     int index = Model.Recipes.IndexOf(recipe);
                     <div class="col">
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title">@recipe.Title</h5>
                                 <h6>
-                                    @foreach (var item in recipe.Categories)
+                                    @foreach (var item in OrderedCategories)
                                     {
                                         <span class="badge rounded-pill bg-secondary">@item.Name</span>
                                     }
                                 </h6>
                                 <div class="row">
                                     <div class="col-9">
-                                        <button type="button" class="btn btn-dark mx-1" data-bs-toggle="modal"
-                                        data-bs-target="#recipe_@index">Details</button>
+                                        <a class=" link-primary mx-1" data-bs-toggle="modal"
+                                        data-bs-target="#recipe_@index">Details</a>
                                     </div>
                                 </div>
                             </div>

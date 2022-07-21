@@ -21,6 +21,6 @@ public class CategoriesModel : PageModel
         var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
         if (categoriesList is null)
             throw new Exception("Could not get categories");
-        Categories = categoriesList;
+        Categories = categoriesList.OrderBy(x => x.Name).ToList();
     }
 }

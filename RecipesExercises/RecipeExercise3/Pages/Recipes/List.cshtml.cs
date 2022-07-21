@@ -27,6 +27,8 @@ public class RecipesModel : PageModel
         if (recipesList is null)
             throw new Exception("Could not deserialize recipes list");
         Recipes = Recipe.Load(categoriesList, recipesList);
+        Recipes = Recipes.OrderBy(x => x.Title).ToList();
+
     }
 
     public async Task<IActionResult> OnPostDeleteAsync(string id)
