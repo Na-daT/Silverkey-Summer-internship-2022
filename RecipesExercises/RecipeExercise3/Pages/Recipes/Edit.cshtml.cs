@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RecipeExercise3.Models;
+using FluentValidation.Results;
+using FluentValidation.AspNetCore;
 
 namespace RecipeExercise3.Pages
 {
@@ -8,6 +10,7 @@ namespace RecipeExercise3.Pages
     {
         private readonly ILogger<EditRecipeModel> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private RecipeValidator validator = new RecipeValidator();
 
         [BindProperty]
         public Recipe UpdatedRecipe { get; set; } = new();
@@ -41,6 +44,8 @@ namespace RecipeExercise3.Pages
 
         public async Task<IActionResult> OnPostAsync(string id)
         {
+            if (!ModelState.IsValid)
+                return Page();
             var httpClient = _httpClientFactory.CreateClient("recipeClient");
             var categoriesList = await httpClient.GetFromJsonAsync<List<Category>>("category");
             if (categoriesList is null)
@@ -51,6 +56,15 @@ namespace RecipeExercise3.Pages
             if (result.IsSuccessStatusCode)
                 return RedirectToPage("/Recipes/List");
             throw new Exception("Could not update recipe");
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(string id)
+        {
+            var HttpClient = _httpClientFactory.CreateClient("recipeClient");
+            var result = await HttpClient.DeleteAsync($"recipes/{id}");
+            if (result.IsSuccessStatusCode)
+                return RedirectToPage("/Recipes/List");
+            throw new Exception("Could not delete recipe");
         }
     }
 }

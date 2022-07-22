@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using FluentValidation.AspNetCore;
+using FluentValidation.Results;
 using RecipeExercise3.Models;
 
 namespace RecipeExercise3.Pages;
@@ -13,6 +15,7 @@ public class CreateModel : PageModel
 
     [BindProperty]
     public Recipe NewRecipe { get; set; } = new();
+    RecipeValidator validator = new RecipeValidator();
 
     [BindProperty]
     public List<Guid> CategoriesIds { get; set; } = new();
