@@ -14,11 +14,12 @@ public class Category
     {
         Id = Guid.NewGuid();
     }
-}
-public class CategoryValidator : AbstractValidator<Category>
-{
-    public CategoryValidator()
+
+    public class CategoryValidator : AbstractValidator<Category>
     {
-        RuleFor(_ => _.Name).NotNull().Length(3, 50);
+        public CategoryValidator()
+        {
+            RuleFor(_ => _.Name).NotNull().Length(3, 50);
+        }
     }
 }

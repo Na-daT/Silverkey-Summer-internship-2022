@@ -43,13 +43,14 @@ public class Recipe
         }
         return recipe;
     }
-}
 
-public class RecipeValidator : AbstractValidator<Recipe>
-{
-    public RecipeValidator()
+    public class RecipeValidator : AbstractValidator<Recipe>
     {
-        RuleFor(_ => _.Title).NotNull().Length(3, 50);
-        RuleFor(_ => _.Categories).NotNull().WithMessage("Please pick a category");
+        public RecipeValidator()
+        {
+            RuleFor(_ => _.Title).NotNull().Length(3, 50);
+            RuleFor(_ => _.Categories).NotNull().WithMessage("Please pick a category");
+        }
     }
 }
+
