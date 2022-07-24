@@ -1,0 +1,57 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  width: 100%;
+}
+
+.myFont {
+  font-family: serif;
+}
+
+.mySection {
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#navbar {
+  position: fixed;
+  /* Make it stick/fixed */
+  top: 0;
+  /* Stay on top */
+  width: 100%;
+  /* Full width */
+  transition: top 0.3s;
+  /* Transition effect when sliding down (and up) */
+}
+
+
+#navbar a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+#cardHover:hover {
+  background-color: #ddd;
+  color: black;
+  box-shadow: grey 0px 0px 10px;
+}
+
+[x-cloak] {
+  display: none !important;
+}
