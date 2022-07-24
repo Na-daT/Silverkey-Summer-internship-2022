@@ -3,10 +3,21 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 builder.Logging.AddConsole();
 
 var app = builder.Build();
+app.UseCors();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
 
 var options = new JsonSerializerOptions
