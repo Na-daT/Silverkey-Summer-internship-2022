@@ -50,9 +50,9 @@
             <img src="/images/ArrowDown.svg" />
         </div>
     </div>
-    <section style="background-color:#F1EEE8;" x-show="recipeOpen" x-trap="recipeOpen" x-transition.duration.700ms
-        x-cloak>
-        <div class="container text-center" id="recipeSection">
+    <section style="background-color:#F1EEE8;" x-show="recipeOpen" x-trap="recipeOpen" id="recipeSection"
+        x-transition.duration.700ms x-cloak>
+        <div class="container text-center">
             <h1 class="display-4 pt-4 fst-italic lead">Recipes</h1>
             <p class="lead mt-3">Here you can find all the recipes you have stored in our website.</p>
         </div>
@@ -77,7 +77,7 @@
             <div class="container text-center pb-3">
                 <div class="row justify-content-lg-end">
                     <div class="col-md-4">
-                        <a class="lead m-3 fw-bold link-dark" x-on:click="addRecipe=true" style="color: #135C2D;">You
+                        <a class="lead m-3 fw-bold link-dark" href="#creationForms" style="color: #135C2D;">You
                             can add new recipes
                             here...</a>
                     </div>
@@ -144,8 +144,8 @@
 
                 <div class="row justify-content-center">
                     <div class="col justify-content-end">
-                        <button class="btn btn-dark m-2" x-on:click="addCategory=true" style="opacity:80%;">Add a new
-                            Category</button>
+                        <a class="btn btn-dark m-2" href="#creationForms" style="opacity:80%;">Add a new
+                            Category</a>
                     </div>
                     <div class="col-sm-4 p-0">
                         <object data="/images/online-grocery.svg" width="150" height="150"> </object>
@@ -153,7 +153,7 @@
                 </div>
             </div>
             <div class="col-lg-5">
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 pt-3">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 pt-4">
                     <template x-for="category in categoriesList">
                         <div class="col">
                             <div class="card shadow-sm myCard mb-3">
@@ -164,6 +164,68 @@
                         </div>
                     </template>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section style="background-image: url('images/formmd.jpg');" id="creationForms">
+    <div class="container">
+        <div class="row justify-content-center p-4">
+            <div class="col-md-5">
+                <div x-data="CategoriesData()" x-init="FetchCategories()">
+                    <form method="post" x-data="RecipeToPost()" x-on:submit="PostRecipe()"
+                        class="form-control shadow-sm">
+                        <div class="form-label text-center">
+                            <h1 class="lead fs-3 ">Add new recipe
+                            </h1>
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" x-model="recipeToPost.title"
+                                placeholder="Title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="recipeIngredients">Ingredients</label>
+                            <textarea class="form-control" id="recipeIngredients" rows="3"
+                                x-model="newRecipe.ingredients" placeholder="Enter ingredients" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="recipeInstructions">Instructions</label>
+                            <textarea class="form-control" id="recipeInstructions" rows="3"
+                                x-model="newRecipe.instructions" placeholder="Enter instructions" required></textarea>
+                        </div>
+                        <div class="form-group">
+
+                            <label for="recipeCategories">Categories</label>
+                            <select class="form-control" id="recipeCategories" x-model="newRecipe.categories" multiple>
+                                <template x-for="category in categoriesList">
+                                    <option x-text="category.name"></option>
+                                </template>
+                            </select>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <input type="submit" class="btn m-2" value="Create recipe" id="submitbutton"
+                                style="color: white; background-color:#2C7A48;" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <form method="post" x-data="RecipeToPost()" x-on:submit="PostRecipe()" class="form-control shadow-sm">
+                    <div class="form-label text-center">
+                        <h1 class="lead fs-3 ">Add new category
+                        </h1>
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Name</label>
+                        <input type="text" class="form-control" id="title" name="title" x-model="recipeToPost.title"
+                            placeholder="Type category name" required>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <input type="submit" class="btn m-2" value="Create category" id="submitbutton"
+                            style="color: white; background-color:#2C7A48;" />
+                    </div>
+                </form>
             </div>
         </div>
     </div>
