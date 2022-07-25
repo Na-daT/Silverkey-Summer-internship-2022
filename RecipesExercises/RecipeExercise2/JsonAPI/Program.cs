@@ -9,8 +9,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3000")
             .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyHeader();
     });
 });
 builder.Logging.SetMinimumLevel(LogLevel.Warning);

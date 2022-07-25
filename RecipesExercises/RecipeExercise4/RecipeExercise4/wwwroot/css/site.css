@@ -14,7 +14,6 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
   width: 100%;
 }
 
@@ -54,4 +53,10 @@ body {
 
 [x-cloak] {
   display: none !important;
+}
+
+.myCard:hover {
+  background-color: #2c7a49ca;
+  color: white;
+  box-shadow: gray 0px 0px 10px;
 }

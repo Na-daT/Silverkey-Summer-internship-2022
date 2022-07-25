@@ -9,9 +9,11 @@
 }
 
 <head>
+    <script defer src="https://unpkg.com/@Html.Raw('@')alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/@Html.Raw('@')alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+
     <script src="//unpkg.com/alpinejs" defer></script>
     <!-- Alpine Plugins -->
-    <script defer src="https://unpkg.com/alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
 </head>
 <div x-data="{recipeOpen: false}" x-intersect="recipeOpen = true">
     <header>
@@ -23,27 +25,28 @@
             </div>
             <div class="row justify-content-center border-bottom py-2">
                 <div class=" col-sm-1">
-                    <a href="#button1" class="text-black">Home</a>
+                    <a href="#" class="text-black">Home</a>
                 </div>
                 <div class=" col-sm-1">
                     <a href="#recipeSection" x-on:click="recipeOpen=true" class="text-black">Recipes</a>
                 </div>
                 <div class=" col-sm-1">
-                    <a href="#button1" class="text-black">Categories</a>
+                    <a href="#categoriesSection" class="text-black">Categories</a>
                 </div>
             </div>
     </header>
 
     <div class="row pt-5 pb-3 mb-1 my-3 text-center justify-content-center ">
         <div class="col-md-6 px-0">
-            <h3 class="display-6">Welcome</h3>
-            <h1 class="display-4 fst-italic">Nada's Recipes Website</h1>
-            <p class="lead my-3">A simple website where you can store, edit, and delete your recipes and their
+            <h3 class="display-6" style="color: #135C2D;">Welcome</h3>
+            <h1 class="display-4 fst-italic" style="color: #135C2D;">Nada's Recipes Wesbsite</h1>
+            <p class="lead my-3" style="color: #135C2D;">A simple website where you can store, edit, and delete your
+                recipes and their
                 different
                 categories.</p>
-            <p class="lead mb-3 mt-3"><a href="#recipeSection" class="link-dark fw-bold"
-                    x-on:click="recipeOpen = true">Check
-                    out our Recipes</a></p>
+            <p class="lead mb-3 mt-3" style="color: #135C2D;"><a href="#recipeSection" class="link-dark fw-bold"
+                    x-on:click="recipeOpen = true" style="color: #135C2D;">Check
+                    out your Recipes</a></p>
             <img src="/images/ArrowDown.svg" />
         </div>
     </div>
@@ -51,26 +54,111 @@
         x-cloak>
         <div class="container text-center" id="recipeSection">
             <h1 class="display-4 pt-4 fst-italic lead">Recipes</h1>
-            <p class="lead my-3">Here you can find all the recipes you have stored in our website.</p>
+            <p class="lead mt-3">Here you can find all the recipes you have stored in our website.</p>
         </div>
-        <div x-data="{ recipes: [] }"
-            x-init="recipes = await fetch('@recipeUrl',{method: 'GET', mode:'cors'}).then(response=>response.json()).then(data => recipes = data)">
+        <div x-data="RecipeData()" x-init="FetchRecipes()">
             <div class="container pb-4 pt-2">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3">
                     <template x-for="recipe in recipes">
                         <div class="col " x-show="recipeOpen" x-transition.duration.1500ms>
-                            <div class="card shadow-sm" id="cardHover" x-on:click="">
+                            <div class="card shadow-sm rounded-0" id="cardHover" x-on:click="whichRecipe=recipe.id">
                                 <div class="card-body">
                                     <h5 class="card-title fs-4 mx-1" x-text="recipe.title"></h5>
                                     <template x-for="category in recipe.categories">
-                                        <span class="badge rounded-pill bg-secondary p-1 mx-1"
+                                        <span class="badge rounded-pill p-1 mx-1" style="background-color:#135C2D;"
                                             x-text="category.name"></span>
                                     </template>
-                                    @* <div class="row">
-                                        <div class="col-9">
-                                        <a class=" link-primary mx-1" data-bs-toggle="modal">Details</a>
-                                        </div>
-                                        </div> *@
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            <div class="container text-center pb-3">
+                <div class="row justify-content-lg-end">
+                    <div class="col-md-4">
+                        <a class="lead m-3 fw-bold link-dark" x-on:click="addRecipe=true" style="color: #135C2D;">You
+                            can add new recipes
+                            here...</a>
+                    </div>
+                </div>
+            </div>
+            <template x-for="recipePicked in recipes">
+                <div class="row justify-content-center p-3 pb-4" x-show="whichRecipe === recipePicked.id"
+                    x-transition.duration.400ms x-cloak x-on:click="whichRecipe = 0">
+                    <div style="background-color: white;" id="recipePicked.id"
+                        class="border-bottom round col-lg-9 shadow-lg pb-2">
+                        <div class="row text-center justify-content-center">
+                            <div class="col-sm-3  border-bottom ">
+                                <h1 class="lead fs-2 pt-2" x-text="recipePicked.title"></h1>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class=" col-lg-4 rounded ps-5 pt-4">
+                                <table class="table table-hover rounded shadow-sm text-center"
+                                    style="background-color:#F1EEE8 ;">
+                                    <thead>
+                                        <tr>
+                                            <th class="fs-4" style="color: #135C2D;">Ingredients</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="ingredient in recipePicked.ingredients">
+                                            <tr>
+                                                <td x-text="ingredient"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-lg-5 p-4">
+                                <table class="table table-borderless">
+                                    <thead class=" p-4">
+                                        <tr>
+                                            <th class="fs-4" style="color: #135C2D;">Instructions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="instruction in recipePicked.instructions">
+                                            <tr>
+                                                <td x-text="instruction"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </section>
+</div>
+<section style="background-color: white;" class="p-5" id="categoriesSection">
+    <div class="container" x-data="CategoriesData()" x-init="FetchCategories()">
+        <div class="row justify-content-center">
+            <div class="col-lg-5" style="background-color: #2C7A48; color:white;">
+                <h1 class=" fs-3 fw-bold lead p-3">Categories</h1>
+                <p class="lead mt-3 px-3 fs-5">Here you can find all the categories you have stored in our website. You
+                    can update each Category by clicking on it, or add a new category by clicking the button below. </p>
+
+                <div class="row justify-content-center">
+                    <div class="col justify-content-end">
+                        <button class="btn btn-dark m-2" x-on:click="addCategory=true" style="opacity:80%;">Add a new
+                            Category</button>
+                    </div>
+                    <div class="col-sm-4 p-0">
+                        <object data="/images/online-grocery.svg" width="150" height="150"> </object>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 pt-3">
+                    <template x-for="category in categoriesList">
+                        <div class="col">
+                            <div class="card shadow-sm myCard mb-3">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title fs-6" x-text="category.name"></h5>
                                 </div>
                             </div>
                         </div>
@@ -78,19 +166,8 @@
                 </div>
             </div>
         </div>
-        <div class="container text-center pb-3">
-            <div class="row justify-content-lg-end">
-                <div class="col-md-4">
-                    <a class="lead m-3  fw-bold link-dark" data-bs-toggle="modal" data-bs-target="#newRecipeModal">You
-                        can
-                        add new recipes
-                        here...</a>
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
-
+    </div>
+</section>
 <div class="modal fade" id="newRecipeModal" tabindex="-1" aria-labelledby="newRecipeModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -99,17 +176,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div x-data="{
-                    newRecipe: {
-                        title: '',
-                        ingredients: [],
-                        instructions: [],
-                        categories: [],
-                    },
-                    categoriesList:[]}"
-                    x-init="await fetch('@categoriesUrl',{method: 'GET', mode:'cors'}).then(response=>response.json()).then(data => categoriesList = data)">
-                    <form method="post"
-                        x-on:submit="await fetch('@recipePostUrl',{method:'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(newRecipe)}).then(respone => response.json())">
+                <div x-data="CategoriesData()" x-init="FetchCategories()">
+                    <form method="post" x-data="RecipeToPost()" x-on:submit="PostRecipe()">
                         <label for="recipeTitle">Recipe title</label>
                         <input type="text" class="form-control" id="recipeTitle" x-model="newRecipe.title"
                             placeholder="Enter recipe title" required>
@@ -130,18 +198,68 @@
                 </div>
             </div>
         </div>
-
     </div>
+</div>
 
-    @* <script>
-        document.addEventListener('alpine:init', async () => {
-        const result = await fetch('@recipeUrl', { method: 'GET', mode: 'cors' }).then(response =>
-        response.json()).then(data => recipes = data);
-        if (!result.ok) {
-        throw new Error('${result.stauts}: ${await result.text()}');
+@section scripts{
+<script>
+    function scrollPlease() {
+        window.scroll(
+
+
+        );
+    }
+</script>
+<script>
+    function RecipeData() {
+        return {
+            // other default properties
+            recipes: [],
+            whichRecipe: 0,
+            addRecipe: false,
+            FetchRecipes() {
+                fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.recipes = data;
+                    });
+            }
         }
-        Alpine.store('recipes', {
-        my_data: await result.json(),
-        })
-        })
-        </script> *@
+    }
+</script>
+<script>
+    function CategoriesData() {
+        return {
+            categoriesList: [],
+            FetchCategories() {
+                fetch('@categoriesUrl', { method: 'GET', mode: 'cors' })
+                    .then(response => response.json())
+                    .then(data => this.categoriesList = data);
+            }
+        }
+    }
+</script>
+<script>
+    function RecipeToPost() {
+        return {
+            newRecipe: {
+                id: @Model.GetID(),
+                title: '',
+                ingredients: [],
+                instructions: [],
+                categories: [],
+            },
+            PostRecipe() {
+                fetch('@recipePostUrl', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.newRecipe)
+                });
+            }
+        }
+    }
+</script>
+}
