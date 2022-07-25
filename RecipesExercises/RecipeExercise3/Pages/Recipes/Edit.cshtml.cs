@@ -10,7 +10,7 @@ namespace RecipeExercise3.Pages
     {
         private readonly ILogger<EditRecipeModel> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
-        private RecipeValidator validator = new RecipeValidator();
+        private Recipe.RecipeValidator validator = new Recipe.RecipeValidator();
 
         [BindProperty]
         public Recipe UpdatedRecipe { get; set; } = new();

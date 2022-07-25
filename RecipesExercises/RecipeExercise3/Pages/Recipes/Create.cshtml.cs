@@ -15,7 +15,7 @@ public class CreateModel : PageModel
 
     [BindProperty]
     public Recipe NewRecipe { get; set; } = new();
-    RecipeValidator validator = new RecipeValidator();
+    Recipe.RecipeValidator validator = new Recipe.RecipeValidator();
 
     [BindProperty]
     public List<Guid> CategoriesIds { get; set; } = new();
