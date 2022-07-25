@@ -230,48 +230,8 @@
         </div>
     </div>
 </section>
-<div class="modal fade" id="newRecipeModal" tabindex="-1" aria-labelledby="newRecipeModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">New Recipe</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div x-data="CategoriesData()" x-init="FetchCategories()">
-                    <form method="post" x-data="RecipeToPost()" x-on:submit="PostRecipe()">
-                        <label for="recipeTitle">Recipe title</label>
-                        <input type="text" class="form-control" id="recipeTitle" x-model="newRecipe.title"
-                            placeholder="Enter recipe title" required>
-                        <label for="recipeIngredients">Ingredients</label>
-                        <textarea class="form-control" id="recipeIngredients" rows="3" x-model="newRecipe.ingredients"
-                            placeholder="Enter ingredients" required></textarea>
-                        <label for="recipeInstructions">Instructions</label>
-                        <textarea class="form-control" id="recipeInstructions" rows="3" x-model="newRecipe.instructions"
-                            placeholder="Enter instructions" required></textarea>
-                        <label for="recipeCategories">Categories</label>
-                        <select class="form-control" id="recipeCategories" x-model="newRecipe.categories" multiple>
-                            <template x-for="category in categoriesList">
-                                <option x-text="category.name"></option>
-                            </template>
-                        </select>
-                        <button type="submit" class="btn btn-primary mt-3">Add Recipe</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 @section scripts{
-<script>
-    function scrollPlease() {
-        window.scroll(
-
-
-        );
-    }
-</script>
 <script>
     function RecipeData() {
         return {
