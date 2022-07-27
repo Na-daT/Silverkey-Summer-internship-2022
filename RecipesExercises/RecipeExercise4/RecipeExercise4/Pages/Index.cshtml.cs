@@ -16,9 +16,9 @@ public class IndexModel : PageModel
         MyUrl = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("api")["url"];
     }
 
-    public Guid GetID()
+    public string GetID()
     {
-        return new Guid();
+        return System.Guid.NewGuid().ToString();
     }
 
     public void OnGet()

@@ -6,14 +6,13 @@
     var recipeUrl = @Model.MyUrl + "recipe";
     var recipePostUrl = @Model.MyUrl + "recipes";
     var categoriesUrl = @Model.MyUrl + "category";
+    var categoriesPostUrl = @Model.MyUrl + "categories";
 }
 
 <head>
     <script defer src="https://unpkg.com/@Html.Raw('@')alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/@Html.Raw('@')alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
-
     <script src="//unpkg.com/alpinejs" defer></script>
-    <!-- Alpine Plugins -->
 </head>
 <div x-data="{recipeOpen: false}" x-intersect="recipeOpen = true">
     <header>
@@ -28,7 +27,7 @@
                     <a href="#" class="text-black">Home</a>
                 </div>
                 <div class=" col-sm-1">
-                    <a href="#recipeSection" x-on:click="recipeOpen=true" class="text-black">Recipes</a>
+                    <a href="#recipeSection" class="text-black">Recipes</a>
                 </div>
                 <div class=" col-sm-1">
                     <a href="#categoriesSection" class="text-black">Categories</a>
@@ -50,8 +49,8 @@
             <img src="/images/ArrowDown.svg" />
         </div>
     </div>
-    <section style="background-color:#F1EEE8;" x-show="recipeOpen" x-trap="recipeOpen" id="recipeSection"
-        x-transition.duration.700ms x-cloak>
+    <section style="background-color:#F1EEE8;" x-show="recipeOpen" id="recipeSection" x-transition.duration.700ms
+        x-cloak>
         <div class="container text-center">
             <h1 class="display-4 pt-4 fst-italic lead">Recipes</h1>
             <p class="lead mt-3">Here you can find all the recipes you have stored in our website.</p>
@@ -141,7 +140,6 @@
                 <h1 class=" fs-3 fw-bold lead p-3">Categories</h1>
                 <p class="lead mt-3 px-3 fs-5">Here you can find all the categories you have stored in our website. You
                     can update each Category by clicking on it, or add a new category by clicking the button below. </p>
-
                 <div class="row justify-content-center">
                     <div class="col justify-content-end">
                         <a class="btn btn-dark m-2" href="#creationForms" style="opacity:80%;">Add a new
@@ -169,76 +167,198 @@
     </div>
 </section>
 <section style="background-image: url('images/formmd.jpg');" id="creationForms">
-    <div class="container">
+    <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-md-5">
-                <div x-data="CategoriesData()" x-init="FetchCategories()">
-                    <form method="post" x-data="RecipeToPost()" x-on:submit="PostRecipe()"
-                        class="form-control shadow-sm">
+                <div x-data="RecipeToPost()" x-init="getMyCategories()">
+
+                    <form method="post" x-on:submit="PostRecipe()" class="form-control shadow-sm">
                         <div class="form-label text-center">
                             <h1 class="lead fs-3 ">Add new recipe
                             </h1>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group py-1">
                             <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" x-model="recipeToPost.title"
+                            <input type="text" class="form-control" id="title" name="title" x-model="newRecipe.title"
                                 placeholder="Title" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group py-1">
                             <label for="recipeIngredients">Ingredients</label>
-                            <textarea class="form-control" id="recipeIngredients" rows="3"
-                                x-model="newRecipe.ingredients" placeholder="Enter ingredients" required></textarea>
+                            <button type="button" class="btn btn-sm mx-3 my-1"
+                                style="background-color: #2C7A48; color:white;"
+                                x-on:click="newRecipe.ingredients.push(null)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                            0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                            0 1 8 2Z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="newRowIng py-1">
+                                <input type="hidden" id="ingredientsCount" value="0">
+                                <template x-for="(ingredient,index) in newRecipe.ingredients">
+                                    <div class="input-group pb-1">
+                                        <input type="text" class="form-control py-1" id="recipeIngredients"
+                                            name="recipeIngredients" x-model="newRecipe.ingredients[index]"
+                                            placeholder="Ingredients" aria-describedby="removeIngredient" required>
+                                        <button type="button" class="btn btn-danger btn-sm" id="removeIngredient"
+                                            x-on:click="newRecipe.ingredients.splice(index,1)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group py-1">
                             <label for="recipeInstructions">Instructions</label>
-                            <textarea class="form-control" id="recipeInstructions" rows="3"
-                                x-model="newRecipe.instructions" placeholder="Enter instructions" required></textarea>
+                            <button type="button" class="btn btn-sm mx-3 my-1"
+                                style="background-color: #2C7A48; color:white;"
+                                x-on:click="newRecipe.instructions.push(null)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                            0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                            0 1 8 2Z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <div id="newRowIns py-1">
+                                <input type="hidden" id="instructionsCount" value="0">
+                                <template x-for="(instruction,index) in newRecipe.instructions">
+                                    <div class="input-group pb-1">
+                                        <input type="text" class="form-control py-1" id="recipeInstructions"
+                                            name="recipeInstructions" x-model="newRecipe.instructions[index]"
+                                            placeholder="Instruction" aria-describedby="removeInstruction" required>
+                                        <button type="button" class="btn btn-danger btn-sm" id="removeInstruction"
+                                            x-on:click="newRecipe.instructions.splice(index,1)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
-                        <div class="form-group">
-
+                        <div class="form-group py-1">
                             <label for="recipeCategories">Categories</label>
                             <select class="form-control" id="recipeCategories" x-model="newRecipe.categories" multiple>
-                                <template x-for="category in categoriesList">
+                                <template x-for="category in myCategories">
                                     <option x-text="category.name"></option>
                                 </template>
                             </select>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                             <input type="submit" class="btn m-2" value="Create recipe" id="submitbutton"
-                                style="color: white; background-color:#2C7A48;" />
+                                style="color: white; background-color:#1c4d2d;" />
                         </div>
                     </form>
                 </div>
             </div>
             <div class="col-md-5">
-                <form method="post" x-data="RecipeToPost()" x-on:submit="PostRecipe()" class="form-control shadow-sm">
-                    <div class="form-label text-center">
-                        <h1 class="lead fs-3 ">Add new category
-                        </h1>
-                    </div>
-                    <div class="form-group">
-                        <label for="title">Name</label>
-                        <input type="text" class="form-control" id="title" name="title" x-model="recipeToPost.title"
-                            placeholder="Type category name" required>
-                    </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <input type="submit" class="btn m-2" value="Create category" id="submitbutton"
-                            style="color: white; background-color:#2C7A48;" />
-                    </div>
-                </form>
+                <div x-data="CategoryToPost()">
+                    <form method="post" class="form-control shadow-sm" x-on:submit="PostCategory()">
+                        <div class="form-label text-center">
+                            <h1 class="lead fs-3 ">Add new category
+                            </h1>
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Name</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                placeholder="Type category name" x-model="newCategory.name" required>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <input type="submit" class="btn m-2" value="Create category" id="submitbutton"
+                                style="color: white; background-color:#1c4d2d;" />
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-@section scripts{
+@section Scripts{
+<script>
+    function RecipeToPost() {
+        return {
+            newRecipe: {
+                id: '@Model.GetID()',
+                title: '',
+                ingredients: [],
+                instructions: [],
+                categories: []
+            },
+            myCategories: [],
+            PostRecipe() {
+                console.log(JSON.stringify(this.newRecipe));
+                console.log(JSON.stringify(this.myCategories));
+                let myListyy = [];
+                for (let i = 0; i < this.newRecipe.categories.length; i++) {
+                    let temp = this.myCategories.filter(fetchedCategory => fetchedCategory.name === this.newRecipe.categories[i])
+                    myListyy = myListyy.concat(temp);
+                }
+                this.newRecipe.categories = myListyy;
+                console.log(JSON.stringify(myListyy));
+                fetch('http://localhost:3000/api/json/recipes', {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify(this.newRecipe),
+                    headers: {
+                        'Content-Type': 'application/json;',
+                    }
+                });
+            },
+            getMyCategories() {
+                fetch('http://localhost:3000/api/json/category', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json;',
+                    }
+                }).then(response => response.json())
+                    .then(data => {
+                        this.myCategories = data;
+                    });
+            }
+        }
+    }
+</script>
+<script>
+    function CategoryToPost() {
+        return {
+            newCategory: {
+                id: '@Model.GetID()',
+                name: ''
+            },
+            PostCategory() {
+                fetch('@categoriesPostUrl', {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify(this.newCategory),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+
+        }
+    }
+</script>
 <script>
     function RecipeData() {
         return {
             // other default properties
             recipes: [],
             whichRecipe: 0,
-            addRecipe: false,
             FetchRecipes() {
                 fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
                     .then(res => res.json())
@@ -261,27 +381,5 @@
         }
     }
 </script>
-<script>
-    function RecipeToPost() {
-        return {
-            newRecipe: {
-                id: @Model.GetID(),
-                title: '',
-                ingredients: [],
-                instructions: [],
-                categories: [],
-            },
-            PostRecipe() {
-                fetch('@recipePostUrl', {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(this.newRecipe)
-                });
-            }
-        }
-    }
-</script>
+
 }
