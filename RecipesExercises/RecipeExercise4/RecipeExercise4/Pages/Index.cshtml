@@ -35,7 +35,7 @@
             </div>
     </header>
 
-    <div class="row pt-5 pb-3 mb-1 my-3 text-center justify-content-center ">
+    <div class="row pt-5 pb-3 mb-1 my-3 text-center justify-content-center">
         <div class="col-md-6 px-0">
             <h3 class="display-6" style="color: #135C2D;">Welcome</h3>
             <h1 class="display-4 fst-italic" style="color: #135C2D;">Nada's Recipes Wesbsite</h1>
@@ -44,9 +44,9 @@
                 different
                 categories.</p>
             <p class="lead mb-3 mt-3" style="color: #135C2D;"><a href="#recipeSection" class="link-dark fw-bold"
-                    x-on:click="recipeOpen = true" style="color: #135C2D;">Check
+                    style="color: #135C2D;">Check
                     out your Recipes</a></p>
-            <img src="/images/ArrowDown.svg" />
+            <img src="/images/ArrowDown.svg" id="mainJump" />
         </div>
     </div>
     <section style="background-color:#F1EEE8;" x-show="recipeOpen" id="recipeSection" x-transition.duration.700ms
@@ -60,8 +60,8 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3">
                     <template x-for="recipe in recipes">
                         <div class="col " x-show="recipeOpen" x-transition.duration.1500ms>
-                            <div class="card shadow-sm rounded-0" id="cardHover" x-on:click="whichRecipe=recipe.id">
-                                <div class="card-body">
+                            <div class="card shadow-sm rounded-0" id="cardHover">
+                                <div class="card-body" x-on:click="whichRecipe=recipe.id;updateRecipe =0 ">
                                     <h5 class="card-title fs-4 mx-1" x-text="recipe.title"></h5>
                                     <template x-for="category in recipe.categories">
                                         <span class="badge rounded-pill p-1 mx-1" style="background-color:#135C2D;"
@@ -75,7 +75,7 @@
             </div>
             <div class="container text-center pb-3">
                 <div class="row justify-content-lg-end">
-                    <div class="col-md-4">
+                    <div class="col-md-4 justify-content-end">
                         <a class="lead m-3 fw-bold link-dark" href="#creationForms" style="color: #135C2D;">You
                             can add new recipes
                             here...</a>
@@ -83,13 +83,159 @@
                 </div>
             </div>
             <template x-for="recipePicked in recipes">
+                <div class="row justify-content-center p-3 pb-4" x-data="UpdateRecipe()" x-init="getMyCategories()"
+                    x-show="updateRecipe === recipePicked.id" x-transition.duration.400ms x-cloak>
+                    <div style="background-color: white;" id="recipePicked.id"
+                        class="border-bottom round col-md-5 shadow-lg py-2" x-init="recipeToUpdate = recipePicked">
+                        <div class="row justify-content-end">
+                            <div class="col-md-2">
+                                <button class="btn" x-on:click="updateRecipe = 0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                        class="bi bi-x-lg" viewBox="0 0 16 16">
+                                        <path
+                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <form method="post" x-on:submit.prevent="UpdateFunction()" class="form-control shadow-sm">
+                            <div class="form-label text-center">
+                                <h1 class="lead fs-3 " x-text="recipeToUpdate.title">
+                                </h1>
+                            </div>
+                            <input aria-hidden="true" x-model="recipeToUpdate.id" hidden>
+                            <div class="form-group py-1">
+                                <label for="title">Title</label>
+                                <input type="text" class="form-control" id="title" name="title"
+                                    x-model="recipeToUpdate.title" placeholder="Title" required>
+                            </div>
+                            <div class="form-group py-1">
+                                <label for="recipeIngredients">Ingredients</label>
+                                <button type="button" class="btn btn-sm mx-3 my-1"
+                                    style="background-color: #2C7A48; color:white;"
+                                    x-on:click="recipeToUpdate.ingredients.push(null)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                        class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                            0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                            0 1 8 2Z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <div id="newRowIng py-1">
+                                    <input type="hidden" id="ingredientsCount" value="0">
+                                    <template x-for="(ingredient,index) in recipeToUpdate.ingredients">
+                                        <div class="input-group pb-1">
+                                            <input type="text" class="form-control py-1" id="recipeIngredients"
+                                                name="recipeIngredients" x-model="recipeToUpdate.ingredients[index]"
+                                                placeholder="Ingredients" aria-describedby="removeIngredient" required>
+                                            <button type="button" class="btn btn-danger btn-sm" id="removeIngredient"
+                                                x-on:click="recipeToUpdate.ingredients.splice(index,1)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                    fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="form-group py-1">
+                                <label for="recipeInstructions">Instructions</label>
+                                <button type="button" class="btn btn-sm mx-3 my-1"
+                                    style="background-color: #2C7A48; color:white;"
+                                    x-on:click="recipeToUpdate.instructions.push(null)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                        class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                            0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                            0 1 8 2Z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <div id="newRowIns py-1">
+                                    <input type="hidden" id="instructionsCount" value="0">
+                                    <template x-for="(instruction,index) in recipeToUpdate.instructions">
+                                        <div class="input-group pb-1">
+                                            <input type="text" class="form-control py-1" id="recipeInstructions"
+                                                name="recipeInstructions" x-model="recipeToUpdate.instructions[index]"
+                                                placeholder="Instruction" aria-describedby="removeInstruction" required>
+                                            <button type="button" class="btn btn-danger btn-sm" id="removeInstruction"
+                                                x-on:click="recipeToUpdate.instructions.splice(index,1)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                    fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="form-group py-1">
+                                <label for="recipeCategories">Categories</label>
+                                <select class="form-control" id="recipeCategories" x-model="selectedCategories.names"
+                                    multiple>
+                                    <template x-for="category in myCategories">
+                                        <option x-text="category.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <input type="submit" class="btn m-2" value="Update recipe" id="submitbutton"
+                                    style="color: white; background-color:#1c4d2d;" />
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </template>
+            <template x-for="recipePicked in recipes">
                 <div class="row justify-content-center p-3 pb-4" x-show="whichRecipe === recipePicked.id"
-                    x-transition.duration.400ms x-cloak x-on:click="whichRecipe = 0">
+                    x-transition.duration.400ms x-cloak>
                     <div style="background-color: white;" id="recipePicked.id"
                         class="border-bottom round col-lg-9 shadow-lg pb-2">
-                        <div class="row text-center justify-content-center">
-                            <div class="col-sm-3  border-bottom ">
+                        <div class="row justify-content-end">
+                            <div class="col-sm-auto align-self-end">
+                                <button class="btn" x-on:click="whichRecipe = 0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                        class="bi bi-x-lg" viewBox="0 0 16 16">
+                                        <path
+                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center text-center">
+                            <div class="col-md-4 border-bottom">
                                 <h1 class="lead fs-2 pt-2" x-text="recipePicked.title"></h1>
+                            </div>
+                            <div class="col-sm-auto p-0">
+                                <button class="btn btn-sm my-2"
+                                    x-on:click="updateRecipe = recipePicked.id; whichRecipe = 0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                        class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                        <path
+                                            d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                        <path fill-rule="evenodd"
+                                            d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="col-sm-auto p-0">
+                                <div x-data="DeleteRecipe()" x-init="idToDelete = recipePicked.id">
+                                    <button class="btn btn-sm my-2" x-on:click="DeleteFunction()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red"
+                                            class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                            <path
+                                                d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="row justify-content-center">
@@ -154,9 +300,19 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 pt-4">
                     <template x-for="category in categoriesList">
                         <div class="col">
-                            <div class="card shadow-sm myCard mb-3">
+                            <div class="card shadow-sm myCard mb-3" x-show="whichCategory != category.id"
+                                x-on:click="whichCategory = category.id; categoryToUpdate = category">
                                 <div class="card-body text-center">
                                     <h5 class="card-title fs-6" x-text="category.name"></h5>
+                                </div>
+                            </div>
+                            <div class="card shadow-sm myCard mb-3" x-show="whichCategory === category.id">
+                                <div class="card-body text-center">
+                                    <form x-on:submit.prevent="UpdateCategory()">
+                                        <input type="text" class="form-control" x-model="categoryToUpdate.name">
+                                        <button type="submit" class="btn btn-sm btn-dark mt-2">Update</button>
+                                        <a class="link-dark" x-on:click="whichCategory = 0">Cancel</a>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -171,8 +327,7 @@
         <div class="row justify-content-center p-4">
             <div class="col-md-5">
                 <div x-data="RecipeToPost()" x-init="getMyCategories()">
-
-                    <form method="post" x-on:submit="PostRecipe()" class="form-control shadow-sm">
+                    <form method="post" x-on:submit.prevent="PostRecipe()" class="form-control shadow-sm">
                         <div class="form-label text-center">
                             <h1 class="lead fs-3 ">Add new recipe
                             </h1>
@@ -265,7 +420,7 @@
             </div>
             <div class="col-md-5">
                 <div x-data="CategoryToPost()">
-                    <form method="post" class="form-control shadow-sm" x-on:submit="PostCategory()">
+                    <form method="post" class="form-control shadow-sm" x-on:submit.prevent="PostCategory()">
                         <div class="form-label text-center">
                             <h1 class="lead fs-3 ">Add new category
                             </h1>
@@ -288,6 +443,122 @@
 
 @section Scripts{
 <script>
+    function DeleteRecipe() {
+        return {
+            idToDelete: 0,
+            DeleteFunction() {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: 'grey',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('@recipePostUrl' + '/' + this.idToDelete, {
+                            method: 'DELETE',
+                        }).then(response => {
+                            if (response.ok) {
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    icon: 'success',
+                                    confirmButtonText: 'Ok',
+                                    confirmButtonColor: '#2C7A48'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.hash = '#mainJump';
+                                        window.location.reload(true);
+                                    }
+                                })
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    }
+</script>
+<script>
+    function UpdateRecipe() {
+        return {
+            myCategories: [],
+            recipeToUpdate: {
+                id: '',
+                title: '',
+                ingredients: [],
+                instructions: [],
+                categories: []
+            },
+            selectedCategories: {
+                names: []
+            },
+            UpdateFunction() {
+                console.log(this.recipeToUpdate);
+                console.log(JSON.stringify(this.selectedCategories));
+                this.recipeToUpdate.categories = [];
+                console.log(this.recipeToUpdate);
+                console.log(JSON.stringify(this.myCategories));
+                let myList = [];
+                for (let i = 0; i < this.selectedCategories.names.length; i++) {
+                    let temp1 = this.myCategories.filter(fetchedCategory => fetchedCategory.name === this.selectedCategories.names[i])
+                    myList = myList.concat(temp1);
+                }
+                this.recipeToUpdate.categories = myList;
+                console.log(JSON.stringify(this.recipeToUpdate));
+                console.log(JSON.stringify(myList));
+                Swal.fire({
+                    title: 'Confirm new updates?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#2C7A48',
+                    cancelButtonColor: 'grey',
+                    confirmButtonText: 'Yes, update it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('@recipePostUrl', {
+                            method: 'PUT',
+                            mode: 'cors',
+                            body: JSON.stringify(this.recipeToUpdate),
+                            headers: {
+                                'Content-Type': 'application/json;',
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: 'Recipe updated!',
+                                    icon: 'success',
+                                    confirmButtonText: 'Ok',
+                                    confirmButtonColor: '#2C7A48'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.hash = '#mainJump';
+                                        window.location.reload(true);
+                                    }
+                                })
+                            }
+                        })
+                    }
+                });
+            },
+            getMyCategories() {
+                fetch('@categoriesUrl', {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json;',
+                    }
+                }).then(response => response.json())
+                    .then(data => {
+                        this.myCategories = data;
+                    });
+            }
+        }
+    }
+</script>
+<script>
     function RecipeToPost() {
         return {
             newRecipe: {
@@ -308,17 +579,45 @@
                 }
                 this.newRecipe.categories = myListyy;
                 console.log(JSON.stringify(myListyy));
-                fetch('http://localhost:3000/api/json/recipes', {
+                fetch('@recipePostUrl', {
                     method: 'POST',
                     mode: 'cors',
                     body: JSON.stringify(this.newRecipe),
                     headers: {
                         'Content-Type': 'application/json;',
                     }
+                }).then(response => {
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Recipe created!',
+                            icon: 'success',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.hash = '#mainJump';
+                                window.location.reload(true);
+                            }
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Recipe not created! please try again',
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.hash = '#creationForms';
+                                window.location.reload(true);
+                            }
+                        })
+                    }
+
                 });
             },
             getMyCategories() {
-                fetch('http://localhost:3000/api/json/category', {
+                fetch('@categoriesUrl', {
                     method: 'GET',
                     mode: 'cors',
                     headers: {
@@ -347,6 +646,33 @@
                     headers: {
                         'Content-Type': 'application/json'
                     }
+                }).then(response => {
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Category created!',
+                            icon: 'success',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.hash = '#categoriesSection';
+                                window.location.reload(true);
+                            }
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Recipe not created! please try again',
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.hash = '#creationForms';
+                                window.location.reload(true);
+                            }
+                        });
+                    }
                 });
             }
 
@@ -356,9 +682,9 @@
 <script>
     function RecipeData() {
         return {
-            // other default properties
             recipes: [],
             whichRecipe: 0,
+            updateRecipe: 0,
             FetchRecipes() {
                 fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
                     .then(res => res.json())
@@ -373,10 +699,25 @@
     function CategoriesData() {
         return {
             categoriesList: [],
+            whichCategory: 0,
+            categoryToUpdate: {
+                id: 0,
+                name: ''
+            },
             FetchCategories() {
                 fetch('@categoriesUrl', { method: 'GET', mode: 'cors' })
                     .then(response => response.json())
                     .then(data => this.categoriesList = data);
+            },
+            UpdateCategory() {
+                fetch('@categoriesPostUrl', {
+                    method: 'PUT',
+                    mode: 'cors',
+                    body: JSON.stringify(this.categoryToUpdate),
+                    headers: {
+                        'Content-Type': 'application/json;',
+                    }
+                }).then(() => { this.whichCategory = 0; })
             }
         }
     }
