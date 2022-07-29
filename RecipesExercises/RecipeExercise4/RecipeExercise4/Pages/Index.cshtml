@@ -55,7 +55,7 @@
             <h1 class="display-4 pt-4 fst-italic lead">Recipes</h1>
             <p class="lead mt-3">Here you can find all the recipes you have stored in our website.</p>
         </div>
-        <div x-data="RecipeData()" x-init="FetchRecipes()">
+        <div x-data="recipeData()" x-init="fetchRecipes()">
             <div class="container pb-4 pt-2">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3">
                     <template x-for="recipe in recipes">
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <template x-for="recipePicked in recipes">
-                <div class="row justify-content-center p-3 pb-4" x-data="UpdateRecipe()" x-init="getMyCategories()"
+                <div class="row justify-content-center p-3 pb-4" x-data="updateMyRecipe()" x-init="getMyCategories()"
                     x-show="updateRecipe === recipePicked.id" x-transition.duration.400ms x-cloak>
                     <div style="background-color: white;" id="recipePicked.id"
                         class="border-bottom round col-md-5 shadow-lg py-2" x-init="recipeToUpdate = recipePicked">
@@ -98,7 +98,7 @@
                                 </button>
                             </div>
                         </div>
-                        <form method="post" x-on:submit.prevent="UpdateFunction()" class="form-control shadow-sm">
+                        <form method="post" x-on:submit.prevent="updateFunction()" class="form-control shadow-sm">
                             <div class="form-label text-center">
                                 <h1 class="lead fs-3 " x-text="recipeToUpdate.title">
                                 </h1>
@@ -226,8 +226,8 @@
                                 </button>
                             </div>
                             <div class="col-sm-auto p-0">
-                                <div x-data="DeleteRecipe()" x-init="idToDelete = recipePicked.id">
-                                    <button class="btn btn-sm my-2" x-on:click="DeleteFunction()">
+                                <div x-data="deleteRecipe()" x-init="idToDelete = recipePicked.id">
+                                    <button class="btn btn-sm my-2" x-on:click="deleteFunction()">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red"
                                             class="bi bi-trash3-fill" viewBox="0 0 16 16">
                                             <path
@@ -280,7 +280,7 @@
     </section>
 </div>
 <section style="background-color: white;" class="p-5" id="categoriesSection">
-    <div class="container" x-data="CategoriesData()" x-init="FetchCategories()">
+    <div class="container" x-data="categoriesData()" x-init="FetchCategories()">
         <div class="row justify-content-center">
             <div class="col-lg-5" style="background-color: #2C7A48; color:white;">
                 <h1 class=" fs-3 fw-bold lead p-3">Categories</h1>
@@ -308,7 +308,7 @@
                             </div>
                             <div class="card shadow-sm myCard mb-3" x-show="whichCategory === category.id">
                                 <div class="card-body text-center">
-                                    <form x-on:submit.prevent="UpdateCategory()">
+                                    <form x-on:submit.prevent="updateCategory()">
                                         <input type="text" class="form-control" x-model="categoryToUpdate.name">
                                         <button type="submit" class="btn btn-sm btn-dark mt-2">Update</button>
                                         <a class="link-dark" x-on:click="whichCategory = 0">Cancel</a>
@@ -326,8 +326,8 @@
     <div class="container-fluid">
         <div class="row justify-content-center p-4">
             <div class="col-md-5">
-                <div x-data="RecipeToPost()" x-init="getMyCategories()">
-                    <form method="post" x-on:submit.prevent="PostRecipe()" class="form-control shadow-sm">
+                <div x-data="recipeToPost()" x-init="getMyCategories()">
+                    <form method="post" x-on:submit.prevent="postRecipe()" class="form-control shadow-sm">
                         <div class="form-label text-center">
                             <h1 class="lead fs-3 ">Add new recipe
                             </h1>
@@ -419,8 +419,8 @@
                 </div>
             </div>
             <div class="col-md-5">
-                <div x-data="CategoryToPost()">
-                    <form method="post" class="form-control shadow-sm" x-on:submit.prevent="PostCategory()">
+                <div x-data="categoryToPost()">
+                    <form method="post" class="form-control shadow-sm" x-on:submit.prevent="postCategory()">
                         <div class="form-label text-center">
                             <h1 class="lead fs-3 ">Add new category
                             </h1>
@@ -443,10 +443,10 @@
 
 @section Scripts{
 <script>
-    function DeleteRecipe() {
+    function deleteRecipe() {
         return {
             idToDelete: 0,
-            DeleteFunction() {
+            deleteFunction() {
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -481,7 +481,7 @@
     }
 </script>
 <script>
-    function UpdateRecipe() {
+    function updateMyRecipe() {
         return {
             myCategories: [],
             recipeToUpdate: {
@@ -494,20 +494,14 @@
             selectedCategories: {
                 names: []
             },
-            UpdateFunction() {
-                console.log(this.recipeToUpdate);
-                console.log(JSON.stringify(this.selectedCategories));
+            updateFunction() {
                 this.recipeToUpdate.categories = [];
-                console.log(this.recipeToUpdate);
-                console.log(JSON.stringify(this.myCategories));
                 let myList = [];
                 for (let i = 0; i < this.selectedCategories.names.length; i++) {
                     let temp1 = this.myCategories.filter(fetchedCategory => fetchedCategory.name === this.selectedCategories.names[i])
                     myList = myList.concat(temp1);
                 }
                 this.recipeToUpdate.categories = myList;
-                console.log(JSON.stringify(this.recipeToUpdate));
-                console.log(JSON.stringify(myList));
                 Swal.fire({
                     title: 'Confirm new updates?',
                     icon: 'warning',
@@ -559,7 +553,7 @@
     }
 </script>
 <script>
-    function RecipeToPost() {
+    function recipeToPost() {
         return {
             newRecipe: {
                 id: '@Model.GetID()',
@@ -569,9 +563,7 @@
                 categories: []
             },
             myCategories: [],
-            PostRecipe() {
-                console.log(JSON.stringify(this.newRecipe));
-                console.log(JSON.stringify(this.myCategories));
+            postRecipe() {
                 let myListyy = [];
                 for (let i = 0; i < this.newRecipe.categories.length; i++) {
                     let temp = this.myCategories.filter(fetchedCategory => fetchedCategory.name === this.newRecipe.categories[i])
@@ -632,13 +624,13 @@
     }
 </script>
 <script>
-    function CategoryToPost() {
+    function categoryToPost() {
         return {
             newCategory: {
                 id: '@Model.GetID()',
                 name: ''
             },
-            PostCategory() {
+            postCategory() {
                 fetch('@categoriesPostUrl', {
                     method: 'POST',
                     mode: 'cors',
@@ -680,12 +672,12 @@
     }
 </script>
 <script>
-    function RecipeData() {
+    function recipeData() {
         return {
             recipes: [],
             whichRecipe: 0,
             updateRecipe: 0,
-            FetchRecipes() {
+            fetchRecipes() {
                 fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
                     .then(res => res.json())
                     .then(data => {
@@ -696,7 +688,7 @@
     }
 </script>
 <script>
-    function CategoriesData() {
+    function categoriesData() {
         return {
             categoriesList: [],
             whichCategory: 0,
@@ -704,12 +696,12 @@
                 id: 0,
                 name: ''
             },
-            FetchCategories() {
+            fetchCategories() {
                 fetch('@categoriesUrl', { method: 'GET', mode: 'cors' })
                     .then(response => response.json())
                     .then(data => this.categoriesList = data);
             },
-            UpdateCategory() {
+            updateCategory() {
                 fetch('@categoriesPostUrl', {
                     method: 'PUT',
                     mode: 'cors',
