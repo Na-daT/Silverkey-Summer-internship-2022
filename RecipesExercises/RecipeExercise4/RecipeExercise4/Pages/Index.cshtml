@@ -697,11 +697,8 @@
                     .then(data => {
                         this.recipes = data;
                     });
-                console.log(JSON.stringify(this.recipes));
-
             },
             get loadRecipes() {
-                console.log(JSON.stringify(this.recipes));
                 if (this.search === "") {
                     return this.recipes;
                 }
@@ -748,16 +745,10 @@
                     }).then(() => { this.updateRecipes(); });
             },
             updateRecipes() {
-                console.log('we are here');
-                console.log(this.recipesDataTemp);
-                console.log('we are here 4');
                 for (let i = 0; i < this.recipesDataTemp.length; i++) {
-                    console.log(JSON.stringify(this.categoryToUpdate));
-                    console.log(JSON.stringify(this.recipesDataTemp[i]));
                     if (this.recipesDataTemp[i].categories.find(category => category.id === this.categoryToUpdate.id) !== undefined) {
                         this.recipesDataTemp[i].categories = this.recipesDataTemp[i].categories.filter(category => category.id !== this.categoryToUpdate.id);
                         this.recipesDataTemp[i].categories.push(this.categoryToUpdate);
-                        console.log(JSON.stringify(this.recipesDataTemp[i]));
                         fetch('@recipePostUrl', {
                             method: 'PUT',
                             mode: 'cors',
