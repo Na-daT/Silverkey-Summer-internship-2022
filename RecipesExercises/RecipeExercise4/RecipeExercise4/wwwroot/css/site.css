@@ -32,10 +32,12 @@ body {
   background-color: #ddd;
   color: black;
   box-shadow: grey 0px 0px 10px;
+  transform: scale(1.05);
 }
 
 .myCard:hover {
   background-color: #2c7a49ca;
   color: white;
   box-shadow: gray 0px 0px 10px;
+  transform: scale(1.05);
 }

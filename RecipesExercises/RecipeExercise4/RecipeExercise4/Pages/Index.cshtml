@@ -34,7 +34,7 @@
                 </div>
             </div>
     </header>
-
+    @*Main Section*@
     <div class="row pt-5 pb-3 mb-1 my-3 text-center justify-content-center">
         <div class="col-md-6 px-0">
             <h3 class="display-6" style="color: #135C2D;">Welcome</h3>
@@ -49,21 +49,29 @@
             <img src="/images/ArrowDown.svg" id="mainJump" />
         </div>
     </div>
+    @*Recipe Section*@
     <section style="background-color:#F1EEE8;" x-show="recipeOpen" id="recipeSection" x-transition.duration.700ms
         x-cloak>
         <div class="container text-center">
-            <h1 class="display-4 pt-4 fst-italic lead">Recipes</h1>
-            <p class="lead mt-3">Here you can find all the recipes you have stored in our website.</p>
+            <h1 class="display-4 pt-4 lead">Recipes</h1>
+            <p class="lead mt-3 mb-0">Here you can find all the recipes you have stored in our website.</p>
         </div>
         <div x-data="recipeData()" x-init="fetchRecipes()">
             <div class="container pb-4 pt-2">
+                <div class="row justify-content-end">
+                    <div class="col col-sm-3 justify-content-end align-content-end m-2">
+                        <input x-ref="searchField" x-model="search"
+                            x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
+                            placeholder="Search for a recipe..." type="search" class="form-control" />
+                    </div>
+                </div>
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3">
-                    <template x-for="recipe in recipes">
+                    <template x-for="item in loadRecipes" :key="item.title">
                         <div class="col " x-show="recipeOpen" x-transition.duration.1500ms>
                             <div class="card shadow-sm rounded-0" id="cardHover">
-                                <div class="card-body" x-on:click="whichRecipe=recipe.id;updateRecipe =0 ">
-                                    <h5 class="card-title fs-4 mx-1" x-text="recipe.title"></h5>
-                                    <template x-for="category in recipe.categories">
+                                <div class="card-body" x-on:click="whichRecipe=item.id;updateRecipe =0 ">
+                                    <h5 class="card-title fs-4 mx-1" x-text="item.title"></h5>
+                                    <template x-for="category in item.categories">
                                         <span class="badge rounded-pill p-1 mx-1" style="background-color:#135C2D;"
                                             x-text="category.name"></span>
                                     </template>
@@ -73,16 +81,9 @@
                     </template>
                 </div>
             </div>
-            <div class="container text-center pb-3">
-                <div class="row justify-content-lg-end">
-                    <div class="col-md-4 justify-content-end">
-                        <a class="lead m-3 fw-bold link-dark" href="#creationForms" style="color: #135C2D;">You
-                            can add new recipes
-                            here...</a>
-                    </div>
-                </div>
-            </div>
-            <template x-for="recipePicked in recipes">
+
+            @*update recipe forms*@
+            <template x-for="recipePicked in loadRecipes">
                 <div class="row justify-content-center p-3 pb-4" x-data="updateMyRecipe()" x-init="getMyCategories()"
                     x-show="updateRecipe === recipePicked.id" x-transition.duration.400ms x-cloak>
                     <div style="background-color: white;" id="recipePicked.id"
@@ -193,7 +194,9 @@
                     </div>
                 </div>
             </template>
-            <template x-for="recipePicked in recipes">
+
+            @* single recipe details *@
+            <template x-for="recipePicked in loadRecipes">
                 <div class="row justify-content-center p-3 pb-4" x-show="whichRecipe === recipePicked.id"
                     x-transition.duration.400ms x-cloak>
                     <div style="background-color: white;" id="recipePicked.id"
@@ -276,6 +279,15 @@
                     </div>
                 </div>
             </template>
+            <div class="container text-center pb-3">
+                <div class="row justify-content-lg-end">
+                    <div class="col-md-4 justify-content-end">
+                        <a class="lead m-3 fw-bold link-dark" href="#creationForms" style="color: #135C2D;">You
+                            can add new recipes
+                            here...</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </div>
@@ -677,14 +689,28 @@
             recipes: [],
             whichRecipe: 0,
             updateRecipe: 0,
+            search: "",
             fetchRecipes() {
                 fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
                     .then(res => res.json())
                     .then(data => {
                         this.recipes = data;
                     });
+                console.log(JSON.stringify(this.recipes));
+
+            },
+            get loadRecipes() {
+                console.log(JSON.stringify(this.recipes));
+                if (this.search === "") {
+                    return this.recipes;
+                }
+                return this.recipes.filter((item) => {
+                    return item.title
+                        .toLowerCase()
+                        .includes(this.search.toLowerCase());
+                });
             }
-        }
+        };
     }
 </script>
 <script>
