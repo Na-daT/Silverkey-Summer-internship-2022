@@ -280,7 +280,7 @@
     </section>
 </div>
 <section style="background-color: white;" class="p-5" id="categoriesSection">
-    <div class="container" x-data="categoriesData()" x-init="FetchCategories()">
+    <div class="container" x-data="categoriesData()" x-init="fetchCategories()">
         <div class="row justify-content-center">
             <div class="col-lg-5" style="background-color: #2C7A48; color:white;">
                 <h1 class=" fs-3 fw-bold lead p-3">Categories</h1>
@@ -570,7 +570,6 @@
                     myListyy = myListyy.concat(temp);
                 }
                 this.newRecipe.categories = myListyy;
-                console.log(JSON.stringify(myListyy));
                 fetch('@recipePostUrl', {
                     method: 'POST',
                     mode: 'cors',
@@ -585,17 +584,18 @@
                             text: 'Recipe created!',
                             icon: 'success',
                             confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.hash = '#mainJump';
-                                window.location.reload(true);
-                            }
                         })
+                            .then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.hash = '#mainJump';
+                                    window.location.reload(true);
+                                }
+                            })
                     }
                     else {
                         Swal.fire({
                             title: 'Error!',
-                            text: 'Recipe not created! please try again',
+                            text: 'Recipe not created! please try again.',
                             icon: 'error',
                             confirmButtonText: 'Ok'
                         }).then((result) => {
@@ -696,10 +696,12 @@
                 id: 0,
                 name: ''
             },
+            recipesDataTemp: [],
             fetchCategories() {
                 fetch('@categoriesUrl', { method: 'GET', mode: 'cors' })
                     .then(response => response.json())
-                    .then(data => this.categoriesList = data);
+                    .then(data => this.categoriesList = data)
+                    .then(() => { this.categoriesList = this.categoriesList.sort((a, b) => a.name.localeCompare(b.name)) });
             },
             updateCategory() {
                 fetch('@categoriesPostUrl', {
@@ -709,10 +711,38 @@
                     headers: {
                         'Content-Type': 'application/json;',
                     }
-                }).then(() => { this.whichCategory = 0; })
+                }).then(() => { this.whichCategory = 0; }).then(() => { this.getRecipesList(); });
+            },
+            getRecipesList() {
+                fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.recipesDataTemp = data;
+                    }).then(() => { this.updateRecipes(); });
+            },
+            updateRecipes() {
+                console.log('we are here');
+                console.log(this.recipesDataTemp);
+                console.log('we are here 4');
+                for (let i = 0; i < this.recipesDataTemp.length; i++) {
+                    console.log(JSON.stringify(this.categoryToUpdate));
+                    console.log(JSON.stringify(this.recipesDataTemp[i]));
+                    if (this.recipesDataTemp[i].categories.find(category => category.id === this.categoryToUpdate.id) !== undefined) {
+                        this.recipesDataTemp[i].categories = this.recipesDataTemp[i].categories.filter(category => category.id !== this.categoryToUpdate.id);
+                        this.recipesDataTemp[i].categories.push(this.categoryToUpdate);
+                        console.log(JSON.stringify(this.recipesDataTemp[i]));
+                        fetch('@recipePostUrl', {
+                            method: 'PUT',
+                            mode: 'cors',
+                            body: JSON.stringify(this.recipesDataTemp[i]),
+                            headers: {
+                                'Content-Type': 'application/json;',
+                            }
+                        });
+                    }
+                }
             }
         }
     }
 </script>
-
 }
