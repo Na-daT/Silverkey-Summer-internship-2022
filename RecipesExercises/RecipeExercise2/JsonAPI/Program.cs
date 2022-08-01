@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -17,8 +18,15 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 app.UseCors();
-var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
+//var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
+app.UseSwagger();
+app.UseSwaggerUI();
 
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = String.Empty;
+});
 var options = new JsonSerializerOptions
 {
     PropertyNameCaseInsensitive = true,
@@ -141,4 +149,4 @@ app.MapPut("api/json/categories", async ([FromBody] Category categoryToUpdate) =
     }
 });
 
-app.Run($"http://localhost:{port}");
+app.Run();
