@@ -16,6 +16,7 @@ builder.Services.AddFluentValidation(options =>
     options.RegisterValidatorsFromAssemblyContaining(typeof(Program));
     options.ImplicitlyValidateChildProperties = true;
 });
+builder.Services.AddGrpc();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
