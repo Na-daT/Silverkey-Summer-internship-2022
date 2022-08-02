@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "RecipeExercise5";
+option csharp_namespace = "Server_gRPC";
 
 package greet;
 

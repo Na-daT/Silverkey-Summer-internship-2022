@@ -1,4 +1,4 @@
-using RecipeExercise5.Services;
+using Server_gRPC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
