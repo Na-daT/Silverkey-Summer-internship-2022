@@ -1,4 +1,6 @@
 using Server_gRPC.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
-
+builder.WebHost.ConfigureKestrel(k =>
+{
+    k.ConfigureEndpointDefaults(options => options.Protocols = HttpProtocols.Http2);
+    k.ListenLocalhost(5500, o => o.UseHttps());
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
