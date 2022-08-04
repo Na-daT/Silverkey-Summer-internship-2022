@@ -9,6 +9,238 @@
     var categoriesPostUrl = @Model.MyUrl + "categories";
 }
 
+@section Scripts{
+<script>
+    async function loadRecipes(search) {
+        var recipesList = await getRecipesAsync();
+        if (search === String.empty) {
+            return recipesList;
+        }
+        var result = [];
+        for (var i = 0; i < recipesList.length; i++) {
+            if (recipesList[i].title.toLowerCase().indexOf(search.toLowerCase()) > -1) {
+                result.push(recipesList[i]);
+            }
+        }
+        console.log(result);
+        return result;
+    }
+    async function getRecipesAsync() {
+        const response = await fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
+            .then(res => { return res })
+        if (response.ok) {
+            const json = await response.json();
+            console.log(json);
+            return json;
+        }
+    }
+    async function getCategoriesAsync() {
+        const response = await fetch('@categoriesUrl', { method: 'GET', mode: 'cors' })
+            .then(res => { return res })
+        if (response.ok) {
+            return response.json()
+        }
+    }
+    async function deleteRecipeAsync(recipe) {
+        const alert = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: 'grey',
+            confirmButtonText: 'Yes, delete it!'
+        });
+        if (alert.value === true) {
+            const response = await fetch('@recipePostUrl' + '/' + recipe.id, {
+                method: 'DELETE',
+            }).then(res => { return res })
+            if (response.ok) {
+                await Swal.fire({
+                    title: 'Deleted!',
+                    icon: 'success',
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: '#2C7A48'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.hash = '#mainJump';
+                        window.location.reload(true);
+                    }
+                })
+            }
+            else {
+                await Swal.fire({
+                    title: 'Error!',
+                    icon: 'Try again later.',
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: '#2C7A48'
+                })
+            }
+        }
+    }
+</script>
+<script>
+    async function updateMyRecipeAsync(recipeToUpdate, selectedCategories) {
+        myCategories = await getCategoriesAsync();
+        recipeToUpdate.categories = [];
+        let myList = [];
+        for (let i = 0; i < selectedCategories.names.length; i++) {
+            let temp1 = myCategories.filter(fetchedCategory => fetchedCategory.name === selectedCategories.names[i])
+            myList = myList.concat(temp1);
+        }
+        recipeToUpdate.categories = myList;
+        const alert = await Swal.fire({
+            title: 'Confirm new updates?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2C7A48',
+            cancelButtonColor: 'grey',
+            confirmButtonText: 'Yes, update it!'
+        })
+        if (alert.value === true) {
+            const result = await fetch('@recipePostUrl', {
+                method: 'PUT',
+                mode: 'cors',
+                body: JSON.stringify(recipeToUpdate),
+                headers: {
+                    'Content-Type': 'application/json;',
+                }
+            }).then(res => { return res })
+            if (result.ok) {
+                await Swal.fire({
+                    title: 'Success!',
+                    text: 'Recipe updated!',
+                    icon: 'success',
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: '#2C7A48'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.hash = '#mainJump';
+                        window.location.reload(true);
+                    }
+                })
+            }
+        }
+    }
+    async function recipeToPostAsync(newRecipe, myCategories) {
+        let myListyy = [];
+        for (let i = 0; i < newRecipe.categories.length; i++) {
+            let temp = myCategories.filter(fetchedCategory => fetchedCategory.name === newRecipe.categories[i])
+            myListyy = myListyy.concat(temp);
+        }
+        newRecipe.categories = myListyy;
+        const response = await fetch('@recipePostUrl', {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify(newRecipe),
+            headers: {
+                'Content-Type': 'application/json;',
+            }
+        }).then(res => { return res })
+        if (response.ok) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Recipe created!',
+                icon: 'success',
+                confirmButtonText: 'Ok'
+            })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.hash = '#mainJump';
+                        window.location.reload(true);
+                    }
+                })
+        }
+        else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Recipe not created! please try again.',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.hash = '#creationForms';
+                    window.location.reload(true);
+                }
+            })
+        }
+    }
+    async function categoryToPostAsync(newCategory) {
+        console.log(JSON.stringify(newCategory));
+        const response = await fetch('@categoriesPostUrl', {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify(newCategory),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => { return res })
+        if (response.ok) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Category created!',
+                icon: 'success',
+                confirmButtonText: 'Ok'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.hash = '#categoriesSection';
+                    window.location.reload(true);
+                }
+            })
+        }
+        else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Category not created! please try again',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            })
+        }
+    }
+
+    async function updateCategoryAsync(categoryToUpdate, whichCategory) {
+        var recipesDataTemp = await getRecipesAsync();
+        const response = await fetch('@categoriesPostUrl', {
+            method: 'PUT',
+            mode: 'cors',
+            body: JSON.stringify(categoryToUpdate),
+            headers: {
+                'Content-Type': 'application/json;',
+            }
+        }).then(res => { return res })
+        if (response.ok) {
+            whichCategory = 0;
+            for (let i = 0; i < recipesDataTemp.length; i++) {
+                if (recipesDataTemp[i].categories.find(category => category.id === categoryToUpdate.id) !== undefined) {
+                    recipesDataTemp[i].categories = recipesDataTemp[i].categories.filter(category => category.id !== categoryToUpdate.id);
+                    recipesDataTemp[i].categories.push(categoryToUpdate);
+                    await fetch('@recipePostUrl', {
+                        method: 'PUT',
+                        mode: 'cors',
+                        body: JSON.stringify(recipesDataTemp[i]),
+                        headers: {
+                            'Content-Type': 'application/json;',
+                        }
+                    });
+                }
+            }
+            await Swal.fire({
+                title: 'Success!',
+                text: 'Category updated!',
+                icon: 'success',
+                confirmButtonText: 'Ok'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.hash = '#categoriesSection';
+                    window.location.reload(true);
+                }
+            })
+        }
+        return whichCategory;
+    }
+</script>
+}
+
 <head>
     <script defer src="https://unpkg.com/@Html.Raw('@')alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/@Html.Raw('@')alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
@@ -57,17 +289,20 @@
             <p class="lead mt-3 mb-0">Here you can find all the recipes you have stored in our website.</p>
         </div>
         @*All recipes cards*@
-        <div x-data="recipeData()" x-init="fetchRecipes()">
+        <div x-data="{recipes: [],whichRecipe: 0, updateRecipe: 0,search:'', loadedRecipes: []}"
+            x-init="recipes = await getRecipesAsync()">
             <div class="container pb-4 pt-2">
                 <div class="row justify-content-end">
                     <div class="col col-sm-3 justify-content-end align-content-end m-2">
                         <input x-ref="searchField" x-model="search"
                             x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
-                            placeholder="Search for a recipe..." type="search" class="form-control" />
+                            placeholder="Search for a recipe..." type="search" class="form-control"
+                            x-on:change="loadedRecipes = await loadRecipes(search)" />
                     </div>
                 </div>
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3">
-                    <template x-for="item in loadRecipes" :key="item.title">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3"
+                    x-init="loadedRecipes = await loadRecipes(search)">
+                    <template x-for="item in loadedRecipes" :key="item.title">
                         <div class="col " x-show="recipeOpen" x-transition.duration.1500ms>
                             <div class="card shadow-sm rounded-0" id="cardHover">
                                 <div class="card-body" x-on:click="whichRecipe=item.id;updateRecipe =0 ">
@@ -84,9 +319,11 @@
             </div>
 
             @*update recipe forms*@
-            <template x-for="recipePicked in loadRecipes">
-                <div class="row justify-content-center p-3 pb-4" x-data="updateMyRecipe()" x-init="getMyCategories()"
-                    x-show="updateRecipe === recipePicked.id" x-transition.duration.400ms x-cloak>
+            <template x-for="recipePicked in loadedRecipes">
+                <div class="row justify-content-center p-3 pb-4"
+                    x-data="{myCategories: [],recipeToUpdate: {id: '',title: '',ingredients: [],instructions: [],categories: []},selectedCategories: {names: []}}"
+                    x-init="myCategories = await getCategoriesAsync()" x-show="updateRecipe === recipePicked.id"
+                    x-transition.duration.400ms x-cloak>
                     <div style="background-color: white;" id="recipePicked.id"
                         class="border-bottom round col-md-5 shadow-lg py-2" x-init="recipeToUpdate = recipePicked">
                         <div class="row justify-content-end">
@@ -100,7 +337,8 @@
                                 </button>
                             </div>
                         </div>
-                        <form method="post" x-on:submit.prevent="updateFunction()" class="form-control shadow-sm">
+                        <form method="post" class="form-control shadow-sm"
+                            x-on:submit.prevent="async()=>{await updateMyRecipeAsync(recipeToUpdate, selectedCategories)}">
                             <div class="form-label text-center">
                                 <h1 class="lead fs-3 " x-text="recipeToUpdate.title">
                                 </h1>
@@ -197,7 +435,7 @@
             </template>
 
             @* single recipe details *@
-            <template x-for="recipePicked in loadRecipes">
+            <template x-for="recipePicked in loadedRecipes">
                 <div class="row justify-content-center p-3 pb-4" x-show="whichRecipe === recipePicked.id"
                     x-transition.duration.400ms x-cloak>
                     <div style="background-color: white;" id="recipePicked.id"
@@ -230,8 +468,8 @@
                                 </button>
                             </div>
                             <div class="col-sm-auto p-0">
-                                <div x-data="deleteRecipe()" x-init="idToDelete = recipePicked.id">
-                                    <button class="btn btn-sm my-2" x-on:click="deleteFunction()">
+                                <div>
+                                    <button class="btn btn-sm my-2" x-on:click="deleteRecipeAsync(recipePicked)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red"
                                             class="bi bi-trash3-fill" viewBox="0 0 16 16">
                                             <path
@@ -295,7 +533,8 @@
 </div>
 @*Categories section*@
 <section style="background-color: white;" class="p-5" id="categoriesSection">
-    <div class="container" x-data="categoriesData()" x-init="fetchCategories()">
+    <div class="container" x-data="{categoriesList: [],whichCategory: 0,categoryToUpdate: {id: 0,name: ''},}"
+        x-init="categoriesList = await getCategoriesAsync()">
         <div class="row justify-content-center">
             <div class="col-lg-5" style="background-color: #2C7A48; color:white;">
                 <h1 class=" fs-3 fw-bold lead p-3">Categories</h1>
@@ -324,7 +563,8 @@
                             </div>
                             <div class="card shadow-sm myCard mb-3" x-show="whichCategory === category.id">
                                 <div class="card-body text-center">
-                                    <form x-on:submit.prevent="updateCategory()">
+                                    <form
+                                        x-on:submit.prevent="async()=>{whichCategory = await updateCategoryAsync(categoryToUpdate, whichCategory)}">
                                         <input type="text" class="form-control" x-model="categoryToUpdate.name">
                                         <button type="submit" class="btn btn-sm btn-dark mt-2">Update</button>
                                         <a class="link-dark" x-on:click="whichCategory = 0">Cancel</a>
@@ -343,8 +583,10 @@
         <div class="row justify-content-center p-4">
             @*Recipes Creation form*@
             <div class="col-md-5">
-                <div x-data="recipeToPost()" x-init="getMyCategories()">
-                    <form method="post" x-on:submit.prevent="postRecipe()" class="form-control shadow-sm">
+                <div x-data="{newRecipe: {id: '@Model.GetID()',title: '',ingredients: [],instructions: [],categories: []},myCategories: []}"
+                    x-init="myCategories = await getCategoriesAsync()">
+                    <form method="post" x-on:submit.prevent="async()=>{await recipeToPostAsync(newRecipe,myCategories)}"
+                        class="form-control shadow-sm">
                         <div class="form-label text-center">
                             <h1 class="lead fs-3 ">Add new recipe
                             </h1>
@@ -437,8 +679,9 @@
             </div>
             @*Categories Creation form*@
             <div class="col-md-5">
-                <div x-data="categoryToPost()">
-                    <form method="post" class="form-control shadow-sm" x-on:submit.prevent="postCategory()">
+                <div x-data="{ newCategory: {id: '@Model.GetID()',name: ''}}">
+                    <form method="post" class="form-control shadow-sm"
+                        x-on:submit.prevent="async ()=>{await categoryToPostAsync(newCategory)}">
                         <div class="form-label text-center">
                             <h1 class="lead fs-3 ">Add new category
                             </h1>
@@ -458,312 +701,3 @@
         </div>
     </div>
 </section>
-
-@section Scripts{
-<script>
-    function deleteRecipe() {
-        return {
-            idToDelete: 0,
-            deleteFunction() {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: 'grey',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch('@recipePostUrl' + '/' + this.idToDelete, {
-                            method: 'DELETE',
-                        }).then(response => {
-                            if (response.ok) {
-                                Swal.fire({
-                                    title: 'Deleted!',
-                                    icon: 'success',
-                                    confirmButtonText: 'Ok',
-                                    confirmButtonColor: '#2C7A48'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.hash = '#mainJump';
-                                        window.location.reload(true);
-                                    }
-                                })
-                            }
-                        });
-                    }
-                });
-            }
-        }
-    }
-</script>
-<script>
-    function updateMyRecipe() {
-        return {
-            myCategories: [],
-            recipeToUpdate: {
-                id: '',
-                title: '',
-                ingredients: [],
-                instructions: [],
-                categories: []
-            },
-            selectedCategories: {
-                names: []
-            },
-            updateFunction() {
-                this.recipeToUpdate.categories = [];
-                let myList = [];
-                for (let i = 0; i < this.selectedCategories.names.length; i++) {
-                    let temp1 = this.myCategories.filter(fetchedCategory => fetchedCategory.name === this.selectedCategories.names[i])
-                    myList = myList.concat(temp1);
-                }
-                this.recipeToUpdate.categories = myList;
-                Swal.fire({
-                    title: 'Confirm new updates?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#2C7A48',
-                    cancelButtonColor: 'grey',
-                    confirmButtonText: 'Yes, update it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch('@recipePostUrl', {
-                            method: 'PUT',
-                            mode: 'cors',
-                            body: JSON.stringify(this.recipeToUpdate),
-                            headers: {
-                                'Content-Type': 'application/json;',
-                            }
-                        }).then(response => {
-                            if (response.ok) {
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: 'Recipe updated!',
-                                    icon: 'success',
-                                    confirmButtonText: 'Ok',
-                                    confirmButtonColor: '#2C7A48'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.hash = '#mainJump';
-                                        window.location.reload(true);
-                                    }
-                                })
-                            }
-                        })
-                    }
-                });
-            },
-            getMyCategories() {
-                fetch('@categoriesUrl', {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json;',
-                    }
-                }).then(response => response.json())
-                    .then(data => {
-                        this.myCategories = data;
-                    });
-            }
-        }
-    }
-</script>
-<script>
-    function recipeToPost() {
-        return {
-            newRecipe: {
-                id: '@Model.GetID()',
-                title: '',
-                ingredients: [],
-                instructions: [],
-                categories: []
-            },
-            myCategories: [],
-            postRecipe() {
-                let myListyy = [];
-                for (let i = 0; i < this.newRecipe.categories.length; i++) {
-                    let temp = this.myCategories.filter(fetchedCategory => fetchedCategory.name === this.newRecipe.categories[i])
-                    myListyy = myListyy.concat(temp);
-                }
-                this.newRecipe.categories = myListyy;
-                fetch('@recipePostUrl', {
-                    method: 'POST',
-                    mode: 'cors',
-                    body: JSON.stringify(this.newRecipe),
-                    headers: {
-                        'Content-Type': 'application/json;',
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Recipe created!',
-                            icon: 'success',
-                            confirmButtonText: 'Ok'
-                        })
-                            .then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.hash = '#mainJump';
-                                    window.location.reload(true);
-                                }
-                            })
-                    }
-                    else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Recipe not created! please try again.',
-                            icon: 'error',
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.hash = '#creationForms';
-                                window.location.reload(true);
-                            }
-                        })
-                    }
-                });
-            },
-            getMyCategories() {
-                fetch('@categoriesUrl', {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json;',
-                    }
-                }).then(response => response.json())
-                    .then(data => {
-                        this.myCategories = data;
-                    });
-            }
-        }
-    }
-</script>
-<script>
-    function categoryToPost() {
-        return {
-            newCategory: {
-                id: '@Model.GetID()',
-                name: ''
-            },
-            postCategory() {
-                fetch('@categoriesPostUrl', {
-                    method: 'POST',
-                    mode: 'cors',
-                    body: JSON.stringify(this.newCategory),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Category created!',
-                            icon: 'success',
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.hash = '#categoriesSection';
-                                window.location.reload(true);
-                            }
-                        })
-                    }
-                    else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Recipe not created! please try again',
-                            icon: 'error',
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.hash = '#creationForms';
-                                window.location.reload(true);
-                            }
-                        });
-                    }
-                });
-            }
-        }
-    }
-</script>
-<script>
-    function recipeData() {
-        return {
-            recipes: [],
-            whichRecipe: 0,
-            updateRecipe: 0,
-            search: "",
-            fetchRecipes() {
-                fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
-                    .then(res => res.json())
-                    .then(data => {
-                        this.recipes = data;
-                    });
-            },
-            get loadRecipes() {
-                if (this.search === "") {
-                    return this.recipes;
-                }
-                return this.recipes.filter((item) => {
-                    return item.title
-                        .toLowerCase()
-                        .includes(this.search.toLowerCase());
-                });
-            }
-        };
-    }
-</script>
-<script>
-    function categoriesData() {
-        return {
-            categoriesList: [],
-            whichCategory: 0,
-            categoryToUpdate: {
-                id: 0,
-                name: ''
-            },
-            recipesDataTemp: [],
-            fetchCategories() {
-                fetch('@categoriesUrl', { method: 'GET', mode: 'cors' })
-                    .then(response => response.json())
-                    .then(data => this.categoriesList = data)
-                    .then(() => { this.categoriesList = this.categoriesList.sort((a, b) => a.name.localeCompare(b.name)) });
-            },
-            updateCategory() {
-                fetch('@categoriesPostUrl', {
-                    method: 'PUT',
-                    mode: 'cors',
-                    body: JSON.stringify(this.categoryToUpdate),
-                    headers: {
-                        'Content-Type': 'application/json;',
-                    }
-                }).then(() => { this.whichCategory = 0; }).then(() => { this.getRecipesList(); });
-            },
-            getRecipesList() {
-                fetch('@recipeUrl', { method: 'GET', mode: 'cors' })
-                    .then(res => res.json())
-                    .then(data => {
-                        this.recipesDataTemp = data;
-                    }).then(() => { this.updateRecipes(); });
-            },
-            updateRecipes() {
-                for (let i = 0; i < this.recipesDataTemp.length; i++) {
-                    if (this.recipesDataTemp[i].categories.find(category => category.id === this.categoryToUpdate.id) !== undefined) {
-                        this.recipesDataTemp[i].categories = this.recipesDataTemp[i].categories.filter(category => category.id !== this.categoryToUpdate.id);
-                        this.recipesDataTemp[i].categories.push(this.categoryToUpdate);
-                        fetch('@recipePostUrl', {
-                            method: 'PUT',
-                            mode: 'cors',
-                            body: JSON.stringify(this.recipesDataTemp[i]),
-                            headers: {
-                                'Content-Type': 'application/json;',
-                            }
-                        });
-                    }
-                }
-            }
-        }
-    }
-</script>
-}
