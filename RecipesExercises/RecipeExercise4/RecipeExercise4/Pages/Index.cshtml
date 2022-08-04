@@ -297,7 +297,7 @@
                         <input x-ref="searchField" x-model="search"
                             x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
                             placeholder="Search for a recipe..." type="search" class="form-control"
-                            x-on:change="loadedRecipes = await loadRecipes(search)" />
+                            x-on:input="loadedRecipes = await loadRecipes(search)" />
                     </div>
                 </div>
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3"
