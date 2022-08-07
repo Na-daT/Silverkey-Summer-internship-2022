@@ -10,7 +10,8 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyOrigin()
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
     });
 });
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
