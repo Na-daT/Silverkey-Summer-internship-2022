@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "Server_gRPC";
+option csharp_namespace = "Server";
 
 package greet;
 
@@ -12,9 +12,20 @@ service Greeter {
 
 // The request message containing the user's name.
 message HelloRequest {
-  string name = 1;
+  repeated Recipe recipes = 1;
+  repeated Category categories = 2;
 }
-
+message Recipe{
+	string id = 1;
+	string title = 2;
+	repeated string ingredients = 3;
+	repeated string instructions = 4;
+	repeated Category categories = 5;
+}
+message Category{
+	string id = 1;
+	string name = 2;
+}
 // The response message containing the greetings.
 message HelloReply {
   string message = 1;

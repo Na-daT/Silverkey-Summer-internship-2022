@@ -1,9 +1,14 @@
+using System.Threading.Tasks;
+using Grpc.Net.Client;
+using Grpc.Core;
+using GrpcGreeterClient;
 using CurrieTechnologies.Razor.SweetAlert2;
 using FluentValidation.AspNetCore;
-using Grpc.Net.Client;
-using Greet;
 
-
+IConfiguration config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables()
+    .Build();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,7 +25,7 @@ builder.Services.AddFluentValidation(options =>
     options.RegisterValidatorsFromAssemblyContaining(typeof(Program));
     options.ImplicitlyValidateChildProperties = true;
 });
-builder.Services.AddGrpc();
+//builder.Services.AddGrpc();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
