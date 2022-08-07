@@ -7,7 +7,7 @@ package greet;
 // The greeting service definition.
 service Greeter {
   // Sends a greeting
-  rpc SayHello (RecipesListRequest) returns (RecipesList);
+  rpc GetRecipes (RecipesListRequest) returns (RecipesList);
 }
 
 message RecipesListRequest {

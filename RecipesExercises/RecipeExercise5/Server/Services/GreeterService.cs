@@ -7,21 +7,19 @@ namespace Server.Services;
 
 public class GreeterService : Greeter.GreeterBase
 {
+    public GreeterService()
+    {
+
+    }
     private readonly ILogger<GreeterService> _logger;
     public GreeterService(ILogger<GreeterService> logger)
     {
         _logger = logger;
     }
-    public override Task<RecipesList> SayHello(RecipesListRequest request, ServerCallContext context)
+    public override Task<RecipesList> GetRecipes(RecipesListRequest request, ServerCallContext context)
     {
-        var message = new StringBuilder();
-        foreach (var r in request.Recipes)
-        {
-            message.AppendLine(r.Title);
-        }
-        return Task.FromResult(new HelloReply
-        {
-            Message = message.ToString()
-        });
+        RecipesList reply = new();
+        reply.Recipes.Add(new Recipe { Title = "Banana Cake", Ingredients = new[] { "sugar", "eggs" }, Instructions = new[] { "Bake in three layer pans at 350 degrees." }, Categories = new[] { new Category { Id = "1", Name = "Baking" } } });
+        return Task.FromResult(reply);
     }
 }
