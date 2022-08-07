@@ -12,7 +12,7 @@ public class GreeterService : Greeter.GreeterBase
     {
         _logger = logger;
     }
-    public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
+    public override Task<RecipesList> SayHello(RecipesListRequest request, ServerCallContext context)
     {
         var message = new StringBuilder();
         foreach (var r in request.Recipes)

@@ -19,12 +19,11 @@ namespace Client_2.Pages
         {
             using var channel = GrpcChannel.ForAddress("https://localhost:7103");
             var client = new Greeter.GreeterClient(channel);
-            var request = new Greeter.GreeterClient.HelloRequest();
-            request.Recipes.Add(new Recipe { Title = "Recipe 1", Ingredients = new[] { "Ingredient 1", "Ingredient 2" }, Instructions = new[] { "Instruction 1", "Instruction 2" }, Categories = new[] { new Category { Id = "1", Name = "Category 1" } } });
-            request.Categories.Add(new Category { Id = "1", Name = "Category 1" });
-
-            var reply = await client.SayHello(request);
-            _logger.LogInformation(reply.Message);
+            var request = new HelloRequest();
+            var response = await client.SayHelloAsync(request);
+            //request.Recipes.Add(new Recipe { Title = "Recipe 1", Ingredients = new[] { "Ingredient 1", "Ingredient 2" }, Instructions = new[] { "Instruction 1", "Instruction 2" }, Categories = new[] { new Category { Id = "1", Name = "Category 1" } } });
+            //request.Categories.Add(new Category { Id = "1", Name = "Category 1" });
+            _logger.LogInformation(response.Message);
         }
     }
 }
