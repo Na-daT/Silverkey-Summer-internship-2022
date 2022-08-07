@@ -282,7 +282,7 @@
     @*Recipe Section*@
     <section style="background-color:#F1EEE8;" x-show="recipeOpen" id="recipeSection" x-transition.duration.700ms
         x-cloak>
-        <div class="container text-center">
+        <div class="container text-center" id="recipesTitle">
             <h1 class="display-4 pt-4 lead">Recipes</h1>
             <p class="lead mt-3 mb-0">Here you can find all the recipes you have stored in our website.</p>
         </div>
@@ -304,7 +304,7 @@
                         <div class="col " x-show="detailCards" x-transition.duration.200ms>
                             <div class="card shadow-sm rounded-0" id="cardHover">
                                 <div class="card-body"
-                                    x-on:click="whichRecipe=item.id;updateRecipe = 0;detailCards=false">
+                                    x-on:click="whichRecipe=item.id;updateRecipe = 0;detailCards=false; window.location.hash = '#recipeSection'">
                                     <h5 class="card-title fs-4 mx-1" x-text="item.title"></h5>
                                     <template x-for="category in item.categories">
                                         <span class="badge rounded-pill p-1 mx-1" style="background-color:#135C2D;"
@@ -327,7 +327,8 @@
                         class="border-bottom round col-md-5 shadow-lg py-2" x-init="recipeToUpdate = recipePicked">
                         <div class="row justify-content-end">
                             <div class="col-md-2">
-                                <button class="btn" x-on:click="updateRecipe = 0;detailCards = true">
+                                <button class="btn"
+                                    x-on:click="updateRecipe = 0;detailCards = true; window.location.hash = '#recipesTitle'">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                         class="bi bi-x-lg" viewBox="0 0 16 16">
                                         <path
@@ -443,7 +444,8 @@
                         class="border-bottom round col-lg-9 shadow-lg pb-2">
                         <div class="row justify-content-end">
                             <div class="col-sm-auto align-self-end">
-                                <button class="btn" x-on:click="whichRecipe = 0;detailCards = true">
+                                <button class="btn"
+                                    x-on:click="whichRecipe = 0;detailCards = true;  window.location.hash = '#recipesTitle'">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                         class="bi bi-x-lg" viewBox="0 0 16 16">
                                         <path
