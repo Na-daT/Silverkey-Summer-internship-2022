@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option csharp_namespace = "Server";
+
+package categoryPackage;
+
+service Categories{
+  rpc ListCategories (ListCategoriesRequest) returns (stream Category) {}
+  rpc AddCategory (AddCategoryRequest) returns (AddCategoryResponse) {}
+  rpc UpdateCategory (UpdateCategoryRequest) returns (UpdateCategoryResponse) {}
+}
+
+message Category {
+    string id = 1;
+    string name = 2;
+}
+
+message ListCategoriesRequest {
+}
+
+/*message GetCategoriesResponse {
+  repeated Category categories = 1;
+}*/
+
+message AddCategoryRequest {
+  string title = 1;
+}
+
+message AddCategoryResponse {
+  string name = 1;
+}
+
+message UpdateCategoryRequest {
+  string id = 1;
+  string name = 2;
+}
+
+message UpdateCategoryResponse {
+  string resultMessage = 1;
+}
