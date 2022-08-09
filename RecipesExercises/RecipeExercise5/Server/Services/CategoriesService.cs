@@ -12,10 +12,10 @@ public class CategoriesService : Categories.CategoriesBase
     //private JsonFormatter jsonFormatter = new JsonFormatter(new JsonFormatter.Settings(false));
     private readonly ILogger<CategoriesService> _logger;
     
-    public CategoriesService(ILogger<CategoriesService> logger, List<Category> categories)
+    public CategoriesService(ILogger<CategoriesService> logger)
     {
         _logger = logger;
-        this._categories = categories;
+        this._categories = Utility.LoadCategories();
     }
 
     public override async Task ListCategories(ListCategoriesRequest request, IServerStreamWriter<Category> responseStream, ServerCallContext context)
@@ -31,9 +31,10 @@ public class CategoriesService : Categories.CategoriesBase
     {
         Category newCategory = new Category();
         newCategory.Name = request.Title;
-        newCategory.Id = new Guid().ToString();
+        newCategory.Id = Guid.NewGuid().ToString();
         _categories.Add(newCategory);
-        return Task.FromResult(new AddCategoryResponse { Name = newCategory.Name });
+        Utility.SaveCategories(_categories);
+        return Task.FromResult( new AddCategoryResponse { Name = newCategory.Name });
     }
 
     public override Task<UpdateCategoryResponse> UpdateCategory(UpdateCategoryRequest request, ServerCallContext context)
@@ -42,9 +43,9 @@ public class CategoriesService : Categories.CategoriesBase
         if (UpdatedCategory != null)
         {
             UpdatedCategory.Name = request.Name;
+            Utility.SaveCategories(_categories);
             return Task.FromResult(new UpdateCategoryResponse { ResultMessage = "success" });
         }
         return Task.FromResult(new UpdateCategoryResponse { ResultMessage = "fail" });
     }
-
 }

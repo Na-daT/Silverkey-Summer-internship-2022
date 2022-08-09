@@ -1,11 +1,11 @@
 syntax = "proto3";
 import "Protos/categoryPackage.proto";
-option csharp_namespace = "Server";
+option csharp_namespace = "Client";
 
 package recipePackage;
 
 service Recipes {
-  rpc ListRecipes (ListRecipesRequest) returns (stream Recipe) {}
+  rpc GetRecipes (GetRecipesRequest) returns (GetRecipesResponse) {}
   rpc CreateRecipe (CreateRecipeRequest) returns (CreateRecipeResponse) {}
   rpc UpdateRecipe (UpdateRecipeRequest) returns (UpdateRecipeResponse) {}
   rpc DeleteRecipe (DeleteRecipeRequest) returns (DeleteRecipeResponse) {}
@@ -30,7 +30,11 @@ message Recipe {
   CategoriesList categories = 5;
 }
 
-message ListRecipesRequest {
+message GetRecipesRequest {
+}
+
+message GetRecipesResponse {
+  repeated Recipe recipe = 1;
 }
 
 message CreateRecipeRequest {
