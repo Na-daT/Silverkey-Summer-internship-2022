@@ -9,30 +9,25 @@ service Recipes {
   rpc CreateRecipe (CreateRecipeRequest) returns (CreateRecipeResponse) {}
   rpc UpdateRecipe (UpdateRecipeRequest) returns (UpdateRecipeResponse) {}
   rpc DeleteRecipe (DeleteRecipeRequest) returns (DeleteRecipeResponse) {}
-}
-
-message Instructions {
-    repeated string instruction = 1;
-}
-message Ingredients {
-    repeated string ingredient = 1;
-}
-
-message CategoriesList {
-    repeated categoryPackage.Category categoryItem = 1;
+  rpc GetRecipe (GetRecipeRequest) returns (GetRecipeResponse) {}
 }
 
 message Recipe {
   string id = 1;
   string title = 2;
-  Ingredients ingredients = 3;
-  Instructions instructions = 4;
-  CategoriesList categories = 5;
+  repeated string ingredients = 3;
+  repeated string instructions = 4;
+  repeated categoryPackage.Category categories = 5;
 }
 
 message ListRecipesRequest {
 }
-
+message GetRecipeRequest{
+	string id = 1;
+}
+message GetRecipeResponse {
+	Recipe recipe = 1;
+}
 message CreateRecipeRequest {
   Recipe recipe = 1;
 }
@@ -47,7 +42,7 @@ message UpdateRecipeRequest {
 }
 
 message UpdateRecipeResponse {
-  string id = 1;
+  string response = 1;
 }
 
 message DeleteRecipeRequest {
@@ -55,5 +50,5 @@ message DeleteRecipeRequest {
 }
 
 message DeleteRecipeResponse {
-  string id = 1;
+  string response = 1;
 }
