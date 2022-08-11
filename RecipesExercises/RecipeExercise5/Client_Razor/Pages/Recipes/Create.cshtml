@@ -1,0 +1,145 @@
+@page
+@model CreateModel
+@inject SweetAlertService Swal;
+
+@{
+    ViewData["Title"] = "Create recipe";
+}
+
+<body background="/images/background.jpg" class="bg">
+    <div class="text-center">
+        <h1 class="display-1 py-1">New recipe</h1>
+    </div>
+    <div class="container bg-light col-xxl-6 px-4 py-5 shadow-lg">
+        <h4 class="mb-3">Recipe's details</h4>
+        <form method="post" id="recipeCreateForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3">
+                <div class="col-sm-12">
+                    <label for="recipeName" class="form-label fs-4">Recipe name</label>
+                    <input asp-for="NewRecipe!.Title" type="text" class="form-control" id="recipeName"
+                        placeholder="Title" required>
+                    <span asp-validation-for="@Model.NewRecipe.Title" class="text-danger"></span>
+                </div>
+                <div class="col-sm-12">
+                    <label for="Ingredients" class="form-label fs-4">Ingredients</label>
+                    <button type="button" class="btn btn-primary btn-sm mx-3" id="addIngredients">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-plus-lg" viewBox="0 1 16 16">
+                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                        0 1 8 2Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <div id="newRowIng">
+                        <input type="hidden" id="ingredientsCount" value="0">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <label for="Instructions" class="form-label fs-4">Instructions</label>
+                    <button type="button" class="btn btn-primary btn-sm mx-3" id="addInstructions">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-plus-lg" viewBox="0 1 16 16">
+                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                        0 1 8 2Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <div id="newRowInstruction">
+                        <input type="hidden" id="InstructionsCount" value="0">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="Categories" class="form-label fs-4">Categories</label>
+                        <select id="categoriesDropdown" asp-for="@Model.CategoriesIds" multiple="multiple"
+                            class="form-control">
+                            @foreach (var item in Model.ListCategories)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="@Model.NewRecipe.Categories" class="text-danger"></span>
+                        <label for="categorySelect">Choose minimum 1</label>
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <input type="submit" class="btn btn-dark m-2" value="Create recipe" id="submitbutton" />
+                <a class="btn btn-outline-danger m-2" onclick="return ConfirmCancel();">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+
+@section Scripts
+{
+<script type="text/javascript">
+    function ConfirmCancel() {
+        Swal.fire({
+            title: 'Are you sure you want to cancel?',
+            text: "All entered data will be lost!",
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: "No, keep me here!",
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Yes, cancel!'
+        }).then((result) => {
+            if (result.value) {
+                window.location.href = '/Recipes/List';
+            }
+        });
+    }
+</script>
+<partial name="_ValidationScriptsPartial" />
+<script>
+    $("#addIngredients").click(function () {
+        var total = $("#ingredientsCount").val();
+        total++;
+        $("#ingredientsCount").val(total);
+        var newRows = '<div class="input-group col-sm-12 py-1" id="div ' + (total) + '">'
+            + '<input type="text" class="form-control" id="Ingredients' + (total) + '" placeholder="Ingredient" data-val="true" name="NewRecipe.Ingredients" value required>'
+            + '<button type="button" tabindex="-1" class="btn btn-danger" id="removeIngredient">'
+            + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">'
+            + '<path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">'
+            + '</path>'
+            + '</svg>'
+            + '</button>'
+            + '<span class="text-danger field-validation-valid" data-valmsg-for="NewRecipe.Ingredients" data-valmsg-replace="true"></span>'
+            + '</div>';
+        $("#newRowIng").append(newRows);
+    });
+    $(document).on('click', '#removeIngredient', function () {
+        var total = $("#ingredientsCount").val();
+        total--;
+        $("#ingredientsCount").val(total);
+        $(this).parent().remove();
+    });
+</script>
+<script>
+    $("#addInstructions").click(function () {
+        var total = $("#InstructionsCount").val();
+        total++;
+        $("#InstructionsCount").val(total);
+        var newRows = '<div class="input-group col-sm-12 py-1" id="div ' + (total) + '">'
+            + '<input type="text" class="form-control" id="Instructions' + (total) + '" placeholder="Instruction" data-val="true" name="NewRecipe.Instructions" value>'
+            + '<button type="button" tabindex="-1" class="btn btn-danger" id="removeInstruction">'
+            + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">'
+            + '<path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">'
+            + '</path>'
+            + '</svg>'
+            + '</button>'
+            + '<span class="text-danger field-validation-valid" data-valmsg-for="NewRecipe.Instructions" data-valmsg-replace="true"></span>'
+            + '</div>';
+        $("#newRowInstruction").append(newRows);
+    });
+    $(document).on('click', '#removeInstruction', function () {
+        var total = $("#InstructionsCount").val();
+        total--;
+        $("#InstructionsCount").val(total);
+        $(this).parent().remove();
+    });
+</script>
+}

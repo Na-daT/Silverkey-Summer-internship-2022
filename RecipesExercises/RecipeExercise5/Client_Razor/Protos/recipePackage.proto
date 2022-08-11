@@ -1,0 +1,55 @@
+syntax = "proto3";
+import "Protos/categoryPackage.proto";
+option csharp_namespace = "Client_Razor";
+
+package recipePackage;
+
+service Recipes {
+  rpc ListRecipes (ListRecipesRequest) returns (stream Recipe) {}
+  rpc CreateRecipe (CreateRecipeRequest) returns (CreateRecipeResponse) {}
+  rpc UpdateRecipe (UpdateRecipeRequest) returns (UpdateRecipeResponse) {}
+  rpc DeleteRecipe (DeleteRecipeRequest) returns (DeleteRecipeResponse) {}
+  rpc GetRecipe (GetRecipeRequest) returns (GetRecipeResponse) {}
+}
+
+message Recipe {
+  string id = 1;
+  string title = 2;
+  repeated string ingredients = 3;
+  repeated string instructions = 4;
+  repeated categoryPackage.Category categories = 5;
+}
+
+message ListRecipesRequest {
+}
+message GetRecipeRequest{
+	string id = 1;
+}
+message GetRecipeResponse {
+	Recipe recipe = 1;
+}
+
+message CreateRecipeRequest {
+  Recipe recipe = 1;
+}
+
+message CreateRecipeResponse {
+  string id = 1;
+}
+
+message UpdateRecipeRequest {
+  string id = 1;
+  Recipe recipe = 2;
+}
+
+message UpdateRecipeResponse {
+  string response = 1;
+}
+
+message DeleteRecipeRequest {
+  string id = 1;
+}
+
+message DeleteRecipeResponse {
+  string response = 1;
+}

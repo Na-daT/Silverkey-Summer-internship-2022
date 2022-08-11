@@ -1,0 +1,28 @@
+﻿@page
+@model IndexModel
+@inject SweetAlertService Swal;
+
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<body background="/images/background.jpg" class="bg">
+    <div class="container col-xxl-8 px-4 py-5">
+        <div class="row flex-lg-row-reverse align-items-center py-3 px-2 shadow-lg bg-light">
+            <div class="col-10 col-sm-8 col-lg-6">
+                <img src="/images/recipes-min.jpg" class=" d-block mx-lg-auto img-fluid rounded-3" width="700"
+                    height="500" loading="lazy">
+            </div>
+            <div class="col-lg-6">
+                <h1 class="display-5 fw-bold lh-1 mb-3">Welcome! to Nada's Recipes App</h1>
+                <p class="lead">
+                    This is a simple recipes app that allows you to create, edit, and delete recipes.
+                </p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <a asp-page="/Recipes/List" class="btn btn-dark">Recipes</a>
+                    <a asp-page="/Categories/List" class="btn btn-dark">Categories</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
