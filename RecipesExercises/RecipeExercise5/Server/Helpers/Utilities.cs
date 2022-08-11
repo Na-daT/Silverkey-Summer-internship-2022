@@ -7,7 +7,7 @@ public static class Utility
     public static List<Recipe> LoadRecipes()
     {
         var recipes = new List<Recipe>();
-        using (var streamReader = File.OpenText("/Data/recipe.json"))
+        using (var streamReader = File.OpenText("Data/recipe.json"))
         {
             var jsonRecipes = JsonConvert.DeserializeObject<List<Recipe>>(streamReader.ReadToEnd());
             if (jsonRecipes == null)
@@ -16,7 +16,16 @@ public static class Utility
             }
             foreach (var recipe in jsonRecipes)
             {
-                recipes.Add(new Recipe { Id = recipe.Id, Title = recipe.Title, Ingredients = recipe.Ingredients, Instructions = recipe.Instructions, Categories = recipe.Categories });
+                var newRecipe = new Recipe();
+                newRecipe.Ingredients.Clear();
+                newRecipe.Ingredients.Add(recipe.Ingredients);
+                newRecipe.Instructions.Clear();
+                newRecipe.Instructions.Add(recipe.Instructions);
+                newRecipe.Id = recipe.Id;
+                newRecipe.Title = recipe.Title;
+                newRecipe.Categories.Clear();
+                newRecipe.Categories.Add(recipe.Categories);
+                recipes.Add(newRecipe);
             }
         }
         return recipes;
