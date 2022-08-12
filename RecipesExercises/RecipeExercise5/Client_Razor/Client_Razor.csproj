@@ -6,6 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Protos\categoryPackage.proto" />
+    <None Remove="Protos\recipePackage.proto" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Google.Protobuf" Version="3.21.4" />
 		<PackageReference Include="Grpc.AspNetCore" Version="2.47.0" />
@@ -20,8 +25,11 @@
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Protobuf Include="Protos\categoryPackage.proto" GrpcServices="Server" />
+	  <Protobuf Include="Protos\recipePackage.proto" GrpcServices="Server" />
+	</ItemGroup>
+	<ItemGroup>
 		<Protobuf Include="Protos\categoryPackage.proto" GrpcServices="Client" />
 		<Protobuf Include="Protos\recipePackage.proto" GrpcServices="Client" />
 	</ItemGroup>
-
 </Project>
