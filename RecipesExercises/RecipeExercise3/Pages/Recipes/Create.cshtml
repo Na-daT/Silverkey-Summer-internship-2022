@@ -100,7 +100,7 @@
         total++;
         $("#ingredientsCount").val(total);
         var newRows = '<div class="input-group col-sm-12 py-1" id="div ' + (total) + '">'
-            + '<input type="text" class="form-control" id="Ingredients' + (total) + '" placeholder="Ingredient" data-val="true" name="NewRecipe.Ingredients" value>'
+            + '<input type="text" class="form-control" id="Ingredients' + (total) + '" placeholder="Ingredient" data-val="true" name="NewRecipe.Ingredients" value required>'
             + '<span asp-validation-for="@Model.NewRecipe.Ingredients" class="text-danger"></span>'
             + '<button type="button" class="btn btn-danger" id="removeIngredient">'
             + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">'
@@ -124,7 +124,7 @@
         total++;
         $("#InstructionsCount").val(total);
         var newRows = '<div class="input-group col-sm-12 py-1" id="div ' + (total) + '">'
-            + '<input type="text" class="form-control" id="Instructions' + (total) + '" placeholder="Instruction" data-val="true" name="NewRecipe.Instructions" value>'
+            + '<input type="text" class="form-control" id="Instructions' + (total) + '" placeholder="Instruction" data-val="true" name="NewRecipe.Instructions" value required>'
             + '<span asp-validation-for="@Model.NewRecipe.Instructions" class="text-danger"></span>'
             + '<button type="button" class="btn btn-danger" id="removeInstruction">'
             + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">'
