@@ -37,7 +37,7 @@
                         {
                             <div class="input-group col-sm-12 py-1">
                                 <input type="text" class="form-control" id="@item" value="@item"
-                                asp-for="UpdatedRecipe!.Ingredients" required>
+                                asp-for="@Model.UpdatedRecipe.Ingredients[@Model.UpdatedRecipe.Ingredients.IndexOf(@item)]" required>
                                 <button type="button" class="btn btn-danger" tabindex="-1" id="removeExistingIng">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-trash3-fill" viewBox="0 0 16 16">
@@ -46,8 +46,8 @@
                                         </path>
                                     </svg>
                                 </button>
-                                <span asp-validation-for="@Model.UpdatedRecipe.Ingredients" class="text-danger"></span>
                             </div>
+                            <span asp-validation-for="@Model.UpdatedRecipe.Ingredients[@Model.UpdatedRecipe.Ingredients.IndexOf(@item)]" class="text-danger"></span>
                         }
                         <div id="newRowIng">
                             <input type="hidden" id="ingredientsCount" value="0">
@@ -68,7 +68,7 @@
                         {
                             <div class="input-group col-sm-12 py-1">
                                 <input type="text" id="@instruction" class="form-control" value="@instruction"
-                                asp-for="UpdatedRecipe!.Instructions" required>
+                                asp-for="@Model.UpdatedRecipe.Instructions[@Model.UpdatedRecipe.Instructions.IndexOf(@instruction)]" required>
                                 <button type="button" class="btn btn-danger" tabindex="-1" id="removeExistingInstruction">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-trash3-fill" viewBox="0 0 16 16">
@@ -77,8 +77,8 @@
                                         </path>
                                     </svg>
                                 </button>
-                                <span asp-validation-for="@Model.UpdatedRecipe.Instructions" class="text-danger"></span>'
                             </div>
+                            <span asp-validation-for="@Model.UpdatedRecipe.Instructions[@Model.UpdatedRecipe.Instructions.IndexOf(@instruction)]" class="text-danger"></span>
                         }
                         <div id="newRowInstruction">
                             <input type="hidden" id="InstructionsCount" value="0">
@@ -92,7 +92,15 @@
                                 <span asp-validation-for="@Model.UpdatedRecipe.Categories" class="text-danger"></span>
                                 @foreach (var item in Model.ListCategories)
                                 {
-                                    <option value="@item.Id">@item.Name</option>
+                                    if (@Model.UpdatedRecipe.Categories.Any(X => X.Name == @item.Name))
+                                    {
+                                        <option value="@item.Id" selected>@item.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                    
                                 }
                             </select>
                             <label for="categorySelect">Choose minimum 1</label>

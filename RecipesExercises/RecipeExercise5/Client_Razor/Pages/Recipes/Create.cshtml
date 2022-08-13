@@ -12,17 +12,14 @@
     </div>
     <div class="container bg-light col-xxl-6 px-4 py-5 shadow-lg">
         <h4 class="mb-3">Recipe's details</h4>
-        <form method="post" id="recipeCreateForm">
+        <form method="post" id="recipeCreateForm" class="needs-validation">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row g-3">
                 <div class="col-sm-12">
                     <label for="recipeName" class="form-label fs-4">Recipe name</label>
-                    <input asp-for="NewRecipe!.Title" type="text" class="form-control" id="recipeName"
+                    <input asp-for="@Model.NewRecipe.Title" type="text" class="form-control" id="recipeName"
                         placeholder="Title" required>
-                    <div class="invalid-feedback">
-                        Please choose a Title.
-                    </div>
-                    @*<span asp-validation-for="@Model.NewRecipe.Title" class="text-danger"></span>*@
+                    <span asp-validation-for="@Model.NewRecipe.Title" class="text-danger"></span>
                 </div>
                 <div class="col-sm-12">
                     <label for="Ingredients" class="form-label fs-4">Ingredients</label>
@@ -103,15 +100,15 @@
         total++;
         $("#ingredientsCount").val(total);
         var newRows = '<div class="input-group col-sm-12 py-1" id="div ' + (total) + '">'
-            + '<input type="text" class="form-control" id="Ingredients' + (total) + '" placeholder="Ingredient" data-val="true" required name="NewRecipe.Ingredients" value aria-invalid="true">'
+            + '<input type="text" class="form-control" id="Ingredients' + (total) + '" placeholder="Ingredient" data-val="true" required name="NewRecipe.Ingredients['+(total - 1 )+']" value aria-invalid="true">'
             + '<button type="button" tabindex="-1" class="btn btn-danger" id="removeIngredient">'
             + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">'
             + '<path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">'
             + '</path>'
             + '</svg>'
             + '</button>'
-            + '<span class="text-danger field-validation-valid" data-valmsg-for="NewRecipe.Ingredients" data-valmsg-replace="true"></span>'
-            + '</div>';
+            + '</div>'
+            + '<span class="text-danger field-validation-valid" data-valmsg-for="NewRecipe.Ingredients['+(total - 1 )+']" data-valmsg-replace="true"></span>'
         $("#newRowIng").append(newRows);
     });
     $(document).on('click', '#removeIngredient', function () {
@@ -127,15 +124,15 @@
         total++;
         $("#InstructionsCount").val(total);
         var newRows = '<div class="input-group col-sm-12 py-1" id="div ' + (total) + '">'
-            + '<input type="text" class="form-control input-validation-error" id="Instructions' + (total) + '" placeholder="Instruction" data-val="true" required name="NewRecipe.Instructions" value aria-invalid="true">'
+            + '<input type="text" class="form-control input-validation-error" id="Instructions' + (total) + '" placeholder="Instruction" data-val="true" required name="NewRecipe.Instructions['+(total - 1 )+']" value aria-invalid="true">'
             + '<button type="button" tabindex="-1" class="btn btn-danger" id="removeInstruction">'
             + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">'
             + '<path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">'
             + '</path>'
             + '</svg>'
             + '</button>'
-            + '<span class="text-danger field-validation-valid" data-valmsg-for="NewRecipe.Instructions" data-valmsg-replace="true"></span>'
-            + '</div>';
+            + '</div>'
+            + '<span class="text-danger field-validation-valid" data-valmsg-for="NewRecipe.Instructions['+(total - 1 )+']" data-valmsg-replace="true"></span>';
         $("#newRowInstruction").append(newRows);
     });
     $(document).on('click', '#removeInstruction', function () {
