@@ -1,12 +1,14 @@
 ﻿@page
 @model IndexModel
 @inject SweetAlertService Swal;
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "Home page";
     var recipeUrl = @Model.MyUrl + "recipe";
     var recipePostUrl = @Model.MyUrl + "recipes";
     var categoriesUrl = @Model.MyUrl + "category";
     var categoriesPostUrl = @Model.MyUrl + "categories";
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
 
 @section Scripts{
@@ -25,7 +27,7 @@
         return result;
     }
     async function getRecipesAsync() {
-        const response = await fetch('@recipeUrl', { method: 'GET' })
+        const response = await fetch('@recipeUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken' } });
             .then(res => { return res })
         if (response.ok) {
             const json = await response.json();
@@ -33,7 +35,7 @@
         }
     }
     async function getCategoriesAsync() {
-        const response = await fetch('@categoriesUrl', { method: 'GET' })
+        const response = await fetch('@categoriesUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken' } })
             .then(res => { return res })
         if (response.ok) {
             return response.json()
@@ -52,6 +54,9 @@
         if (alert.value === true) {
             const response = await fetch('@recipePostUrl' + '/' + recipe.id, {
                 method: 'DELETE',
+                headers: {
+                    'RequestVerificationToken': '@requestToken'
+                }
             }).then(res => { return res })
             if (response.ok) {
                 await Swal.fire({
@@ -101,6 +106,7 @@
                 body: JSON.stringify(recipeToUpdate),
                 headers: {
                     'Content-Type': 'application/json;',
+                    'RequestVerificationToken': '@requestToken'
                 }
             }).then(res => { return res })
             if (result.ok) {
@@ -131,6 +137,7 @@
             body: JSON.stringify(newRecipe),
             headers: {
                 'Content-Type': 'application/json;',
+                'RequestVerificationToken': '@requestToken'
             }
         }).then(res => { return res })
         if (response.ok) {
@@ -166,7 +173,8 @@
             method: 'POST',
             body: JSON.stringify(newCategory),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': '@requestToken'
             }
         }).then(res => { return res })
         if (response.ok) {
@@ -199,6 +207,7 @@
             body: JSON.stringify(categoryToUpdate),
             headers: {
                 'Content-Type': 'application/json;',
+                'RequestVerificationToken': '@requestToken'
             }
         }).then(res => { return res })
         if (response.ok) {
@@ -212,6 +221,7 @@
                         body: JSON.stringify(recipesDataTemp[i]),
                         headers: {
                             'Content-Type': 'application/json;',
+                            'RequestVerificationToken': '@requestToken'
                         }
                     });
                 }
