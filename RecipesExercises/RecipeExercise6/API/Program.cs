@@ -43,27 +43,27 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin();
     });
 });
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
+     .AddJwtBearer(c =>
      {
-         c.SaveToken = true;
-         c.RequireHttpsMetadata = false;
-         //c.Authority = $"https://{builder.Configuration["JWT:Issuer"]}";
          c.TokenValidationParameters = new TokenValidationParameters
          {
              ValidateIssuer = true,
              ValidateAudience = true,
+             ValidateLifetime = true,
+             ValidateIssuerSigningKey = true,
              ValidAudience = builder.Configuration["JWT:Audience"],
              ValidIssuer = $"{builder.Configuration["JWT:Issuer"]}",
              IssuerSigningKey = new SymmetricSecurityKey
                (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
          };
      });
+
 builder.Services.AddAuthorization();
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 builder.Logging.AddConsole();
@@ -94,16 +94,12 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
     var hasher = new PasswordHasher<LoginModel>();
     TokenService _tokenService = new TokenService();
     var users = await FileHandler.ReadAsync("users.json");
-    Console.WriteLine(users);
     var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(users);
-    Console.WriteLine(usersList);
     if (usersList is null)
         throw new Exception("Could not deserialize users list");
     var user = usersList.FirstOrDefault(u => u.UserName == loginModel.UserName);
     if (user is null)
         return Results.Unauthorized();
-    Console.WriteLine(user.ToString());
-
     var isPasswordMatch = hasher.VerifyHashedPassword(new LoginModel(), user.Password, loginModel.Password);
     if (isPasswordMatch == PasswordVerificationResult.Failed)
         return Results.Unauthorized();
