@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +18,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Enter JWT Bearer token",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
-        Scheme = "bearer", // must be lower case
+        Scheme = "bearer",
         BearerFormat = "JWT",
         Reference = new OpenApiReference
         {
@@ -72,7 +71,6 @@ builder.Services.AddTransient<ITokenService, TokenService>();
 
 var app = builder.Build();
 app.UseCors();
-//var port = Environment.GetEnvironmentVariable("PORT") ?? "3000";
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthentication();
@@ -90,7 +88,6 @@ var options = new JsonSerializerOptions
 };
 
 app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel) => {
-    Console.WriteLine(loginModel);
     var hasher = new PasswordHasher<LoginModel>();
     TokenService _tokenService = new TokenService();
     var users = await FileHandler.ReadAsync("users.json");
