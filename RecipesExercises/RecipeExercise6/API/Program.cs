@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -66,8 +67,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 builder.Logging.AddConsole();
-builder.Services.AddSingleton(new TokenService());
-builder.Services.AddSingleton<IUserRepositoryService>(new UserRepositoryService());
+builder.Services.AddTransient<ITokenService, TokenService>();
+
 
 var app = builder.Build();
 app.UseCors();
@@ -87,18 +88,43 @@ var options = new JsonSerializerOptions
     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     WriteIndented = true,
 };
-app.MapPost("api/json/login", [AllowAnonymous] async ([FromBodyAttribute] UserModel userModel, TokenService tokenService, IUserRepositoryService userRepositoryService, HttpResponse response) => {
-    var userDto = userRepositoryService.GetUser(userModel);
-    if (userDto == null)
-    {
-        response.StatusCode = 401;
-        return;
-    }
-    var token = tokenService.BuildToken(builder.Configuration["JWT:Key"], builder.Configuration["JWT:Issuer"], builder.Configuration["JWT:Audience"], userDto);
-    await response.WriteAsJsonAsync(new { token = token });
-    return;
-}).Produces(StatusCodes.Status200OK)
-.WithName("Login").WithTags("Accounts");
+
+app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel) => {
+    Console.WriteLine(loginModel);
+    var hasher = new PasswordHasher<LoginModel>();
+    TokenService _tokenService = new TokenService();
+    var users = await FileHandler.ReadAsync("users.json");
+    Console.WriteLine(users);
+    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(users);
+    Console.WriteLine(usersList);
+    if (usersList is null)
+        throw new Exception("Could not deserialize users list");
+    var user = usersList.FirstOrDefault(u => u.UserName == loginModel.UserName);
+    if (user is null)
+        return Results.Unauthorized();
+    Console.WriteLine(user.ToString());
+
+    var isPasswordMatch = hasher.VerifyHashedPassword(new LoginModel(), user.Password, loginModel.Password);
+    if (isPasswordMatch == PasswordVerificationResult.Failed)
+        return Results.Unauthorized();
+
+    var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, loginModel.UserName)
+        };
+
+    var accessToken = _tokenService.GenerateAccessToken(claims);
+    var refreshToken = _tokenService.GenerateRefreshToken();
+
+    user.RefreshToken = refreshToken;
+    user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7).ToString();
+
+
+    var json = await JsonHandler.SerializeAsync(usersList);
+    await FileHandler.WriteAsync("users.json", json);
+
+    return Results.Ok(new AuthenticatedResponse{ RefreshToken = refreshToken, Token = accessToken});
+});
 
 
 app.MapGet("api/json/{fileName}", async Task<string> (string fileName) =>
