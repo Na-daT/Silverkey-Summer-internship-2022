@@ -87,11 +87,12 @@ var options = new JsonSerializerOptions
     WriteIndented = true,
 };
 
-app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel) => {
+app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel) =>
+{
     var hasher = new PasswordHasher<LoginModel>();
     TokenService _tokenService = new TokenService();
-    var users = await FileHandler.ReadAsync("users.json");
-    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(users);
+    var usersJson = await FileHandler.ReadAsync("users.json");
+    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(usersJson);
     if (usersList is null)
         throw new Exception("Could not deserialize users list");
     var user = usersList.FirstOrDefault(u => u.UserName == loginModel.UserName);
@@ -116,11 +117,91 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
     var json = await JsonHandler.SerializeAsync(usersList);
     await FileHandler.WriteAsync("users.json", json);
 
-    return Results.Ok(new AuthenticatedResponse{ RefreshToken = refreshToken, Token = accessToken});
+    return Results.Ok(new AuthenticatedResponse { RefreshToken = refreshToken, Token = accessToken });
+});
+
+app.MapPost("api/json/register", async ([FromBody] RegisterModel newUser) =>
+{
+    var hasher = new PasswordHasher<LoginModel>();
+    var usersJson = await FileHandler.ReadAsync("users.json");
+    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(usersJson);
+    if (usersList is null)
+        throw new Exception("Could not deserialize users list");
+    if (usersList.Find(x => x.UserName == newUser.Username) != null)
+        return Results.BadRequest("username already exists");
+    var hashedPassword = hasher.HashPassword(new LoginModel(), newUser.Password);
+    LoginModel newLoginModel = new LoginModel(Guid.NewGuid().ToString(), newUser.Username, hashedPassword, string.Empty, string.Empty);
+    usersList.Add(newLoginModel);
+    var json = await JsonHandler.SerializeAsync(usersList);
+    await FileHandler.WriteAsync("users.json", json);
+
+    return Results.Ok();
+});
+
+app.MapPost("api/json/refresh-token", async ([FromBody] RefreshRequest request) =>
+{
+    if (request is null)
+        return Results.BadRequest("Invalid client request");
+
+    string accessToken = request.Token;
+    string refreshToken = request.RefreshToken;
+    TokenService _tokenService = new TokenService();
+
+
+    //get principal from expired token
+    var principal = _tokenService.ValidateExpiredToken(accessToken);
+
+    //get username from claim
+    var username = principal.Identity.Name;
+
+    //deserialize and fetch user from json db
+    var usersJson = await FileHandler.ReadAsync("users.json");
+    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(usersJson);
+    if (usersList is null)
+        throw new Exception("Could not deserialize users list");
+    var user = usersList.FirstOrDefault(u => u.UserName == username);
+
+    //check if user exists, if refrsh tokens are the same and if refresh token is not expired yet.
+    if (user is null || user.RefreshToken != refreshToken || DateTime.Parse(user.RefreshTokenExpiryTime) <= DateTime.Now)
+        return Results.BadRequest("Invalid client request");
+
+    //create new tokens
+    var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
+    var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+    //update refresh token of user and save json file
+    user.RefreshToken = newRefreshToken;
+    var json = await JsonHandler.SerializeAsync(usersList);
+    await FileHandler.WriteAsync("users.json", json);
+
+    //return new auth token and refresh token
+    return Results.Ok(new AuthenticatedResponse()
+    {
+        Token = newAccessToken,
+        RefreshToken = newRefreshToken
+    });
+
+});
+
+app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody]string token) =>
+{
+    if (string.IsNullOrEmpty(token))
+        return Results.BadRequest(new { message = "Token is required" });
+    var usersJson = await FileHandler.ReadAsync("users.json");
+    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(usersJson);
+    if (usersList is null)
+        throw new Exception("Could not deserialize users list");
+    var user = usersList.FirstOrDefault(u => u.RefreshToken == token);
+    if (user == null)
+        return Results.BadRequest();
+    user.RefreshToken = null;
+    var json = await JsonHandler.SerializeAsync(usersList);
+    await FileHandler.WriteAsync("users.json", json);
+    return Results.Ok();
 });
 
 
-app.MapGet("api/json/{fileName}", async Task<string> (string fileName) =>
+app.MapGet("api/json/{fileName}", [Authorize] async Task<string> (string fileName) =>
 {
     var jsonFile = fileName + ".json";
     return await FileHandler.ReadAsync(jsonFile);
