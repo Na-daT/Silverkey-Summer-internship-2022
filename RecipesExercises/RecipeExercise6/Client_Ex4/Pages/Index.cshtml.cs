@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using RecipeExercise4.Models;
 
-namespace RecipeExercise6;
+
+namespace RecipeExercise4.Pages;
+
 public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
@@ -14,7 +18,7 @@ public class IndexModel : PageModel
 
     public string GetID()
     {
-        return Guid.NewGuid().ToString();
+        return System.Guid.NewGuid().ToString();
     }
 
     public void OnGet()

@@ -1,6 +1,5 @@
 using FluentValidation.AspNetCore;
 using FluentValidation;
-using CurrieTechnologies.Razor.SweetAlert2;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +9,6 @@ builder.Services.AddFluentValidation(options =>
 {
     options.RegisterValidatorsFromAssemblyContaining(typeof(Program));
 });
-builder.Services.AddSweetAlert2();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
