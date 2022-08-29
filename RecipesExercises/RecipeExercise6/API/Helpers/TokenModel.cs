@@ -16,7 +16,6 @@ public class TokenService : ITokenService
     IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
     public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
-        
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("JWT")["Key"]));
         var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
         var tokeOptions = new JwtSecurityToken(

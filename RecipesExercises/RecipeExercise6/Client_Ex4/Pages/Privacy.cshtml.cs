@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace RecipeExercise4.Pages;
+namespace Client_Ex4.Pages;
 
 public class PrivacyModel : PageModel
 {

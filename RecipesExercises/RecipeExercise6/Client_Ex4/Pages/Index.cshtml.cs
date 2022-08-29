@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using RecipeExercise4.Models;
 
-
-namespace RecipeExercise4.Pages;
+namespace Client_Ex4.Pages;
 
 public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
     public string MyUrl;
+    public string Token { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
 
     public IndexModel(ILogger<IndexModel> logger)
     {

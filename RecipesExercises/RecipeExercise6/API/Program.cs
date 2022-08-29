@@ -106,7 +106,6 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
         {
             new Claim(ClaimTypes.Name, loginModel.UserName)
         };
-
     var accessToken = _tokenService.GenerateAccessToken(claims);
     var refreshToken = _tokenService.GenerateRefreshToken();
 
