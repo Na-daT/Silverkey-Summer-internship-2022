@@ -34,7 +34,7 @@
             const json = await response.json();
             return json;
         }
-        else if (response.status === '401') {
+        else if (response.status == '401') {
             var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
@@ -59,7 +59,7 @@
         if (response.ok) {
             return response.json()
         }
-        else if (response.status === '401') {
+        else if (response.status == '401') {
             var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
@@ -109,7 +109,7 @@
                     }
                 })
             }
-            else if (response.status === '401') {
+            else if (response.status == '401') {
                 var x = await refreshMyToken();
                 if(!x) {
                     Swal.fire({
@@ -180,7 +180,7 @@
                     }
                 })
             }
-            else if (response.status === '401') {
+            else if (response.status == '401') {
                 var x = await refreshMyToken();
                 if(!x) {
                     Swal.fire({
@@ -229,7 +229,7 @@
                         window.location.reload(true);
                     }
                 })
-        } else if (response.status === '401') {
+        } else if (response.status == '401') {
             var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
@@ -283,7 +283,7 @@
                     window.location.reload(true);
                 }
             })
-        } else if (response.status === '401') {
+        } else if (response.status == '401') {
             var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
@@ -348,7 +348,7 @@
                     window.location.reload(true);
                 }
             })
-        } else if (response.status === '401') {
+        } else if (response.status == '401') {
             var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
@@ -441,7 +441,7 @@
         var tokens = { token: '', refreshToken: '' };
         tokens.token = localStorage.token;
         tokens.refreshToken = localStorage.refreshToken;
-        if (tokens.refreshToken === '' || tokens.token === '')
+        if (tokens.refreshToken == '' || tokens.token == '')
         {
             logOut();
         }
@@ -682,7 +682,7 @@
                             <div style="background-color: white;" id="recipePicked.id"
                                 class="border-bottom round col-md-5 shadow-lg py-2"
                                 x-init="recipeToUpdate = recipePicked">
-                                <div class="row justify-content-end p-2">
+                                <div class="row justify-content-end">
                                     <div class="col-md-1">
                                         <button class="btn"
                                             x-on:click="updateRecipe = 0;detailCards = true; window.location.hash = '#recipesTitle'">
