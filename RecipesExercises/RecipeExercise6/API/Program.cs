@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Antiforgery;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -199,6 +200,24 @@ app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody]string token) 
     return Results.Ok();
 });
 
+app.MapGet("/antiforgery", (IAntiforgery antiforgery, HttpContext context) =>
+{
+    var tokens = antiforgery.GetAndStoreTokens(context);
+    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions { HttpOnly = false });
+});
+
+app.MapPost("/validate", async (HttpContext context, IAntiforgery antiforgery) =>
+{
+    try
+    {
+        await antiforgery.ValidateRequestAsync(context);
+        return Results.Ok();
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex?.Message ?? string.Empty);
+    }
+});
 
 app.MapGet("api/json/{fileName}", [Authorize] async Task<string> (string fileName) =>
 {
