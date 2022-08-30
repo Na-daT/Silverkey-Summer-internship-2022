@@ -35,7 +35,7 @@
             return json;
         }
         else if (response.status === '401') {
-            bool x = await refreshMyToken();
+            var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
                     title: 'Error!',
@@ -60,7 +60,7 @@
             return response.json()
         }
         else if (response.status === '401') {
-            bool x = await refreshMyToken();
+            var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
                     title: 'Error!',
@@ -110,7 +110,7 @@
                 })
             }
             else if (response.status === '401') {
-                bool x = await refreshMyToken();
+                var x = await refreshMyToken();
                 if(!x) {
                     Swal.fire({
                         title: 'Error!',
@@ -181,7 +181,7 @@
                 })
             }
             else if (response.status === '401') {
-                bool x = await refreshMyToken();
+                var x = await refreshMyToken();
                 if(!x) {
                     Swal.fire({
                         title: 'Error!',
@@ -230,7 +230,7 @@
                     }
                 })
         } else if (response.status === '401') {
-            bool x = await refreshMyToken();
+            var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
                     title: 'Error!',
@@ -284,7 +284,7 @@
                 }
             })
         } else if (response.status === '401') {
-            bool x = await refreshMyToken();
+            var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
                     title: 'Session expired!',
@@ -349,7 +349,7 @@
                 }
             })
         } else if (response.status === '401') {
-            bool x = await refreshMyToken();
+            var x = await refreshMyToken();
             if(!x) {
                 Swal.fire({
                     title: 'Error!',
@@ -413,7 +413,7 @@
             }
         }).then(res => { return res });
         if (response.ok) {
-              await Swal.fire({
+            await Swal.fire({
                 title: 'Success!',
                 text: 'Now please log in!',
                 icon: 'success',
@@ -421,7 +421,8 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.reload(true);
-                })
+                }
+            })
         }
         else
         {
@@ -432,12 +433,18 @@
             })
         }
     }
+</script>
 
+<script>
     async function refreshMyToken()
     {
         var tokens = { token: '', refreshToken: '' };
         tokens.token = localStorage.token;
         tokens.refreshToken = localStorage.refreshToken;
+        if (tokens.refreshToken === '' || tokens.token === '')
+        {
+            logOut();
+        }
         const response = await fetch('@refreshTokenUrl', {
             method: 'POST',
             body: JSON.stringify(tokens),
@@ -547,8 +554,8 @@
                                         x-model="profile.username" placeholder="enter username" required>
                                 </div>
                                  <div class="form-group py-2">
-                                    <label for="password">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password"
+                                    <label for="Loginpassword">Password</label>
+                                    <input type="password" class="form-control" id="Loginpassword" name="password"
                                         x-model="profile.password" placeholder="enter password" required>
                                 </div>
                                 <div class="form-group" style="display: flex; justify-content: center;" >
@@ -562,8 +569,8 @@
                                         x-model="profile.username" placeholder="enter username" required>
                                 </div>
                                  <div class="form-group py-2">
-                                    <label for="password">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password"
+                                    <label for="registerpassword">Password</label>
+                                    <input type="password" class="form-control" id="registerpassword" name="password"
                                         x-model="profile.password" placeholder="enter password" required>
                                 </div>
                                 <div class="form-group" style="display: flex; justify-content: center;" >
@@ -675,8 +682,8 @@
                             <div style="background-color: white;" id="recipePicked.id"
                                 class="border-bottom round col-md-5 shadow-lg py-2"
                                 x-init="recipeToUpdate = recipePicked">
-                                <div class="row justify-content-end">
-                                    <div class="col-md-2">
+                                <div class="row justify-content-end p-2">
+                                    <div class="col-md-1">
                                         <button class="btn"
                                             x-on:click="updateRecipe = 0;detailCards = true; window.location.hash = '#recipesTitle'">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
