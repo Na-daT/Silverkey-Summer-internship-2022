@@ -62,6 +62,15 @@ builder.Services.AddAuthentication(options =>
              IssuerSigningKey = new SymmetricSecurityKey
                (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
          };
+         c.Events.OnMessageReceived = context => {
+
+             if (context.Request.Cookies.ContainsKey("X-Access-Token"))
+             {
+                 context.Token = context.Request.Cookies["X-Access-Token"];
+             }
+
+             return Task.CompletedTask;
+         };
      });
 
 builder.Services.AddAuthorization();
@@ -88,7 +97,7 @@ var options = new JsonSerializerOptions
     WriteIndented = true,
 };
 
-app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel) =>
+app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel, HttpContext context) =>
 {
     var hasher = new PasswordHasher<LoginModel>();
     TokenService _tokenService = new TokenService();
@@ -111,8 +120,17 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
     var refreshToken = _tokenService.GenerateRefreshToken();
 
     user.RefreshToken = refreshToken;
+    
+    var cookieOptions = new CookieOptions
+    {
+        HttpOnly = true,
+        SameSite = SameSiteMode.Strict,
+        Expires = DateTime.Now.AddDays(7)
+    };
+    context.Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions { HttpOnly = true, Expires = DateTime.Now.AddMinutes(5) });
+    context.Response.Cookies.Append("refreshTokeX-Refresh-Tokenn", refreshToken, cookieOptions);
+    
     user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7).ToString();
-
 
     var json = await JsonHandler.SerializeAsync(usersList);
     await FileHandler.WriteAsync("users.json", json);
@@ -138,7 +156,7 @@ app.MapPost("api/json/register", async ([FromBody] RegisterModel newUser) =>
     return Results.Ok();
 });
 
-app.MapPost("api/json/refresh-token", async ([FromBody] RefreshRequest request) =>
+app.MapPost("api/json/refresh-token", async ([FromBody] RefreshRequest request, HttpContext context) =>
 {
     if (request is null)
         return Results.BadRequest("Invalid client request");
@@ -171,6 +189,11 @@ app.MapPost("api/json/refresh-token", async ([FromBody] RefreshRequest request) 
 
     //update refresh token of user and save json file
     user.RefreshToken = newRefreshToken;
+    user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7).ToString();
+
+    context.Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions() { HttpOnly = false, Expires = DateTime.Now.AddMinutes(5) });
+    context.Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = false, Expires = DateTime.Now.AddDays(7) });
+
     var json = await JsonHandler.SerializeAsync(usersList);
     await FileHandler.WriteAsync("users.json", json);
 
@@ -183,7 +206,7 @@ app.MapPost("api/json/refresh-token", async ([FromBody] RefreshRequest request) 
 
 });
 
-app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody]string token) =>
+app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token) =>
 {
     if (string.IsNullOrEmpty(token))
         return Results.BadRequest(new { message = "Token is required" });
