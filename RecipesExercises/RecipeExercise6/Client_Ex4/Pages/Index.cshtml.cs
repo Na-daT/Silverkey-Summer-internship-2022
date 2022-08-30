@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Client_Ex4.Pages;
 
 public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
-    public string MyUrl;
+    public string MyUrl { get; set; }
     public string Token { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
 
@@ -18,7 +17,7 @@ public class IndexModel : PageModel
 
     public string GetID()
     {
-        return System.Guid.NewGuid().ToString();
+        return Guid.NewGuid().ToString();
     }
 
     public void OnGet()
