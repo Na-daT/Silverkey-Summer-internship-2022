@@ -7,11 +7,12 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
-//using Microsoft.AspNetCore.Antiforgery;
-//using SD.LLBLGen.Pro.ORMSupportClasses;
-//using SD.LLBLGen.Pro.DQE.SqlServer;
+using Microsoft.AspNetCore.Antiforgery;
+using SD.LLBLGen.Pro.ORMSupportClasses;
+using SD.LLBLGen.Pro.DQE.SqlServer;
+using System.Data.SqlClient;
 
-using FromScratchDBFirst.DatabaseSpecific;
+//using FromScratchDBFirst.DatabaseSpecific;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,13 +49,13 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin();
     });
 });
-//RuntimeConfiguration.AddConnectionString("ConnectionString.SQL Server (SqlClient)",
-//                                                     builder.Configuration.GetConnectionString("ConnectionString.SQL Server (SqlClient)"));
-//RuntimeConfiguration.ConfigureDQE<SQLServerDQEConfiguration>(c =>
-//{
-//    // add more here...
-//    c.AddDbProviderFactory(typeof(Microsoft.Data.SqlClient.SqlClientFactory));
-//});
+RuntimeConfiguration.AddConnectionString("ConnectionString.SQL Server (SqlClient)",
+                                                     builder.Configuration.GetConnectionString("ConnectionString.SQL Server (SqlClient)"));
+RuntimeConfiguration.ConfigureDQE<SQLServerDQEConfiguration>(c =>
+{
+    // add more here...
+    c.AddDbProviderFactory(typeof(System.Data.SqlClient.SqlClientFactory));
+});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
