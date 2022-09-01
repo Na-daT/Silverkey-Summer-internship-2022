@@ -1,0 +1,490 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--LLBLGen Pro v5.9 project file. Do not manually edit this file. Incorrect references could lead to an unloadable project file.-->
+<Project Version="5.9" TargetFrameworkName="Entity Framework Core v6" UseLegacyDefaults="false">
+  <Properties>
+    <Abbreviations />
+    <Property Name="AdditionalTaskPerformerFolder" Value="" />
+    <Property Name="AdditionalTasksFolder" Value="" />
+    <Property Name="AdditionalTemplatesFolder" Value="" />
+    <Property Name="AdditionalTypeConverterFolder" Value="" />
+    <Property Name="AddNewElementsAfterRefresh_v5" Value="false" />
+    <Property Name="AddNewElementsAfterRelationalModelDataSync_v5" Value="false" />
+    <Property Name="AddNewFieldsAfterRefresh_v5" Value="true" />
+    <Property Name="AddNewFieldsAfterRelationalModelDataSync_v5" Value="true" />
+    <Property Name="AddNewViewsAsEntitiesAfterRefresh_v5" Value="false" />
+    <Property Name="AddNewViewsAsEntitiesAfterRelationalModelDataSync_v5" Value="false" />
+    <Property Name="AutoAddManyToManyRelationships" Value="false" />
+    <Property Name="AutoAssignSequencesToIntegerPks" Value="true" />
+    <Property Name="AutoAssignTypeConverterToFieldMapping" Value="true" />
+    <Property Name="AutomaticallyGenerateSourceCodeOnProjectSave" Value="false" />
+    <Property Name="ConnectionStringKeyNamePattern" Value="ConnectionString.{$ProviderName}" />
+    <Property Name="DefaultDDLSQLScriptDestinationFolder" Value=".\DDLSQLScripts" />
+    <Property Name="DefaultDeleteRuleAction" Value="1" />
+    <Property Name="DefaultSourceCodeDestinationFolder" Value=".\Code" />
+    <Property Name="DefaultUpdateRuleAction" Value="0" />
+    <Property Name="DeleteObsoleteFiles" Value="true" />
+    <Property Name="ElementNamePrefixPattern" Value="{$SchemaName}" />
+    <Property Name="ElementNamePrefixPatternIsAppliedWhen" Value="1" />
+    <Property Name="EncodingToUse" Value="0" />
+    <Property Name="EntityActionCombinationDefaultForTable" Value="0" />
+    <Property Name="EntityActionCombinationDefaultForView" Value="4" />
+    <Property Name="EntityFieldNameStripPattern" Value="{}{}" />
+    <Property Name="EntityNameStripPattern" Value="{tbl_}{}" />
+    <Property Name="ExcludableOrphanedElementDetectedAction" Value="3" />
+    <Property Name="FailCodeGenerationOnWriteError" Value="false" />
+    <Property Name="FieldMappedOntoRelatedFieldPattern" Value="{$RelatedFieldName}" />
+    <Property Name="FkFieldsAreNamedAfterTargetField" Value="true" />
+    <Property Name="ForeignKeyConstraintPattern" Value="FK_{$Guid}" />
+    <Property Name="ForeignKeyFieldPattern" Value="{$NavigatorName}{$RelatedFieldName}" />
+    <Property Name="GroupUsage" Value="0" />
+    <Property Name="IdentifyingFieldsFollowDBPrimaryKeyConstraints_v5" Value="true" />
+    <Property Name="InsertUnderscoreAtWordBreakCaseInsensitiveDBs" Value="false" />
+    <Property Name="InsertUnderscoreAtWordBreakCaseSensitiveDBs" Value="false" />
+    <Property Name="LengthPrecisionScaleFollowDBLengthPrecisionScale_v5" Value="true" />
+    <Property Name="MakeElementNamePascalCasing" Value="true" />
+    <Property Name="NavigatorMappedOntoManyToManyPattern" Value="{$EndEntityName}CollectionVia{$IntermediateEntityName$S}" />
+    <Property Name="NavigatorMappedOntoOneManyToOnePattern" Value="{$EndEntityName$S}" />
+    <Property Name="NavigatorMappedOntoOneToManyPattern" Value="{$EndEntityName$P}" />
+    <Property Name="NonExcludableOrphanedElementDetectedAction" Value="3" />
+    <Property Name="PreferDecimalOverCurrencyTypes" Value="true" />
+    <Property Name="PreferNaturalCharacterTypes" Value="true" />
+    <Property Name="PreferSystemSequencesOverSchemaSequencesIfApplicable" Value="true" />
+    <Property Name="PreferVariableLengthTypes" Value="true" />
+    <Property Name="PrimaryKeyConstraintPattern" Value="PK_{$Guid}" />
+    <Property Name="ProjectCreator" Value="nada" />
+    <Property Name="ProjectName" Value="recipesApp" />
+    <Property Name="ReflectNullabilityOfElementFieldInTargetField_v5" Value="false" />
+    <Property Name="ReflectTypeOfElementFieldInTargetField_v5" Value="true" />
+    <Property Name="RelationalModelDataElementNameCasingCaseInsensitiveDBs" Value="3" />
+    <Property Name="RelationalModelDataElementNameCasingCaseSensitiveDBs" Value="3" />
+    <Property Name="RelationshipsFollowDBForeignKeyConstraints_v5" Value="true" />
+    <Property Name="RemoveUnderscoresFromElementName" Value="true" />
+    <Property Name="RemoveUnmappedElementsAfterRefresh_v5" Value="false" />
+    <Property Name="RemoveUnmappedElementsAfterRelationalModelDataSync_v5" Value="false" />
+    <Property Name="ResetFieldOrderBasedOnTargetOrderAtRefresh" Value="false" />
+    <Property Name="ResetFieldOrderBasedOnTargetOrderAtRelationalModelDataSync" Value="false" />
+    <Property Name="RetrieveDBCustomProperties" Value="false" />
+    <Property Name="RootNamespace" Value="" />
+    <Property Name="SequenceNameMatchingPattern" Value="SEQ_{$TableName}" />
+    <Property Name="SequencePattern" Value="SEQ_{$EntityName}" />
+    <Property Name="SetGroupNameAfterSchemaName" Value="true" />
+    <Property Name="SetSchemaNameAfterGroupName" Value="true" />
+    <Property Name="SingularizeElementNames" Value="true" />
+    <Property Name="StoredProcNameStripPattern" Value="{pr_, sp_}{}" />
+    <Property Name="StoreTimeLastGeneratedIntoProject" Value="false" />
+    <Property Name="StoreTimeLastSyncIntoProject" Value="true" />
+    <Property Name="SyncCustomFieldOrderingWithTableFieldIndex" Value="false" />
+    <Property Name="SyncMappedElementNamesAfterRefresh_v5" Value="false" />
+    <Property Name="SyncMappedElementNamesAfterRelationalModelDataSync_v5" Value="false" />
+    <Property Name="SyncRelationalModelDataElementNameWithModelElementName_v5" Value="false" />
+    <Property Name="SyncRenamedMappedElementNamesAfterRefresh_v5" Value="false" />
+    <Property Name="SyncRenamedMappedElementNamesAfterRelationalModelDataSync_v5" Value="false" />
+    <Property Name="TableValuedFunctionNameStripPattern" Value="{fn_, pr_, sp_}{}" />
+    <Property Name="TargetPerEntityEdgesRequireBackingFkConstraint" Value="true" />
+    <Property Name="TypedViewFieldNameStripPattern" Value="{}{}" />
+    <Property Name="TypedViewMappedOnResultsetPattern" Value="{$ProcFunctionName}{$ResultsetName}Result" />
+    <Property Name="TypedViewNameStripPattern" Value="{vw_}{}" />
+    <Property Name="UniqueConstraintPattern" Value="UC_{$Guid}" />
+    <Property Name="UniqueConstraintsFollowDBUniqueConstraints_v5" Value="true" />
+    <Property Name="UpdateCustomPropertiesAfterRefresh_v5" Value="false" />
+    <Property Name="UpdateCustomPropertiesAfterRelationalModelDataSync_v5" Value="false" />
+    <Property Name="UseCustomFieldOrderingOnNewElements" Value="false" />
+  </Properties>
+  <TypeShortcuts />
+  <IgnoredWarnings />
+  <SavedSearchQueries />
+  <CodeGenerationCyclePreferences>
+    <OutputType Value="3">
+      <LastUsedPreferences>
+        <DestinationRootFolder Value=".\Code" />
+        <FrameworkName Value="Entity Framework Core v6" />
+        <LanguageName Value="C#" />
+        <PlatformName Value=".NET 6" />
+        <PresetName Value="SD.EntityFramework.Core v6" />
+        <RootNamespace Value="recipesApp" />
+        <TemplateGroup Value="General" />
+        <TemplateBindings>
+          <Binding Name="SD.EntityFramework.Core.v6.Firebird" />
+          <Binding Name="SD.EntityFramework.Core.v6.PostgreSql" />
+          <Binding Name="SD.EntityFramework.Core.v6.SqlServer" />
+          <Binding Name="SD.EntityFramework.Core v6" />
+          <Binding Name="SD.EntityFramework.NET6" />
+          <Binding Name="SD.EntityFramework.Shared" />
+          <Binding Name="SD.TemplateBindings.General" />
+        </TemplateBindings>
+        <AdhocTemplateSets />
+      </LastUsedPreferences>
+    </OutputType>
+  </CodeGenerationCyclePreferences>
+  <CodeGenerationMetaDataDefaults />
+  <EntityModel>
+    <ValueTypeDefinitions />
+    <EntityDefinitions>
+      <EntityDefinition Name="Category" ObjectID="4fb9644a-8a57-4ba8-a623-791251c5834c">
+        <Fields>
+          <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
+          <Field Name="IsActive" Type="bool" />
+          <Field Name="Name" Type="string" MaxLength="100" />
+        </Fields>
+      </EntityDefinition>
+      <EntityDefinition Name="Ingredient" ObjectID="9425a5d7-7754-4e73-81c7-c7eebe62bcae">
+        <Fields>
+          <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
+          <Field Name="Name" Type="string" MaxLength="1000" />
+          <Field Name="RecipeId" Type="long" Precision="20" />
+        </Fields>
+      </EntityDefinition>
+      <EntityDefinition Name="Instruction" ObjectID="b2a09452-9a5a-48b7-823c-22cf66d96143">
+        <Fields>
+          <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
+          <Field Name="Name" Type="string" MaxLength="1000" />
+          <Field Name="RecipeId" Type="long" Precision="20" />
+        </Fields>
+      </EntityDefinition>
+      <EntityDefinition Name="Recipe" ObjectID="7f6f3bc9-5c11-41c5-956f-9d45a7fce688">
+        <Fields>
+          <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
+          <Field Name="IsActive" Type="bool" />
+          <Field Name="Title" Type="string" MaxLength="100" />
+        </Fields>
+      </EntityDefinition>
+      <EntityDefinition Name="RecipeCategory" ObjectID="77277cc3-8fa8-4199-aebd-51c0904d7496">
+        <Fields>
+          <Field Name="CategoryId" Type="long" Precision="20" />
+          <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
+          <Field Name="RecipeId" Type="long" Precision="20" />
+        </Fields>
+      </EntityDefinition>
+      <EntityDefinition Name="User" ObjectID="dcefbf20-5018-469c-b73d-323dcb26fddc">
+        <Fields>
+          <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
+          <Field Name="IsActive" Type="bool" />
+          <Field Name="Password" Type="string" MaxLength="100" />
+          <Field Name="Username" Type="string" MaxLength="100" />
+        </Fields>
+      </EntityDefinition>
+      <EntityDefinition Name="VersionInfo" ObjectID="f47caf67-63f6-43b6-8295-a00e77eea6dd">
+        <Fields>
+          <Field Name="AppliedOn" Type="datetime" IsOptional="true" />
+          <Field Name="Description" Type="string" IsOptional="true" MaxLength="1024" />
+          <Field Name="Version" Type="long" Precision="20" />
+        </Fields>
+      </EntityDefinition>
+    </EntityDefinitions>
+    <Relationships>
+      <NormalRelationship Name="Ingredient.Recipe-Recipe.Ingredients" Start=":Ingredient" End=":Recipe" StartNavigator="Recipe" EndNavigator="Ingredients" Type="4">
+        <FieldRelationships>
+          <FieldFieldRelationship FkField="RecipeId" PkField="Id" />
+        </FieldRelationships>
+      </NormalRelationship>
+      <NormalRelationship Name="Instruction.Recipe-Recipe.Instructions" Start=":Instruction" End=":Recipe" StartNavigator="Recipe" EndNavigator="Instructions" Type="4">
+        <FieldRelationships>
+          <FieldFieldRelationship FkField="RecipeId" PkField="Id" />
+        </FieldRelationships>
+      </NormalRelationship>
+      <NormalRelationship Name="RecipeCategory.Category-Category.RecipeCategories" Start=":RecipeCategory" End=":Category" StartNavigator="Category" EndNavigator="RecipeCategories" Type="4">
+        <FieldRelationships>
+          <FieldFieldRelationship FkField="CategoryId" PkField="Id" />
+        </FieldRelationships>
+      </NormalRelationship>
+      <NormalRelationship Name="RecipeCategory.Recipe-Recipe.RecipeCategories" Start=":RecipeCategory" End=":Recipe" StartNavigator="Recipe" EndNavigator="RecipeCategories" Type="4">
+        <FieldRelationships>
+          <FieldFieldRelationship FkField="RecipeId" PkField="Id" />
+        </FieldRelationships>
+      </NormalRelationship>
+    </Relationships>
+    <InheritanceHierarchies />
+  </EntityModel>
+  <TargetDatabases>
+    <TargetDatabase Type="88EBFD8C-CBDD-4452-88AF-1C99E41A123F" SyncSource="2">
+      <ConnectionElements>
+        <ConnectionElement Name="ServerName" Value="localhost" />
+        <ConnectionElement Name="CatalogName" Value="recipesapp" />
+        <ConnectionElement Name="UserID" Value="postgres" />
+        <ConnectionElement Name="Password" Value="" />
+        <ConnectionElement Name="PortNumber" Value="5432" />
+        <ConnectionElement Name="SslMode" Value="Disable" />
+      </ConnectionElements>
+      <SystemSequences>
+        <Sequence Name="SystemIdentity" />
+      </SystemSequences>
+      <Catalogs>
+        <Catalog Name="recipesapp" SyncSource="2">
+          <Schemas>
+            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-01T20:00:13.963708Z">
+              <Sequences>
+                <Sequence Name="category_id_seq" />
+                <Sequence Name="ingredient_id_seq" />
+                <Sequence Name="instruction_id_seq" />
+                <Sequence Name="recipe_category_id_seq" />
+                <Sequence Name="recipe_id_seq" />
+                <Sequence Name="user_id_seq" />
+              </Sequences>
+              <Tables>
+                <Table Name="category">
+                  <PkConstraintName Name="PK_category" />
+                  <Fields>
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('category_id_seq'::regclass)" DefaultSequence="recipesapp:public:category_id_seq" DbType="10" Precision="20" />
+                    <Field Name="name" Ordinal="2" DbType="24" Length="100" />
+                    <Field Name="is_active" Ordinal="3" HasDefaultValue="true" DefaultValue="false" DbType="0" />
+                  </Fields>
+                </Table>
+                <Table Name="ingredient">
+                  <PkConstraintName Name="PK_ingredient" />
+                  <Fields>
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('ingredient_id_seq'::regclass)" DefaultSequence="recipesapp:public:ingredient_id_seq" DbType="10" Precision="20" />
+                    <Field Name="recipe_id" Ordinal="2" DbType="10" Precision="20" />
+                    <Field Name="name" Ordinal="3" DbType="24" Length="1000" />
+                  </Fields>
+                </Table>
+                <Table Name="instruction">
+                  <PkConstraintName Name="PK_instruction" />
+                  <Fields>
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('instruction_id_seq'::regclass)" DefaultSequence="recipesapp:public:instruction_id_seq" DbType="10" Precision="20" />
+                    <Field Name="recipe_id" Ordinal="2" DbType="10" Precision="20" />
+                    <Field Name="name" Ordinal="3" DbType="24" Length="1000" />
+                  </Fields>
+                </Table>
+                <Table Name="recipe">
+                  <PkConstraintName Name="PK_recipe" />
+                  <Fields>
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('recipe_id_seq'::regclass)" DefaultSequence="recipesapp:public:recipe_id_seq" DbType="10" Precision="20" />
+                    <Field Name="title" Ordinal="2" DbType="24" Length="100" />
+                    <Field Name="is_active" Ordinal="3" HasDefaultValue="true" DefaultValue="false" DbType="0" />
+                  </Fields>
+                </Table>
+                <Table Name="recipe_category">
+                  <PkConstraintName Name="PK_recipe_category" />
+                  <Fields>
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('recipe_category_id_seq'::regclass)" DefaultSequence="recipesapp:public:recipe_category_id_seq" DbType="9" Precision="10" />
+                    <Field Name="recipe_id" Ordinal="2" DbType="9" Precision="10" />
+                    <Field Name="category_id" Ordinal="3" DbType="9" Precision="10" />
+                  </Fields>
+                </Table>
+                <Table Name="user">
+                  <PkConstraintName Name="PK_user" />
+                  <Fields>
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('user_id_seq'::regclass)" DefaultSequence="recipesapp:public:user_id_seq" DbType="10" Precision="20" />
+                    <Field Name="username" Ordinal="2" DbType="24" Length="100" />
+                    <Field Name="password" Ordinal="3" DbType="24" Length="100" />
+                    <Field Name="is_active" Ordinal="4" HasDefaultValue="true" DefaultValue="false" DbType="0" />
+                  </Fields>
+                </Table>
+                <Table Name="VersionInfo">
+                  <Fields>
+                    <Field Name="Version" Ordinal="1" DbType="10" Precision="20" />
+                    <Field Name="AppliedOn" Ordinal="2" IsOptional="true" DbType="22" />
+                    <Field Name="Description" Ordinal="3" IsOptional="true" DbType="24" Length="1024" />
+                  </Fields>
+                </Table>
+              </Tables>
+            </Schema>
+          </Schemas>
+          <ForeignKeyConstraints>
+            <ForeignKeyConstraint Name="public:ingredient:FK_ingredient_recipe_id_recipe_id">
+              <FieldPairs>
+                <FieldPair PkField="public:recipe:id" FkField="public:ingredient:recipe_id" />
+              </FieldPairs>
+            </ForeignKeyConstraint>
+            <ForeignKeyConstraint Name="public:instruction:FK_instruction_recipe_id_recipe_id">
+              <FieldPairs>
+                <FieldPair PkField="public:recipe:id" FkField="public:instruction:recipe_id" />
+              </FieldPairs>
+            </ForeignKeyConstraint>
+            <ForeignKeyConstraint Name="public:recipe_category:FK_recipe_category_category_id_category_id">
+              <FieldPairs>
+                <FieldPair PkField="public:category:id" FkField="public:recipe_category:category_id" />
+              </FieldPairs>
+            </ForeignKeyConstraint>
+            <ForeignKeyConstraint Name="public:recipe_category:FK_recipe_category_recipe_id_recipe_id">
+              <FieldPairs>
+                <FieldPair PkField="public:recipe:id" FkField="public:recipe_category:recipe_id" />
+              </FieldPairs>
+            </ForeignKeyConstraint>
+          </ForeignKeyConstraints>
+        </Catalog>
+      </Catalogs>
+    </TargetDatabase>
+  </TargetDatabases>
+  <MappingStores>
+    <MappingStore Type="88EBFD8C-CBDD-4452-88AF-1C99E41A123F">
+      <EntityMappings>
+        <EntityMapping EntityName=":Category" TargetName="recipesapp:public:category">
+          <FieldMappings>
+            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:category_id_seq" />
+            <FieldMapping FieldName="IsActive" TargetFieldName="is_active" />
+            <FieldMapping FieldName="Name" TargetFieldName="name" />
+          </FieldMappings>
+        </EntityMapping>
+        <EntityMapping EntityName=":Ingredient" TargetName="recipesapp:public:ingredient">
+          <FieldMappings>
+            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:ingredient_id_seq" />
+            <FieldMapping FieldName="Name" TargetFieldName="name" />
+            <FieldMapping FieldName="RecipeId" TargetFieldName="recipe_id" />
+          </FieldMappings>
+        </EntityMapping>
+        <EntityMapping EntityName=":Instruction" TargetName="recipesapp:public:instruction">
+          <FieldMappings>
+            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:instruction_id_seq" />
+            <FieldMapping FieldName="Name" TargetFieldName="name" />
+            <FieldMapping FieldName="RecipeId" TargetFieldName="recipe_id" />
+          </FieldMappings>
+        </EntityMapping>
+        <EntityMapping EntityName=":Recipe" TargetName="recipesapp:public:recipe">
+          <FieldMappings>
+            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:recipe_id_seq" />
+            <FieldMapping FieldName="IsActive" TargetFieldName="is_active" />
+            <FieldMapping FieldName="Title" TargetFieldName="title" />
+          </FieldMappings>
+        </EntityMapping>
+        <EntityMapping EntityName=":RecipeCategory" TargetName="recipesapp:public:recipe_category">
+          <FieldMappings>
+            <FieldMapping FieldName="CategoryId" TargetFieldName="category_id" />
+            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:recipe_category_id_seq" />
+            <FieldMapping FieldName="RecipeId" TargetFieldName="recipe_id" />
+          </FieldMappings>
+        </EntityMapping>
+        <EntityMapping EntityName=":User" TargetName="recipesapp:public:user">
+          <FieldMappings>
+            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:user_id_seq" />
+            <FieldMapping FieldName="IsActive" TargetFieldName="is_active" />
+            <FieldMapping FieldName="Password" TargetFieldName="password" />
+            <FieldMapping FieldName="Username" TargetFieldName="username" />
+          </FieldMappings>
+        </EntityMapping>
+        <EntityMapping EntityName=":VersionInfo" TargetName="recipesapp:public:VersionInfo">
+          <FieldMappings>
+            <FieldMapping FieldName="AppliedOn" TargetFieldName="AppliedOn" />
+            <FieldMapping FieldName="Description" TargetFieldName="Description" />
+            <FieldMapping FieldName="Version" TargetFieldName="Version" />
+          </FieldMappings>
+        </EntityMapping>
+      </EntityMappings>
+      <TypedViewMappings />
+      <SPCallMappings />
+      <TvfCallMappings />
+      <TypeConversionDefinitions />
+    </MappingStore>
+  </MappingStores>
+  <ModelViews />
+  <DerivedModels>
+    <DerivedModel Name="View" ObjectID="491fc076-00dc-418e-9432-f60c5f3b2ae4" TargetFrameworkName="DTO Class Model" UseLegacyDefaults="false">
+      <CodeGenerationMetaDataDefaults>
+        <TargetElement Type="32768">
+          <Defaults>
+            <Attributes>
+              <Attribute Value="Serializable" />
+              <Attribute Value="DataContract" />
+            </Attributes>
+          </Defaults>
+        </TargetElement>
+        <TargetElement Type="65536">
+          <Defaults>
+            <Attributes>
+              <Attribute Value="Serializable" />
+              <Attribute Value="DataContract" />
+            </Attributes>
+          </Defaults>
+        </TargetElement>
+        <TargetElement Type="131072">
+          <Defaults>
+            <Attributes>
+              <Attribute Value="DataMember" />
+            </Attributes>
+          </Defaults>
+        </TargetElement>
+        <TargetElement Type="262144">
+          <Defaults>
+            <Attributes>
+              <Attribute Value="DataMember" />
+            </Attributes>
+          </Defaults>
+        </TargetElement>
+        <TargetElement Type="524288">
+          <Defaults>
+            <Attributes>
+              <Attribute Value="DataMember" />
+            </Attributes>
+          </Defaults>
+        </TargetElement>
+      </CodeGenerationMetaDataDefaults>
+      <Settings>
+        <Property Name="DerivedElementClassNameSuffix" Value="" />
+        <Property Name="PrefixDenormalizedFieldsWithNavigatorName" Value="true" />
+        <Property Name="SyncDerivedElementNamesWithSourceElementNames" Value="false" />
+      </Settings>
+      <CodeGenerationCyclePreferences OutputType="3">
+        <LastUsedPreferences>
+          <DestinationRootFolder Value=".\Code" />
+          <FrameworkName Value="DTO Class Model" />
+          <LanguageName Value="C#" />
+          <PlatformName Value=".NET 6" />
+          <PresetName Value="SD.DTOClasses.ReadOnlyDTOs" />
+          <RootNamespace Value="View" />
+          <TemplateGroup Value="General" />
+          <TemplateBindings>
+            <Binding Name="SD.DTOClassModel.NET6" />
+            <Binding Name="SD.DTOClassModel" />
+            <Binding Name="SD.TemplateBindings.General" />
+          </TemplateBindings>
+          <AdhocTemplateSets />
+        </LastUsedPreferences>
+      </CodeGenerationCyclePreferences>
+      <Documents>
+        <Document Name="RecipeDetailsView">
+          <RootEntity Entity=":Recipe" />
+          <Fields>
+            <Field Name="Ingredients">
+              <Document Name="Ingredient">
+                <RootEntity Entity=":Ingredient" NavigatorPath="Ingredients" />
+                <Fields>
+                  <Field Name="Name">
+                    <EntityField Name="Name" />
+                  </Field>
+                </Fields>
+              </Document>
+            </Field>
+            <Field Name="Instructions">
+              <Document Name="Instruction">
+                <RootEntity Entity=":Instruction" NavigatorPath="Instructions" />
+                <Fields>
+                  <Field Name="Name">
+                    <EntityField Name="Name" />
+                  </Field>
+                </Fields>
+              </Document>
+            </Field>
+            <Field Name="Title">
+              <EntityField Name="Title" />
+            </Field>
+          </Fields>
+        </Document>
+        <Document Name="RecipeMenuView">
+          <RootEntity Entity=":Recipe" />
+          <Fields>
+            <Field Name="RecipeCategories">
+              <Document Name="RecipeCategory">
+                <RootEntity Entity=":RecipeCategory" NavigatorPath="RecipeCategories" />
+                <Fields>
+                  <Field Name="Category">
+                    <Document Name="Category">
+                      <RootEntity Entity=":Category" NavigatorPath="RecipeCategories,Category" />
+                      <Fields>
+                        <Field Name="Name">
+                          <EntityField Name="Name" />
+                        </Field>
+                      </Fields>
+                    </Document>
+                  </Field>
+                </Fields>
+              </Document>
+            </Field>
+            <Field Name="Title">
+              <EntityField Name="Title" />
+            </Field>
+          </Fields>
+        </Document>
+      </Documents>
+    </DerivedModel>
+  </DerivedModels>
+</Project>
