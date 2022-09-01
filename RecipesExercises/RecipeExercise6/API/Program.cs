@@ -62,15 +62,16 @@ builder.Services.AddAuthentication(options =>
              IssuerSigningKey = new SymmetricSecurityKey
                (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
          };
-         c.Events.OnMessageReceived = context => {
+         //  c.Events.OnMessageReceived = context =>
+         //  {
 
-             if (context.Request.Cookies.ContainsKey("X-Access-Token"))
-             {
-                 context.Token = context.Request.Cookies["X-Access-Token"];
-             }
+         //      if (context.Request.Cookies.ContainsKey("X-Access-Token"))
+         //      {
+         //          context.Token = context.Request.Cookies["X-Access-Token"];
+         //      }
 
-             return Task.CompletedTask;
-         };
+         //      return Task.CompletedTask;
+         //  };
      });
 
 builder.Services.AddAuthorization();
@@ -120,7 +121,7 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
     var refreshToken = _tokenService.GenerateRefreshToken();
 
     user.RefreshToken = refreshToken;
-    
+
     //var cookieOptions = new CookieOptions
     //{
     //    HttpOnly = true,
@@ -128,7 +129,7 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
     //};
     //context.Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions { HttpOnly = true, Expires = DateTime.Now.AddMinutes(5) });
     //context.Response.Cookies.Append("X-Refresh-Token", refreshToken, cookieOptions);
-    
+
     user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7).ToString();
 
     var json = await JsonHandler.SerializeAsync(usersList);
@@ -222,24 +223,24 @@ app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token)
     return Results.Ok();
 });
 
-app.MapGet("/antiforgery", (IAntiforgery antiforgery, HttpContext context) =>
-{
-    var tokens = antiforgery.GetAndStoreTokens(context);
-    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions { HttpOnly = false });
-});
+// app.MapGet("/antiforgery", (IAntiforgery antiforgery, HttpContext context) =>
+// {
+//     var tokens = antiforgery.GetAndStoreTokens(context);
+//     context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions { HttpOnly = false });
+// });
 
-app.MapPost("/validate", async (HttpContext context, IAntiforgery antiforgery) =>
-{
-    try
-    {
-        await antiforgery.ValidateRequestAsync(context);
-        return Results.Ok();
-    }
-    catch (Exception ex)
-    {
-        return Results.Problem(ex?.Message ?? string.Empty);
-    }
-});
+// app.MapPost("/validate", async (HttpContext context, IAntiforgery antiforgery) =>
+// {
+//     try
+//     {
+//         await antiforgery.ValidateRequestAsync(context);
+//         return Results.Ok();
+//     }
+//     catch (Exception ex)
+//     {
+//         return Results.Problem(ex?.Message ?? string.Empty);
+//     }
+// });
 
 app.MapGet("api/json/{fileName}", [Authorize] async Task<string> (string fileName) =>
 {
