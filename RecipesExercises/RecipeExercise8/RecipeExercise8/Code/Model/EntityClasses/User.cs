@@ -28,6 +28,10 @@ namespace recipesApp.EntityClasses
 		public System.Boolean IsActive { get; set; }
 		/// <summary>Gets or sets the Password field. </summary>
 		public System.String Password { get; set; }
+		/// <summary>Gets or sets the RefreshToken field. </summary>
+		public System.String? RefreshToken { get; set; }
+		/// <summary>Gets or sets the RefreshTokenExpiry field. </summary>
+		public Nullable<System.DateTime> RefreshTokenExpiry { get; set; }
 		/// <summary>Gets or sets the Username field. </summary>
 		public System.String Username { get; set; }
 	}

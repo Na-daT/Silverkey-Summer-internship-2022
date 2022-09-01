@@ -160,8 +160,6 @@
           <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Password" Type="string" MaxLength="100" />
-          <Field Name="RefreshToken" Type="string" IsOptional="true" MaxLength="1073741824" />
-          <Field Name="RefreshTokenExpiry" Type="datetime" IsOptional="true" />
           <Field Name="Username" Type="string" MaxLength="100" />
         </Fields>
       </EntityDefinition>
@@ -211,9 +209,9 @@
         <Sequence Name="SystemIdentity" />
       </SystemSequences>
       <Catalogs>
-        <Catalog Name="recipesapp">
+        <Catalog Name="recipesapp" SyncSource="2">
           <Schemas>
-            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-01T20:28:42.4481462Z">
+            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-01T20:00:13.963708Z">
               <Sequences>
                 <Sequence Name="category_id_seq" />
                 <Sequence Name="ingredient_id_seq" />
@@ -270,8 +268,6 @@
                     <Field Name="username" Ordinal="2" DbType="24" Length="100" />
                     <Field Name="password" Ordinal="3" DbType="24" Length="100" />
                     <Field Name="is_active" Ordinal="4" HasDefaultValue="true" DefaultValue="false" DbType="0" />
-                    <Field Name="refresh_token" Ordinal="5" IsOptional="true" DbType="19" Length="1073741824" />
-                    <Field Name="refresh_token_expiry" Ordinal="6" IsOptional="true" DbType="22" />
                   </Fields>
                 </Table>
                 <Table Name="VersionInfo">
@@ -353,8 +349,6 @@
             <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:user_id_seq" />
             <FieldMapping FieldName="IsActive" TargetFieldName="is_active" />
             <FieldMapping FieldName="Password" TargetFieldName="password" />
-            <FieldMapping FieldName="RefreshToken" TargetFieldName="refresh_token" />
-            <FieldMapping FieldName="RefreshTokenExpiry" TargetFieldName="refresh_token_expiry" />
             <FieldMapping FieldName="Username" TargetFieldName="username" />
           </FieldMappings>
         </EntityMapping>

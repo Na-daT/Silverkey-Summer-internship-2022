@@ -95,6 +95,8 @@ namespace recipesApp
 			config.Property(t => t.Username).HasColumnName("username").HasMaxLength(100).IsRequired();
 			config.Property(t => t.Password).HasColumnName("password").HasMaxLength(100).IsRequired();
 			config.Property(t => t.IsActive).HasColumnName("is_active");
+			config.Property(t => t.RefreshToken).HasColumnName("refresh_token");
+			config.Property(t => t.RefreshTokenExpiry).HasColumnName("refresh_token_expiry");
 		}
 
 		/// <summary>Defines the mapping information for the entity 'VersionInfo'</summary>
