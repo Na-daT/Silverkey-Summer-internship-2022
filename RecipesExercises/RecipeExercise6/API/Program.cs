@@ -124,11 +124,10 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
     var cookieOptions = new CookieOptions
     {
         HttpOnly = true,
-        SameSite = SameSiteMode.Strict,
         Expires = DateTime.Now.AddDays(7)
     };
-    context.Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions { HttpOnly = true, Expires = DateTime.Now.AddMinutes(5) });
-    context.Response.Cookies.Append("refreshTokeX-Refresh-Tokenn", refreshToken, cookieOptions);
+    //context.Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions { HttpOnly = true, Expires = DateTime.Now.AddMinutes(5) });
+    //context.Response.Cookies.Append("X-Refresh-Token", refreshToken, cookieOptions);
     
     user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7).ToString();
 
