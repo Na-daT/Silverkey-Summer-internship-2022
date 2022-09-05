@@ -13,6 +13,15 @@ namespace View.DtoClasses
 	[DataContract]
 	public partial class RecipeMenuView
 	{
+		/// <summary>Gets or sets the Id field. Derived from Entity Model Field 'Recipe.Id'</summary>
+		[DataMember]
+		public System.Int64 Id { get; set; }
+		/// <summary>Gets or sets the Ingredients field. </summary>
+		[DataMember]
+		public List<RecipeMenuViewTypes.Ingredient> Ingredients { get; set; }
+		/// <summary>Gets or sets the Instructions field. </summary>
+		[DataMember]
+		public List<RecipeMenuViewTypes.Instruction> Instructions { get; set; }
 		/// <summary>Gets or sets the RecipeCategories field. </summary>
 		[DataMember]
 		public List<RecipeMenuViewTypes.RecipeCategory> RecipeCategories { get; set; }
@@ -23,6 +32,26 @@ namespace View.DtoClasses
 
 	namespace RecipeMenuViewTypes
 	{
+		/// <summary> DTO class which is derived from the entity 'Ingredient (Ingredients)'.</summary>
+		[Serializable]
+		[DataContract]
+		public partial class Ingredient
+		{
+			/// <summary>Gets or sets the Name field. Derived from Entity Model Field 'Ingredient.Name'</summary>
+			[DataMember]
+			public System.String Name { get; set; }
+		}
+
+		/// <summary> DTO class which is derived from the entity 'Instruction (Instructions)'.</summary>
+		[Serializable]
+		[DataContract]
+		public partial class Instruction
+		{
+			/// <summary>Gets or sets the Name field. Derived from Entity Model Field 'Instruction.Name'</summary>
+			[DataMember]
+			public System.String Name { get; set; }
+		}
+
 		/// <summary> DTO class which is derived from the entity 'RecipeCategory (RecipeCategories)'.</summary>
 		[Serializable]
 		[DataContract]

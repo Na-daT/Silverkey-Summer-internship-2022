@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "View.Persistence", "Code\Vi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{757B32FB-03DA-4918-AE7F-7D4EDFBDD2DF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client_Ex4", "Client_Ex4\Client_Ex4.csproj", "{60E5E287-626E-498E-8638-BD3D28A05759}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{A30E4066-3CB8-44C1-B544-226381F9A2E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A30E4066-3CB8-44C1-B544-226381F9A2E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A30E4066-3CB8-44C1-B544-226381F9A2E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60E5E287-626E-498E-8638-BD3D28A05759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60E5E287-626E-498E-8638-BD3D28A05759}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60E5E287-626E-498E-8638-BD3D28A05759}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60E5E287-626E-498E-8638-BD3D28A05759}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

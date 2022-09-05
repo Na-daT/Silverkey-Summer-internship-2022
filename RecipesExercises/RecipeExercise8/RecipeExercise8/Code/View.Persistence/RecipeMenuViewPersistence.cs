@@ -39,6 +39,15 @@ namespace View.Persistence
 		{
 			return p__0 => new View.DtoClasses.RecipeMenuView()
 			{
+				Id = p__0.Id,
+				Ingredients = p__0.Ingredients.Select(p__1 => new View.DtoClasses.RecipeMenuViewTypes.Ingredient()
+				{
+					Name = p__1.Name,
+				}).ToList(),
+				Instructions = p__0.Instructions.Select(p__1 => new View.DtoClasses.RecipeMenuViewTypes.Instruction()
+				{
+					Name = p__1.Name,
+				}).ToList(),
 				RecipeCategories = p__0.RecipeCategories.Select(p__1 => new View.DtoClasses.RecipeMenuViewTypes.RecipeCategory()
 				{
 					Category = new View.DtoClasses.RecipeMenuViewTypes.RecipeCategoryTypes.Category()
