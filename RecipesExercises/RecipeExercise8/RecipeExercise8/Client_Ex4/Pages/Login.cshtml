@@ -1,0 +1,39 @@
+@page
+@model LoginModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "Login page";
+    var loginUrl = @Model.MyUrl + "login";
+    var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+}
+@section Scripts
+{
+<script>
+    async function login(profile) {
+        const response = await fetch('@loginUrl', {
+            method: 'POST',
+            body: JSON.stringify(profile),
+            headers: {
+                'Content-Type': 'application/json;',
+                'RequestVerificationToken': '@requestToken',
+            }
+        }).then(res => { return res });
+        if (response.ok) {
+            response.json().then(c => {
+                @* return RedirectToPage("Index", new { token = c["token"] }, new { refreshToken = c["refreshToken"] }); *@
+            })
+        }
+        else {
+            await Swal.fire({
+                title: 'Invalid login!',
+                text: 'Username or password incorrect',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            })
+        }
+    }
+</script>
+}
+<div x-data="{profile: {username:'', password:'' }}">
+
+</div>
