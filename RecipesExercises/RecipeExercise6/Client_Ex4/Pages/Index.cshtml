@@ -10,12 +10,12 @@
     var loginUrl = @Model.MyUrl + "login";
     var registerUrl = @Model.MyUrl + "register";
     var refreshTokenUrl = @Model.MyUrl + "refresh-token";
-    var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+    var antiforgeryUrl = @Model.MyUrl + "antiforgery/token";
 }
 @section Scripts{
 <script>
-    async function loadRecipes(search,tokens) {
-        var recipesList = await getRecipesAsync(tokens);
+    async function loadRecipes(search, tokens) {
+        var recipesList = await getRecipesAsync();
         if (search === String.empty) {
             return recipesList;
         }
@@ -27,8 +27,13 @@
         }
         return result;
     }
-    async function getRecipesAsync(tokens) {
-        const response = await fetch('@recipeUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken', 'Authorization': 'Bearer ' + localStorage.token } })
+    async function getRecipesAsync() {
+        //var antiforgery = await getToken();
+        const response = await fetch('@recipeUrl', {
+            method: 'GET', headers: {
+                'Authorization': 'Bearer ' + localStorage.token
+            }
+        })
             .then(res => { return res })
         if (response.ok) {
             const json = await response.json();
@@ -36,7 +41,7 @@
         }
         else if (response.status == '401') {
             var x = await refreshMyToken();
-            if(!x) {
+            if (!x) {
                 Swal.fire({
                     title: 'Error!',
                     text: 'Session expired please log in again',
@@ -49,19 +54,19 @@
                 })
             }
             else {
-                await getRecipesAsync(tokens);
+                await getRecipesAsync();
             }
         }
     }
     async function getCategoriesAsync(tokens) {
-        const response = await fetch('@categoriesUrl', { method: 'GET', headers: { 'RequestVerificationToken': '@requestToken', 'Authorization': 'Bearer ' + localStorage.token } })
+        const response = await fetch('@categoriesUrl', { method: 'GET', headers: { 'Authorization': 'Bearer ' + localStorage.token } })
             .then(res => { return res })
         if (response.ok) {
             return response.json()
         }
         else if (response.status == '401') {
             var x = await refreshMyToken();
-            if(!x) {
+            if (!x) {
                 Swal.fire({
                     title: 'Error!',
                     text: 'Session expired please log in again',
@@ -92,49 +97,49 @@
             const response = await fetch('@recipePostUrl' + '/' + recipe.id, {
                 method: 'DELETE',
                 headers: {
-                    'RequestVerificationToken': '@requestToken',
-                    'Authorization': 'Bearer ' + localStorage.token
+                    @* 'RequestVerificationToken': '@requestToken', *@
+                'Authorization': 'Bearer ' + localStorage.token
                 }
-            }).then(res => { return res })
-            if (response.ok) {
-                await Swal.fire({
-                    title: 'Deleted!',
-                    icon: 'success',
-                    confirmButtonText: 'Ok',
-                    confirmButtonColor: '#2C7A48'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.hash = '#mainJump';
-                        window.location.reload(true);
-                    }
-                })
+    }).then(res => { return res })
+    if (response.ok) {
+        await Swal.fire({
+            title: 'Deleted!',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+            confirmButtonColor: '#2C7A48'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.hash = '#mainJump';
+                window.location.reload(true);
             }
-            else if (response.status == '401') {
-                var x = await refreshMyToken();
-                if(!x) {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Session expired please log in again',
-                        icon: 'error',
-                        confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            logOut();
-                        }
-                    })
+        })
+    }
+    else if (response.status == '401') {
+        var x = await refreshMyToken();
+        if (!x) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Session expired please log in again',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    logOut();
                 }
-                else {
-                    await deleteRecipeAsync(recipe, tokens);
-                }
-            }
-            else {
-                await Swal.fire({
-                    title: 'Error!',
-                    icon: 'Try again later.',
-                    confirmButtonText: 'Ok',
-                    confirmButtonColor: '#2C7A48'
-                })
-            }
+            })
+        }
+        else {
+            await deleteRecipeAsync(recipe, tokens);
+        }
+    }
+    else {
+        await Swal.fire({
+            title: 'Error!',
+            icon: 'Try again later.',
+            confirmButtonText: 'Ok',
+            confirmButtonColor: '#2C7A48'
+        })
+    }
         }
     }
 </script>
@@ -162,42 +167,42 @@
                 body: JSON.stringify(recipeToUpdate),
                 headers: {
                     'Content-Type': 'application/json;',
-                    'RequestVerificationToken': '@requestToken',
-                    'Authorization': 'Bearer ' + localStorage.token
+                    @* 'RequestVerificationToken': '@requestToken', *@
+                'Authorization': 'Bearer ' + localStorage.token
                 }
-            }).then(res => { return res })
-            if (result.ok) {
-                await Swal.fire({
-                    title: 'Success!',
-                    text: 'Recipe updated!',
-                    icon: 'success',
-                    confirmButtonText: 'Ok',
-                    confirmButtonColor: '#2C7A48'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.hash = '#mainJump';
-                        window.location.reload(true);
-                    }
-                })
+    }).then(res => { return res })
+    if (result.ok) {
+        await Swal.fire({
+            title: 'Success!',
+            text: 'Recipe updated!',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+            confirmButtonColor: '#2C7A48'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.hash = '#mainJump';
+                window.location.reload(true);
             }
-            else if (response.status == '401') {
-                var x = await refreshMyToken();
-                if(!x) {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Session expired please log in again',
-                        icon: 'error',
-                        confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            logOut();
-                        }
-                    })
+        })
+    }
+    else if (response.status == '401') {
+        var x = await refreshMyToken();
+        if (!x) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Session expired please log in again',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    logOut();
                 }
-                else {
-                     await updateMyRecipeAsync(recipeToUpdate, selectedCategories, tokens);
-                }
-            }
+            })
+        }
+        else {
+            await updateMyRecipeAsync(recipeToUpdate, selectedCategories, tokens);
+        }
+    }
         }
     }
     async function recipeToPostAsync(newRecipe, myCategories, tokens) {
@@ -212,54 +217,54 @@
             body: JSON.stringify(newRecipe),
             headers: {
                 'Content-Type': 'application/json;',
-                'RequestVerificationToken': '@requestToken',
-                'Authorization': 'Bearer ' + localStorage.token
+                @* 'RequestVerificationToken': '@requestToken', *@
+            'Authorization': 'Bearer ' + localStorage.token
             }
         }).then(res => { return res })
-        if (response.ok) {
-            Swal.fire({
-                title: 'Success!',
-                text: 'Recipe created!',
-                icon: 'success',
-                confirmButtonText: 'Ok'
+    if (response.ok) {
+        Swal.fire({
+            title: 'Success!',
+            text: 'Recipe created!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    window.location.hash = '#mainJump';
+                    window.location.reload(true);
+                }
             })
-                .then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.hash = '#mainJump';
-                        window.location.reload(true);
-                    }
-                })
-        } else if (response.status == '401') {
-            var x = await refreshMyToken();
-            if(!x) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Session expired please log in again',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        logOut();
-                    }
-                })
-            }
-            else {
-                    await recipeToPostAsync(newRecipe, myCategories, tokens);
-            }
-        }
-        else {
+    } else if (response.status == '401') {
+        var x = await refreshMyToken();
+        if (!x) {
             Swal.fire({
                 title: 'Error!',
-                text: 'Recipe not created! please try again.',
+                text: 'Session expired please log in again',
                 icon: 'error',
                 confirmButtonText: 'Ok'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.hash = '#creationForms';
-                    window.location.reload(true);
+                    logOut();
                 }
             })
         }
+        else {
+            await recipeToPostAsync(newRecipe, myCategories, tokens);
+        }
+    }
+    else {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Recipe not created! please try again.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.hash = '#creationForms';
+                window.location.reload(true);
+            }
+        })
+    }
     }
     async function categoryToPostAsync(newCategory, tokens) {
         const response = await fetch('@categoriesPostUrl', {
@@ -267,106 +272,106 @@
             body: JSON.stringify(newCategory),
             headers: {
                 'Content-Type': 'application/json',
-                'RequestVerificationToken': '@requestToken',
-                'Authorization': 'Bearer ' + localStorage.token
+                @* 'RequestVerificationToken': '@requestToken', *@
+            'Authorization': 'Bearer ' + localStorage.token
             }
         }).then(res => { return res })
-        if (response.ok) {
+    if (response.ok) {
+        Swal.fire({
+            title: 'Success!',
+            text: 'Category created!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.hash = '#categoriesSection';
+                window.location.reload(true);
+            }
+        })
+    } else if (response.status == '401') {
+        var x = await refreshMyToken();
+        if (!x) {
             Swal.fire({
-                title: 'Success!',
-                text: 'Category created!',
-                icon: 'success',
+                title: 'Session expired!',
+                text: 'Please log in again',
+                icon: 'error',
                 confirmButtonText: 'Ok'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.hash = '#categoriesSection';
-                    window.location.reload(true);
+                    logOut();
                 }
             })
-        } else if (response.status == '401') {
-            var x = await refreshMyToken();
-            if(!x) {
-                Swal.fire({
-                    title: 'Session expired!',
-                    text: 'Please log in again',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        logOut();
-                    }
-                })
-            } else {
-                await categoryToPostAsync(newCategory, tokens);
-            }
         } else {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Category not created! please try again',
-                icon: 'error',
-                confirmButtonText: 'Ok'
-            })
+            await categoryToPostAsync(newCategory, tokens);
         }
+    } else {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Category not created! please try again',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+        })
+    }
     }
 
     async function updateCategoryAsync(categoryToUpdate, whichCategory, tokens) {
-        var recipesDataTemp = await getRecipesAsync(tokens);
+        var recipesDataTemp = await getRecipesAsync();
         const response = await fetch('@categoriesPostUrl', {
             method: 'PUT',
             body: JSON.stringify(categoryToUpdate),
             headers: {
                 'Content-Type': 'application/json;',
-                'RequestVerificationToken': '@requestToken',
-                'Authorization': 'Bearer ' + localStorage.token
+                @* 'RequestVerificationToken': '@requestToken', *@
+            'Authorization': 'Bearer ' + localStorage.token
             }
         }).then(res => { return res })
-        if (response.ok) {
-            whichCategory = 0;
-            for (let i = 0; i < recipesDataTemp.length; i++) {
-                if (recipesDataTemp[i].categories.find(category => category.id === categoryToUpdate.id) !== undefined) {
-                    recipesDataTemp[i].categories = recipesDataTemp[i].categories.filter(category => category.id !== categoryToUpdate.id);
-                    recipesDataTemp[i].categories.push(categoryToUpdate);
-                    await fetch('@recipePostUrl', {
-                        method: 'PUT',
-                        body: JSON.stringify(recipesDataTemp[i]),
-                        headers: {
-                            'Content-Type': 'application/json;',
-                            'RequestVerificationToken': '@requestToken',
-                            'Authorization': 'Bearer ' + localStorage.token
+    if (response.ok) {
+        whichCategory = 0;
+        for (let i = 0; i < recipesDataTemp.length; i++) {
+            if (recipesDataTemp[i].categories.find(category => category.id === categoryToUpdate.id) !== undefined) {
+                recipesDataTemp[i].categories = recipesDataTemp[i].categories.filter(category => category.id !== categoryToUpdate.id);
+                recipesDataTemp[i].categories.push(categoryToUpdate);
+                await fetch('@recipePostUrl', {
+                    method: 'PUT',
+                    body: JSON.stringify(recipesDataTemp[i]),
+                    headers: {
+                        'Content-Type': 'application/json;',
+                            @* 'RequestVerificationToken': '@requestToken', *@
+                    'Authorization': 'Bearer ' + localStorage.token
                         }
-                    });
-                }
+        });
+    }
             }
-            await Swal.fire({
-                title: 'Success!',
-                text: 'Category updated!',
-                icon: 'success',
+    await Swal.fire({
+        title: 'Success!',
+        text: 'Category updated!',
+        icon: 'success',
+        confirmButtonText: 'Ok'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.hash = '#categoriesSection';
+            window.location.reload(true);
+        }
+    })
+        } else if (response.status == '401') {
+        var x = await refreshMyToken();
+        if (!x) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Session expired please log in again',
+                icon: 'error',
                 confirmButtonText: 'Ok'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.hash = '#categoriesSection';
-                    window.location.reload(true);
+                    logOut();
                 }
             })
-        } else if (response.status == '401') {
-            var x = await refreshMyToken();
-            if(!x) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Session expired please log in again',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        logOut();
-                    }
-                })
-            }
-            else {
-               whichCategory = await updateCategoryAsync(categoryToUpdate, whichCategory, tokens);
-            }
         }
-        return whichCategory;
+        else {
+            whichCategory = await updateCategoryAsync(categoryToUpdate, whichCategory, tokens);
+        }
+    }
+    return whichCategory;
     }
 </script>
 <script>
@@ -381,68 +386,63 @@
             body: JSON.stringify(profile),
             headers: {
                 'Content-Type': 'application/json;',
-                'RequestVerificationToken': '@requestToken',
+                @* 'RequestVerificationToken': '@requestToken', *@
             }
         }).then(res => { return res });
-        if (response.ok) {
-            const json = await response.json();
-            localStorage.setItem("token", json['token']);
-            localStorage.setItem("refreshToken", json['refreshToken']);
-            return false;
-        }
-        else {
-            await Swal.fire({
-                title: 'Invalid login!',
-                text: 'Username or password incorrect',
-                icon: 'error',
-                confirmButtonText: 'Ok'
-            });
-            return true;
-        }
+    if (response.ok) {
+        const json = await response.json();
+        localStorage.setItem("token", json['token']);
+        localStorage.setItem("refreshToken", json['refreshToken']);
+        return false;
+    }
+    else {
+        await Swal.fire({
+            title: 'Invalid login!',
+            text: 'Username or password incorrect',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+        });
+        return true;
+    }
     }
 </script>
 <script>
-    async function register(profile)
-    {
-        const response = await fetch('@registerUrl',{
+    async function register(profile) {
+        const response = await fetch('@registerUrl', {
             method: 'POST',
             body: JSON.stringify(profile),
             headers: {
                 'Content-Type': 'application/json;',
-                'RequestVerificationToken': '@requestToken',
+                @* 'RequestVerificationToken': '@requestToken', *@
             }
         }).then(res => { return res });
-        if (response.ok) {
-            await Swal.fire({
-                title: 'Success!',
-                text: 'Now please log in!',
-                icon: 'success',
-                confirmButtonText: 'Ok'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.reload(true);
-                }
-            })
-        }
-        else
-        {
-            await Swal.fire({
-                title: 'Username already taken!',
-                icon: 'error',
-                confirmButtonText: 'Ok'
-            })
-        }
+    if (response.ok) {
+        await Swal.fire({
+            title: 'Success!',
+            text: 'Now please log in!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.reload(true);
+            }
+        })
+    }
+    else {
+        await Swal.fire({
+            title: 'Username already taken!',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+        })
+    }
     }
 </script>
-
 <script>
-    async function refreshMyToken()
-    {
+    async function refreshMyToken() {
         var tokens = { token: '', refreshToken: '' };
         tokens.token = localStorage.token;
         tokens.refreshToken = localStorage.refreshToken;
-        if (tokens.refreshToken == '' || tokens.token == '')
-        {
+        if (tokens.refreshToken == '' || tokens.token == '') {
             logOut();
         }
         const response = await fetch('@refreshTokenUrl', {
@@ -450,33 +450,49 @@
             body: JSON.stringify(tokens),
             headers: {
                 'Content-Type': 'application/json;',
-                'RequestVerificationToken': '@requestToken',
+                @* 'RequestVerificationToken': '@requestToken', *@
+            }
+        }).then(res => { return res });
+    if (response.ok) {
+        const json = await response.json();
+        localStorage.setItem("token", json['token']);
+        localStorage.setItem("refreshToken", json['refreshToken']);
+        return true;
+    }
+    else {
+        return false;
+    }
+    }
+</script>
+<script>
+    async function getToken() {
+        const response = await fetch('https://localhost:7047/antiforgery/token', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json;',
+                'Authorization': 'Bearer ' + localStorage.token
             }
         }).then(res => { return res });
         if (response.ok) {
-            const json = await response.json();
-            localStorage.setItem("token", json['token']);
-            localStorage.setItem("refreshToken", json['refreshToken']);
-            return true;
-        }
-        else {
-            return false;
+            const xsrfToken = document.cookie
+                .split("; ")
+                .find(row => row.startsWith("XSRF-TOKEN="))
+                .split("=")[1];
+            console.log(xsrfToken);
+            return xsrfToken;
         }
     }
 </script>
 <script>
-    function checkAuthenticated()
-    {
-        if(localStorage.token)
-        {
+    function checkAuthenticated() {
+        if (localStorage.token) {
             return false;
         }
         return true;
     }
-    function logOut()
-    {
+    function logOut() {
         localStorage.removeItem("token");
-            localStorage.removeItem("refreshToken");
+        localStorage.removeItem("refreshToken");
         window.location.reload(true);
     }
 </script>
@@ -487,608 +503,638 @@
     <script defer src="https://unpkg.com/@Html.Raw('@')alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
-<div x-data="{ tokens:[], start: true}" x-init="start = checkAuthenticated();">
-    <template x-if= "start">
-    <div x-data="{profile: { username:'', password:'' }, registerOpen:false}">
-        <div class="container">
-            <div class="row justify-content-center m-3 shadow-lg" style="transform: translateY(20%);">
-                <div class="col-lg-5 p-5 " style="background-color: #2C7A48; color:white;">
-                    <div class="row">
-                        <div class="col-2"></div>
-                        <div class="col-8" style="display: flex; justify-content: center;">
-                            <img src="images/login-logo.png" alt="logo" class="img-fluid mb-3">
-                        </div>
-                        <div class="col-2"></div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col"></div>
-                        <div class="col">
-                            <div id="welcomeIndicator" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-inner">
-                                    <div class="carousel-item active">
-                                        <p class="lead text-center">Save your favourite recipes in details.</p>
-                                        <object data="/images/reminder_white.svg" width="200" height="200"> </object>
-                                    </div>
-                                    <div class="carousel-item">
-                                        <p class="lead text-center">Properly sort them into categories.</p>
-                                        <object data="/images/diet_white.svg" width="200" height="200"> </object>
-                                    </div>
-                                    <div class="carousel-item">
-                                        <p class="lead text-center">Search for any recipe you need.</p>
-                                        <object data="/images/Loving_it_white.svg" width="200" height="200"> </object>
-                                    </div>
-                                    <div class="carousel-item">
-                                        <p class="lead text-center">Start cooking!</p>
-                                        <object data="/images/cooking_white.svg" width="200" height="200"> </object>
+
+<body>
+    @Html.AntiForgeryToken()
+    <div x-data="{ tokens:[], start: true}" x-init="start = checkAuthenticated();">
+        <template x-if="start">
+            <div x-data="{profile: { username:'', password:'' }, registerOpen:false}">
+                <div class="container">
+                    <div class="row justify-content-center m-3 shadow-lg" style="transform: translateY(20%);">
+                        <div class="col-lg-5 p-5 " style="background-color: #2C7A48; color:white;">
+                            <div class="row">
+                                <div class="col-2"></div>
+                                <div class="col-8" style="display: flex; justify-content: center;">
+                                    <img src="images/login-logo.png" alt="logo" class="img-fluid mb-3">
+                                </div>
+                                <div class="col-2"></div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col"></div>
+                                <div class="col">
+                                    <div id="welcomeIndicator" class="carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner">
+                                            <div class="carousel-item active">
+                                                <p class="lead text-center">Save your favourite recipes in details.</p>
+                                                <object data="/images/reminder_white.svg" width="200" height="200">
+                                                </object>
+                                            </div>
+                                            <div class="carousel-item">
+                                                <p class="lead text-center">Properly sort them into categories.</p>
+                                                <object data="/images/diet_white.svg" width="200" height="200">
+                                                </object>
+                                            </div>
+                                            <div class="carousel-item">
+                                                <p class="lead text-center">Search for any recipe you need.</p>
+                                                <object data="/images/Loving_it_white.svg" width="200" height="200">
+                                                </object>
+                                            </div>
+                                            <div class="carousel-item">
+                                                <p class="lead text-center">Start cooking!</p>
+                                                <object data="/images/cooking_white.svg" width="200" height="200">
+                                                </object>
+                                            </div>
+                                        </div>
+                                        <button class="carousel-control-prev" type="button"
+                                            data-bs-target="#welcomeIndicator" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button"
+                                            data-bs-target="#welcomeIndicator" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
                                     </div>
                                 </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#welcomeIndicator" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#welcomeIndicator" data-bs-slide="next">
-                                    <span  class="carousel-control-next-icon"aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
+                                <div class="col"></div>
                             </div>
                         </div>
-                        <div class="col"></div>
-                    </div>
-                </div>
-                <div class="col-lg-7 p-3" >
-                    <div class="row text-center p-3 m-2" x-show="!registerOpen">
-                        <h1 class="display-6 text-center">Welcome back!</h1>
-                        <p class="lead text-center">Please log in using your username and password</p>
-                    </div>
-                    <div class="row text-center p-3 m-2" x-show="registerOpen">
-                        <h1 class="display-6 text-center">Welcome!</h1>
-                        <p class="lead text-center">We are glad you are joining us today!</p>
-                    </div>
-                    <div class="row p-2 m-2 align-items-center">
-                         <div class="col"></div>
-                         <div class="col-9">
-                            <form method="post" x-on:submit.prevent="async()=>{start = await login(profile);}" x-show="!registerOpen">
-                                <div class="form-group py-2">
-                                    <label for="username">Username</label>
-                                    <input type="text" class="form-control" id="username" name="username"
-                                        x-model="profile.username" placeholder="enter username" required>
+                        <div class="col-lg-7 p-3">
+                            <div class="row text-center p-3 m-2" x-show="!registerOpen">
+                                <h1 class="display-6 text-center">Welcome back!</h1>
+                                <p class="lead text-center">Please log in using your username and password</p>
+                            </div>
+                            <div class="row text-center p-3 m-2" x-show="registerOpen">
+                                <h1 class="display-6 text-center">Welcome!</h1>
+                                <p class="lead text-center">We are glad you are joining us today!</p>
+                            </div>
+                            <div class="row p-2 m-2 align-items-center">
+                                <div class="col"></div>
+                                <div class="col-9">
+                                    <form method="post" x-on:submit.prevent="async()=>{start = await login(profile);}"
+                                        x-show="!registerOpen">
+                                        <div class="form-group py-2">
+                                            <label for="username">Username</label>
+                                            <input type="text" class="form-control" id="username" name="username"
+                                                x-model="profile.username" placeholder="enter username" required>
+                                        </div>
+                                        <div class="form-group py-2">
+                                            <label for="Loginpassword">Password</label>
+                                            <input type="password" class="form-control" id="Loginpassword"
+                                                name="password" x-model="profile.password" placeholder="enter password"
+                                                required>
+                                        </div>
+                                        <div class="form-group" style="display: flex; justify-content: center;">
+                                            <input type="submit" class="btn m-2"
+                                                style="background-color:#2C7A48; color:white;" value="Log in" />
+                                        </div>
+                                    </form>
+                                    <form method="post"
+                                        x-on:submit.prevent="async()=>{await register(profile); registerOpen = false; }"
+                                        x-show="registerOpen" x-cloak>
+                                        <div class="form-group py-2">
+                                            <label for="username">Username</label>
+                                            <input type="text" class="form-control" id="username" name="username"
+                                                x-model="profile.username" placeholder="enter username" required>
+                                        </div>
+                                        <div class="form-group py-2">
+                                            <label for="registerpassword">Password</label>
+                                            <input type="password" class="form-control" id="registerpassword"
+                                                name="password" x-model="profile.password" placeholder="enter password"
+                                                required>
+                                        </div>
+                                        <div class="form-group" style="display: flex; justify-content: center;">
+                                            <input type="submit" class="btn m-2"
+                                                style="background-color:#2C7A48; color:white;" value="Register" />
+                                        </div>
+                                    </form>
                                 </div>
-                                 <div class="form-group py-2">
-                                    <label for="Loginpassword">Password</label>
-                                    <input type="password" class="form-control" id="Loginpassword" name="password"
-                                        x-model="profile.password" placeholder="enter password" required>
-                                </div>
-                                <div class="form-group" style="display: flex; justify-content: center;" >
-                                    <input type="submit" class="btn m-2" style="background-color:#2C7A48; color:white;" value="Log in" />
-                                </div>
-                            </form>
-                            <form method="post" x-on:submit.prevent="async()=>{await register(profile); registerOpen = false; }" x-show="registerOpen" x-cloak>
-                                <div class="form-group py-2">
-                                    <label for="username">Username</label>
-                                    <input type="text" class="form-control" id="username" name="username"
-                                        x-model="profile.username" placeholder="enter username" required>
-                                </div>
-                                 <div class="form-group py-2">
-                                    <label for="registerpassword">Password</label>
-                                    <input type="password" class="form-control" id="registerpassword" name="password"
-                                        x-model="profile.password" placeholder="enter password" required>
-                                </div>
-                                <div class="form-group" style="display: flex; justify-content: center;" >
-                                    <input type="submit" class="btn m-2" style="background-color:#2C7A48; color:white;" value="Register" />
-                                </div>
-                            </form>
-                         </div>
-                        <div class="col"></div>
-                    </div>
-                    <div class="row text-center p-2 m-2" x-show="!registerOpen" x-cloak>
-                        <p class="lead text-center p-0 m-0">Not a user?</p>
-                        <a class="lead text-center p-0 m-0" href="#" style="color: #2C7A48; background-color:white;" x-on:click="registerOpen = true;">Join us!</a>
-                    </div>
-                     <div class="row text-center p-2 m-2" x-show="registerOpen" x-cloak>
-                        <p class="lead text-center p-0 m-0">Already a user?</p>
-                        <a class="lead text-center p-0 m-0" href="#" style="color: #2C7A48; background-color:white;" x-on:click="registerOpen = false;">Log in</a>
+                                <div class="col"></div>
+                            </div>
+                            <div class="row text-center p-2 m-2" x-show="!registerOpen" x-cloak>
+                                <p class="lead text-center p-0 m-0">Not a user?</p>
+                                <a class="lead text-center p-0 m-0" href="#"
+                                    style="color: #2C7A48; background-color:white;"
+                                    x-on:click="registerOpen = true;">Join us!</a>
+                            </div>
+                            <div class="row text-center p-2 m-2" x-show="registerOpen" x-cloak>
+                                <p class="lead text-center p-0 m-0">Already a user?</p>
+                                <a class="lead text-center p-0 m-0" href="#"
+                                    style="color: #2C7A48; background-color:white;"
+                                    x-on:click="registerOpen = false;">Log in</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    </template>
-    <template x-if="!start">
-    <div x-data>
-        <div x-data="{recipeOpen: false, detailCards: true}" x-intersect="recipeOpen = true">
-            <header>
-                <div class=" container-fluid text-center">
-                    <div class="row justify-content-center border-bottom">
-                        <div class="col-md-4 m-2">
-                            <img src="images/logo-black.png" alt="logo" class="img-fluid">
-                        </div>
-                    </div>
-                    <div class="row justify-content-center border-bottom py-2">
-                        <div class=" col-sm-1">
-                            <a href="#" class="text-black">Home</a>
-                        </div>
-                        <div class=" col-sm-1">
-                            <a href="#recipeSection" class="text-black">Recipes</a>
-                        </div>
-                        <div class=" col-sm-1">
-                            <a href="#categoriesSection" class="text-black">Categories</a>
-                        </div>
-                        <div class=" col-sm-1">
-                            <a class="text-black" href="#" x-on:click="logOut();">Log out</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
-            @*Main Section*@
-            <div class="row pt-5 pb-3 mb-1 my-3 text-center justify-content-center">
-                <div class="col-md-6 px-0">
-                    <h3 class="display-6" style="color: #135C2D;">Welcome</h3>
-                    <h1 class="display-4 fst-italic" style="color: #135C2D;">Nada's Recipes Wesbsite</h1>
-                    <p class="lead my-3" style="color: #135C2D;">A simple website where you can store, edit, and
-                        delete
-                        your
-                        recipes and their
-                        different
-                        categories.</p>
-                    <p class="lead mb-3 mt-3" style="color: #135C2D;"><a href="#recipeSection"
-                            class="link-dark fw-bold" style="color: #135C2D;">Check
-                            out your Recipes</a></p>
-                    <img src="/images/ArrowDown.svg" id="mainJump" />
-                </div>
-            </div>
-            @*Recipe Section*@
-            <section style="background-color:#F1EEE8;" x-show="recipeOpen" id="recipeSection"
-                x-transition.duration.700ms x-cloak>
-                <div class="container text-center" id="recipesTitle">
-                    <h1 class="display-4 pt-4 lead">Recipes</h1>
-                    <p class="lead mt-3 mb-0">Here you can find all the recipes you have stored in our website.</p>
-                </div>
-                @*All recipes cards*@
-                <div x-data="{recipes: [],whichRecipe: 0, updateRecipe: 0,search:'', loadedRecipes: []}"
-                    x-init="recipes = await getRecipesAsync(tokens)" id="recipesCards">
-                    <div class="container pb-4 pt-2">
-                        <div class="row justify-content-end">
-                            <div class="col col-sm-3 justify-content-end align-content-end m-2">
-                                <input x-ref="searchField" x-model="search"
-                                    x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
-                                    placeholder="Search for a recipe..." type="search" class="form-control"
-                                    x-on:input="loadedRecipes = await loadRecipes(search,tokens)" />
+        </template>
+        <template x-if="!start">
+            <div x-data>
+                <div x-data="{recipeOpen: false, detailCards: true}" x-intersect="recipeOpen = true">
+                    <header>
+                        <div class=" container-fluid text-center">
+                            <div class="row justify-content-center border-bottom">
+                                <div class="col-md-4 m-2">
+                                    <img src="images/logo-black.png" alt="logo" class="img-fluid">
+                                </div>
+                            </div>
+                            <div class="row justify-content-center border-bottom py-2">
+                                <div class=" col-sm-1">
+                                    <a href="#" class="text-black">Home</a>
+                                </div>
+                                <div class=" col-sm-1">
+                                    <a href="#recipeSection" class="text-black">Recipes</a>
+                                </div>
+                                <div class=" col-sm-1">
+                                    <a href="#categoriesSection" class="text-black">Categories</a>
+                                </div>
+                                <div class=" col-sm-1">
+                                    <a class="text-black" href="#" x-on:click="logOut();">Log out</a>
+                                </div>
                             </div>
                         </div>
-                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3"
-                            x-init="loadedRecipes = await loadRecipes(search,tokens)">
-                            <template x-for="item in loadedRecipes" :key="item.title">
-                                <div class="col " x-show="detailCards" x-transition.duration.200ms>
-                                    <div class="card shadow-sm rounded-0" id="cardHover">
-                                        <div class="card-body"
-                                            x-on:click="whichRecipe=item.id;updateRecipe = 0;detailCards=false; window.location.hash = '#recipeSection'">
-                                            <h5 class="card-title fs-4 mx-1" x-text="item.title"></h5>
-                                            <template x-for="category in item.categories">
-                                                <span class="badge rounded-pill p-1 mx-1"
-                                                    style="background-color:#135C2D;" x-text="category.name"></span>
-                                            </template>
+                    </header>
+                    @*Main Section*@
+                    <div class="row pt-5 pb-3 mb-1 my-3 text-center justify-content-center">
+                        <div class="col-md-6 px-0">
+                            <h3 class="display-6" style="color: #135C2D;">Welcome</h3>
+                            <h1 class="display-4 fst-italic" style="color: #135C2D;">Nada's Recipes Wesbsite</h1>
+                            <p class="lead my-3" style="color: #135C2D;">A simple website where you can store, edit, and
+                                delete
+                                your
+                                recipes and their
+                                different
+                                categories.</p>
+                            <p class="lead mb-3 mt-3" style="color: #135C2D;"><a href="#recipeSection"
+                                    class="link-dark fw-bold" style="color: #135C2D;">Check
+                                    out your Recipes</a></p>
+                            <img src="/images/ArrowDown.svg" id="mainJump" />
+                        </div>
+                    </div>
+                    @*Recipe Section*@
+                    <section style="background-color:#F1EEE8;" x-show="recipeOpen" id="recipeSection"
+                        x-transition.duration.700ms x-cloak>
+                        <div class="container text-center" id="recipesTitle">
+                            <h1 class="display-4 pt-4 lead">Recipes</h1>
+                            <p class="lead mt-3 mb-0">Here you can find all the recipes you have stored in our website.
+                            </p>
+                        </div>
+                        @*All recipes cards*@
+                        <div x-data="{recipes: [],whichRecipe: 0, updateRecipe: 0,search:'', loadedRecipes: []}"
+                            x-init="recipes = await getRecipesAsync()" id="recipesCards">
+                            <div class="container pb-4 pt-2">
+                                <div class="row justify-content-end">
+                                    <div class="col col-sm-3 justify-content-end align-content-end m-2">
+                                        <input x-ref="searchField" x-model="search"
+                                            x-on:keydown.window.prevent.slash="$refs.searchField.focus()"
+                                            placeholder="Search for a recipe..." type="search" class="form-control"
+                                            x-on:input="loadedRecipes = await loadRecipes(search,tokens)" />
+                                    </div>
+                                </div>
+                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3"
+                                    x-init="loadedRecipes = await loadRecipes(search,tokens)">
+                                    <template x-for="item in loadedRecipes" :key="item.title">
+                                        <div class="col " x-show="detailCards" x-transition.duration.200ms>
+                                            <div class="card shadow-sm rounded-0" id="cardHover">
+                                                <div class="card-body"
+                                                    x-on:click="whichRecipe=item.id;updateRecipe = 0;detailCards=false; window.location.hash = '#recipeSection'">
+                                                    <h5 class="card-title fs-4 mx-1" x-text="item.title"></h5>
+                                                    <template x-for="category in item.categories">
+                                                        <span class="badge rounded-pill p-1 mx-1"
+                                                            style="background-color:#135C2D;"
+                                                            x-text="category.name"></span>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            @*update recipe forms*@
+                            <template x-for="recipePicked in loadedRecipes">
+                                <div class="row justify-content-center p-3 pb-4"
+                                    x-data="{myCategories: [],recipeToUpdate: {id: '',title: '',ingredients: [],instructions: [],categories: []},selectedCategories: {names: []}}"
+                                    x-init="myCategories = await getCategoriesAsync(tokens)"
+                                    x-show="updateRecipe === recipePicked.id" x-transition.duration.600ms x-cloak>
+                                    <div style="background-color: white;" id="recipePicked.id"
+                                        class="border-bottom round col-md-5 shadow-lg py-2"
+                                        x-init="recipeToUpdate = recipePicked">
+                                        <div class="row justify-content-end">
+                                            <div class="col-md-1">
+                                                <button class="btn"
+                                                    x-on:click="updateRecipe = 0;detailCards = true; window.location.hash = '#recipesTitle'">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <form method="post" class="form-control shadow-sm"
+                                            x-on:submit.prevent="async()=>{await updateMyRecipeAsync(recipeToUpdate, selectedCategories,tokens)}">
+                                            <div class="form-label text-center">
+                                                <h1 class="lead fs-3 " x-text="recipeToUpdate.title">
+                                                </h1>
+                                            </div>
+                                            <input aria-hidden="true" x-model="recipeToUpdate.id" hidden>
+                                            <div class="form-group py-1">
+                                                <label for="title">Title</label>
+                                                <input type="text" class="form-control" id="title" name="title"
+                                                    x-model="recipeToUpdate.title" placeholder="Title" required>
+                                            </div>
+                                            <div class="form-group py-1">
+                                                <label for="recipeIngredients">Ingredients</label>
+                                                <button type="button" class="btn btn-sm mx-3 my-1"
+                                                    style="background-color: #2C7A48; color:white;"
+                                                    x-on:click="recipeToUpdate.ingredients.push(null)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                        0 1 8 2Z">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                                <div id="newRowIng py-1">
+                                                    <input type="hidden" id="ingredientsCount" value="0">
+                                                    <template x-for="(ingredient,index) in recipeToUpdate.ingredients">
+                                                        <div class="input-group pb-1">
+                                                            <input type="text" class="form-control py-1"
+                                                                id="recipeIngredients" name="recipeIngredients"
+                                                                x-model="recipeToUpdate.ingredients[index]"
+                                                                placeholder="Ingredients"
+                                                                aria-describedby="removeIngredient" required>
+                                                            <button type="button" class="btn btn-danger btn-sm"
+                                                                id="removeIngredient" tabindex="-1"
+                                                                x-on:click="recipeToUpdate.ingredients.splice(index,1)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                                    height="12" fill="currentColor"
+                                                                    class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                    <path
+                                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <div class="form-group py-1">
+                                                <label for="recipeInstructions">Instructions</label>
+                                                <button type="button" class="btn btn-sm mx-3 my-1"
+                                                    style="background-color: #2C7A48; color:white;"
+                                                    x-on:click="recipeToUpdate.instructions.push(null)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                        0 1 8 2Z">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                                <div id="newRowIns py-1">
+                                                    <input type="hidden" id="instructionsCount" value="0">
+                                                    <template
+                                                        x-for="(instruction,index) in recipeToUpdate.instructions">
+                                                        <div class="input-group pb-1">
+                                                            <input type="text" class="form-control py-1"
+                                                                id="recipeInstructions" name="recipeInstructions"
+                                                                x-model="recipeToUpdate.instructions[index]"
+                                                                placeholder="Instruction"
+                                                                aria-describedby="removeInstruction" required>
+                                                            <button type="button" class="btn btn-danger btn-sm"
+                                                                id="removeInstruction" tabindex="-1"
+                                                                x-on:click="recipeToUpdate.instructions.splice(index,1)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                                    height="12" fill="currentColor"
+                                                                    class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                    <path
+                                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <div class="form-group py-1">
+                                                <label for="recipeCategories">Categories</label>
+                                                <select class="form-control" id="recipeCategories"
+                                                    x-model="selectedCategories.names" multiple>
+                                                    <template x-for="category in myCategories">
+                                                        <option x-text="category.name" x-bind:value="category.name"
+                                                            x-bind:label="category.name"
+                                                            x-bind:selected="recipeToUpdate.categories.find(myCategory=>myCategory.name === category.name) !==undefined?true:false">
+                                                        </option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                                <input type="submit" class="btn m-2" value="Update recipe"
+                                                    id="submitbutton" style="color: white; background-color:#1c4d2d;"
+                                                    x-on:click="updateRecipe = 0" />
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </template>
+                            @* single recipe details *@
+                            <template x-for="recipePicked in loadedRecipes">
+                                <div class="row justify-content-center p-3 pb-4"
+                                    x-show="whichRecipe === recipePicked.id" x-transition.duration.600ms x-cloak>
+                                    <div style="background-color: white;" id="recipePicked.id"
+                                        class="border-bottom round col-lg-9 shadow-lg pb-2">
+                                        <div class="row justify-content-end">
+                                            <div class="col-sm-auto align-self-end">
+                                                <button class="btn"
+                                                    x-on:click="whichRecipe = 0;detailCards = true;  window.location.hash = '#recipesTitle'">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="row justify-content-center text-center">
+                                            <div class="col-md-4 border-bottom">
+                                                <h1 class="lead fs-2 pt-2" x-text="recipePicked.title"></h1>
+                                            </div>
+                                            <div class="col-sm-auto p-0">
+                                                <button class="btn btn-sm my-2"
+                                                    x-on:click="updateRecipe = recipePicked.id; whichRecipe = 0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                        fill="currentColor" class="bi bi-pencil-square"
+                                                        viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                                        <path fill-rule="evenodd"
+                                                            d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div class="col-sm-auto p-0">
+                                                <div>
+                                                    <button class="btn btn-sm my-2"
+                                                        x-on:click="deleteRecipeAsync(recipePicked,tokens)">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                            fill="red" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                            <path
+                                                                d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row justify-content-center">
+                                            <div class=" col-lg-4 rounded ps-5 pt-4">
+                                                <table class="table table-hover rounded shadow-sm text-center"
+                                                    style="background-color:#F1EEE8 ;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="fs-4" style="color: #135C2D;">Ingredients</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <template x-for="ingredient in recipePicked.ingredients">
+                                                            <tr>
+                                                                <td x-text="ingredient"></td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-lg-5 p-4">
+                                                <table class="table table-borderless">
+                                                    <thead class=" p-4">
+                                                        <tr>
+                                                            <th class="fs-4" style="color: #135C2D;">Instructions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <template x-for="instruction in recipePicked.instructions">
+                                                            <tr>
+                                                                <td x-text="instruction"></td>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </template>
-                        </div>
-                    </div>
-                    @*update recipe forms*@
-                    <template x-for="recipePicked in loadedRecipes">
-                        <div class="row justify-content-center p-3 pb-4"
-                            x-data="{myCategories: [],recipeToUpdate: {id: '',title: '',ingredients: [],instructions: [],categories: []},selectedCategories: {names: []}}"
-                            x-init="myCategories = await getCategoriesAsync(tokens)"
-                            x-show="updateRecipe === recipePicked.id" x-transition.duration.600ms x-cloak>
-                            <div style="background-color: white;" id="recipePicked.id"
-                                class="border-bottom round col-md-5 shadow-lg py-2"
-                                x-init="recipeToUpdate = recipePicked">
-                                <div class="row justify-content-end">
-                                    <div class="col-md-1">
-                                        <button class="btn"
-                                            x-on:click="updateRecipe = 0;detailCards = true; window.location.hash = '#recipesTitle'">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
-                                            </svg>
-                                        </button>
+                            @*Add new recipe button*@
+                            <div class="container text-center pb-3">
+                                <div class="row justify-content-lg-end">
+                                    <div class="col-md-4 justify-content-end">
+                                        <a class="lead m-3 fw-bold link-dark" href="#creationForms"
+                                            style="color: #135C2D;">You
+                                            can add new recipes
+                                            here...</a>
                                     </div>
                                 </div>
-                                <form method="post" class="form-control shadow-sm"
-                                    x-on:submit.prevent="async()=>{await updateMyRecipeAsync(recipeToUpdate, selectedCategories,tokens)}">
-                                    <div class="form-label text-center">
-                                        <h1 class="lead fs-3 " x-text="recipeToUpdate.title">
-                                        </h1>
-                                    </div>
-                                    <input aria-hidden="true" x-model="recipeToUpdate.id" hidden>
-                                    <div class="form-group py-1">
-                                        <label for="title">Title</label>
-                                        <input type="text" class="form-control" id="title" name="title"
-                                            x-model="recipeToUpdate.title" placeholder="Title" required>
-                                    </div>
-                                    <div class="form-group py-1">
-                                        <label for="recipeIngredients">Ingredients</label>
-                                        <button type="button" class="btn btn-sm mx-3 my-1"
-                                            style="background-color: #2C7A48; color:white;"
-                                            x-on:click="recipeToUpdate.ingredients.push(null)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
-                                                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
-                                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
-                                        0 1 8 2Z">
-                                                </path>
-                                            </svg>
-                                        </button>
-                                        <div id="newRowIng py-1">
-                                            <input type="hidden" id="ingredientsCount" value="0">
-                                            <template x-for="(ingredient,index) in recipeToUpdate.ingredients">
-                                                <div class="input-group pb-1">
-                                                    <input type="text" class="form-control py-1"
-                                                        id="recipeIngredients" name="recipeIngredients"
-                                                        x-model="recipeToUpdate.ingredients[index]"
-                                                        placeholder="Ingredients"
-                                                        aria-describedby="removeIngredient" required>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                        id="removeIngredient" tabindex="-1"
-                                                        x-on:click="recipeToUpdate.ingredients.splice(index,1)">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12"
-                                                            height="12" fill="currentColor"
-                                                            class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="form-group py-1">
-                                        <label for="recipeInstructions">Instructions</label>
-                                        <button type="button" class="btn btn-sm mx-3 my-1"
-                                            style="background-color: #2C7A48; color:white;"
-                                            x-on:click="recipeToUpdate.instructions.push(null)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
-                                                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
-                                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
-                                        0 1 8 2Z">
-                                                </path>
-                                            </svg>
-                                        </button>
-                                        <div id="newRowIns py-1">
-                                            <input type="hidden" id="instructionsCount" value="0">
-                                            <template x-for="(instruction,index) in recipeToUpdate.instructions">
-                                                <div class="input-group pb-1">
-                                                    <input type="text" class="form-control py-1"
-                                                        id="recipeInstructions" name="recipeInstructions"
-                                                        x-model="recipeToUpdate.instructions[index]"
-                                                        placeholder="Instruction"
-                                                        aria-describedby="removeInstruction" required>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                        id="removeInstruction" tabindex="-1"
-                                                        x-on:click="recipeToUpdate.instructions.splice(index,1)">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12"
-                                                            height="12" fill="currentColor"
-                                                            class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="form-group py-1">
-                                        <label for="recipeCategories">Categories</label>
-                                        <select class="form-control" id="recipeCategories"
-                                            x-model="selectedCategories.names" multiple>
-                                            <template x-for="category in myCategories">
-                                                <option x-text="category.name" x-bind:value="category.name"
-                                                    x-bind:label="category.name"
-                                                    x-bind:selected="recipeToUpdate.categories.find(myCategory=>myCategory.name === category.name) !==undefined?true:false">
-                                                </option>
-                                            </template>
-                                        </select>
-                                    </div>
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                        <input type="submit" class="btn m-2" value="Update recipe" id="submitbutton"
-                                            style="color: white; background-color:#1c4d2d;"
-                                            x-on:click="updateRecipe = 0" />
-                                    </div>
-                                </form>
-
                             </div>
                         </div>
-                    </template>
-                    @* single recipe details *@
-                    <template x-for="recipePicked in loadedRecipes">
-                        <div class="row justify-content-center p-3 pb-4" x-show="whichRecipe === recipePicked.id"
-                            x-transition.duration.600ms x-cloak>
-                            <div style="background-color: white;" id="recipePicked.id"
-                                class="border-bottom round col-lg-9 shadow-lg pb-2">
-                                <div class="row justify-content-end">
-                                    <div class="col-sm-auto align-self-end">
-                                        <button class="btn"
-                                            x-on:click="whichRecipe = 0;detailCards = true;  window.location.hash = '#recipesTitle'">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
-                                            </svg>
-                                        </button>
+                    </section>
+                </div>
+                @*Categories section*@
+                <section style="background-color: white;" class="p-5" id="categoriesSection">
+                    <div class="container"
+                        x-data="{categoriesList: [],whichCategory: 0,categoryToUpdate: {id: 0,name: ''},}"
+                        x-init="categoriesList = await getCategoriesAsync(tokens)">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-5" style="background-color: #2C7A48; color:white;">
+                                <h1 class=" fs-3 fw-bold lead p-3">Categories</h1>
+                                <p class="lead mt-3 px-3 fs-5">Here you can find all the categories you have stored in
+                                    our
+                                    website.
+                                    You
+                                    can update each category by clicking on it, or add a new category by clicking the
+                                    button
+                                    below.
+                                </p>
+                                <div class="row justify-content-center">
+                                    <div class="col justify-content-end">
+                                        <a class="btn btn-dark m-2" href="#creationForms" style="opacity:80%;">Add a new
+                                            Category</a>
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        <object data="/images/online-grocery.svg" width="150" height="150"> </object>
                                     </div>
                                 </div>
-                                <div class="row justify-content-center text-center">
-                                    <div class="col-md-4 border-bottom">
-                                        <h1 class="lead fs-2 pt-2" x-text="recipePicked.title"></h1>
-                                    </div>
-                                    <div class="col-sm-auto p-0">
-                                        <button class="btn btn-sm my-2"
-                                            x-on:click="updateRecipe = recipePicked.id; whichRecipe = 0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                                <path fill-rule="evenodd"
-                                                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div class="col-sm-auto p-0">
-                                        <div>
-                                            <button class="btn btn-sm my-2"
-                                                x-on:click="deleteRecipeAsync(recipePicked,tokens)">
+                            </div>
+                            @*Categories cards*@
+                            <div class="col-lg-5">
+                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 pt-4">
+                                    <template x-for="category in categoriesList">
+                                        <div class="col">
+                                            <div class="card shadow-sm myCard mb-3"
+                                                x-show="whichCategory != category.id"
+                                                x-on:click="whichCategory = category.id; categoryToUpdate = category">
+                                                <div class="card-body text-center">
+                                                    <h5 class="card-title fs-6" x-text="category.name"></h5>
+                                                </div>
+                                            </div>
+                                            <div class="card shadow-sm myCard mb-3"
+                                                x-show="whichCategory === category.id">
+                                                <div class="card-body text-center">
+                                                    <form
+                                                        x-on:submit.prevent="async()=>{whichCategory = await updateCategoryAsync(categoryToUpdate, whichCategory,tokens)}">
+                                                        <input type="text" class="form-control"
+                                                            x-model="categoryToUpdate.name">
+                                                        <button type="submit"
+                                                            class="btn btn-sm btn-dark mt-2">Update</button>
+                                                        <a class="link-dark" x-on:click="whichCategory = 0">Cancel</a>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section style="background-image: url('images/formmd.jpg');" id="creationForms">
+                    <div class="container-fluid">
+                        <div class="row justify-content-center p-4">
+                            @*Recipes Creation form*@
+                            <div class="col-md-5">
+                                <div x-data="{newRecipe: {id: '@Model.GetID()',title: '',ingredients: [],instructions: [],categories: []},myCategories: []}"
+                                    x-init="myCategories = await getCategoriesAsync(tokens)">
+                                    <form method="post"
+                                        x-on:submit.prevent="async()=>{await recipeToPostAsync(newRecipe,myCategories,tokens)}"
+                                        class="form-control shadow-sm">
+                                        <div class="form-label text-center">
+                                            <h1 class="lead fs-3 ">Add new recipe
+                                            </h1>
+                                        </div>
+                                        <div class="form-group py-1">
+                                            <label for="title">Title</label>
+                                            <input type="text" class="form-control" id="title" name="title"
+                                                x-model="newRecipe.title" placeholder="Title" required>
+                                        </div>
+                                        <div class="form-group py-1">
+                                            <label for="recipeIngredients">Ingredients</label>
+                                            <button type="button" class="btn btn-sm mx-3 my-1"
+                                                style="background-color: #2C7A48; color:white;"
+                                                x-on:click="newRecipe.ingredients.push(null)">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    fill="red" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                                    <path
-                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                    fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                        0 1 8 2Z">
                                                     </path>
                                                 </svg>
                                             </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row justify-content-center">
-                                    <div class=" col-lg-4 rounded ps-5 pt-4">
-                                        <table class="table table-hover rounded shadow-sm text-center"
-                                            style="background-color:#F1EEE8 ;">
-                                            <thead>
-                                                <tr>
-                                                    <th class="fs-4" style="color: #135C2D;">Ingredients</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <template x-for="ingredient in recipePicked.ingredients">
-                                                    <tr>
-                                                        <td x-text="ingredient"></td>
-                                                    </tr>
+                                            <div id="newRowIng py-1">
+                                                <input type="hidden" id="ingredientsCount" value="0">
+                                                <template x-for="(ingredient,index) in newRecipe.ingredients">
+                                                    <div class="input-group pb-1">
+                                                        <input type="text" class="form-control py-1"
+                                                            id="recipeIngredients" name="recipeIngredients"
+                                                            x-model="newRecipe.ingredients[index]"
+                                                            placeholder="Ingredients"
+                                                            aria-describedby="removeIngredient" required>
+                                                        <button type="button" tabindex="-1"
+                                                            class="btn btn-danger btn-sm" id="removeIngredient"
+                                                            x-on:click="newRecipe.ingredients.splice(index,1)">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                                height="12" fill="currentColor"
+                                                                class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                <path
+                                                                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                                </path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 </template>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="col-lg-5 p-4">
-                                        <table class="table table-borderless">
-                                            <thead class=" p-4">
-                                                <tr>
-                                                    <th class="fs-4" style="color: #135C2D;">Instructions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <template x-for="instruction in recipePicked.instructions">
-                                                    <tr>
-                                                        <td x-text="instruction"></td>
-                                                    </tr>
-                                                </template>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                    @*Add new recipe button*@
-                    <div class="container text-center pb-3">
-                        <div class="row justify-content-lg-end">
-                            <div class="col-md-4 justify-content-end">
-                                <a class="lead m-3 fw-bold link-dark" href="#creationForms"
-                                    style="color: #135C2D;">You
-                                    can add new recipes
-                                    here...</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-        @*Categories section*@
-        <section style="background-color: white;" class="p-5" id="categoriesSection">
-            <div class="container"
-                x-data="{categoriesList: [],whichCategory: 0,categoryToUpdate: {id: 0,name: ''},}"
-                x-init="categoriesList = await getCategoriesAsync(tokens)">
-                <div class="row justify-content-center">
-                    <div class="col-lg-5" style="background-color: #2C7A48; color:white;">
-                        <h1 class=" fs-3 fw-bold lead p-3">Categories</h1>
-                        <p class="lead mt-3 px-3 fs-5">Here you can find all the categories you have stored in our
-                            website.
-                            You
-                            can update each category by clicking on it, or add a new category by clicking the button
-                            below.
-                        </p>
-                        <div class="row justify-content-center">
-                            <div class="col justify-content-end">
-                                <a class="btn btn-dark m-2" href="#creationForms" style="opacity:80%;">Add a new
-                                    Category</a>
-                            </div>
-                            <div class="col-sm-4 p-0">
-                                <object data="/images/online-grocery.svg" width="150" height="150"> </object>
-                            </div>
-                        </div>
-                    </div>
-                    @*Categories cards*@
-                    <div class="col-lg-5">
-                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 pt-4">
-                            <template x-for="category in categoriesList">
-                                <div class="col">
-                                    <div class="card shadow-sm myCard mb-3" x-show="whichCategory != category.id"
-                                        x-on:click="whichCategory = category.id; categoryToUpdate = category">
-                                        <div class="card-body text-center">
-                                            <h5 class="card-title fs-6" x-text="category.name"></h5>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="card shadow-sm myCard mb-3" x-show="whichCategory === category.id">
-                                        <div class="card-body text-center">
-                                            <form
-                                                x-on:submit.prevent="async()=>{whichCategory = await updateCategoryAsync(categoryToUpdate, whichCategory,tokens)}">
-                                                <input type="text" class="form-control"
-                                                    x-model="categoryToUpdate.name">
-                                                <button type="submit"
-                                                    class="btn btn-sm btn-dark mt-2">Update</button>
-                                                <a class="link-dark" x-on:click="whichCategory = 0">Cancel</a>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section style="background-image: url('images/formmd.jpg');" id="creationForms">
-            <div class="container-fluid">
-                <div class="row justify-content-center p-4">
-                    @*Recipes Creation form*@
-                    <div class="col-md-5">
-                        <div x-data="{newRecipe: {id: '@Model.GetID()',title: '',ingredients: [],instructions: [],categories: []},myCategories: []}"
-                            x-init="myCategories = await getCategoriesAsync(tokens)">
-                            <form method="post"
-                                x-on:submit.prevent="async()=>{await recipeToPostAsync(newRecipe,myCategories,tokens)}"
-                                class="form-control shadow-sm">
-                                <div class="form-label text-center">
-                                    <h1 class="lead fs-3 ">Add new recipe
-                                    </h1>
-                                </div>
-                                <div class="form-group py-1">
-                                    <label for="title">Title</label>
-                                    <input type="text" class="form-control" id="title" name="title"
-                                        x-model="newRecipe.title" placeholder="Title" required>
-                                </div>
-                                <div class="form-group py-1">
-                                    <label for="recipeIngredients">Ingredients</label>
-                                    <button type="button" class="btn btn-sm mx-3 my-1"
-                                        style="background-color: #2C7A48; color:white;"
-                                        x-on:click="newRecipe.ingredients.push(null)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
-                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                                        <div class="form-group py-1">
+                                            <label for="recipeInstructions">Instructions</label>
+                                            <button type="button" class="btn btn-sm mx-3 my-1"
+                                                style="background-color: #2C7A48; color:white;"
+                                                x-on:click="newRecipe.instructions.push(null)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
                                         0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
                                         0 1 8 2Z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    <div id="newRowIng py-1">
-                                        <input type="hidden" id="ingredientsCount" value="0">
-                                        <template x-for="(ingredient,index) in newRecipe.ingredients">
-                                            <div class="input-group pb-1">
-                                                <input type="text" class="form-control py-1" id="recipeIngredients"
-                                                    name="recipeIngredients" x-model="newRecipe.ingredients[index]"
-                                                    placeholder="Ingredients" aria-describedby="removeIngredient"
-                                                    required>
-                                                <button type="button" tabindex="-1" class="btn btn-danger btn-sm"
-                                                    id="removeIngredient"
-                                                    x-on:click="newRecipe.ingredients.splice(index,1)">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-trash3-fill"
-                                                        viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
-                                                        </path>
-                                                    </svg>
-                                                </button>
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                            <div id="newRowIns py-1">
+                                                <input type="hidden" id="instructionsCount" value="0">
+                                                <template x-for="(instruction,index) in newRecipe.instructions">
+                                                    <div class="input-group pb-1">
+                                                        <input type="text" class="form-control py-1"
+                                                            id="recipeInstructions" name="recipeInstructions"
+                                                            x-model="newRecipe.instructions[index]"
+                                                            placeholder="Instruction"
+                                                            aria-describedby="removeInstruction" required>
+                                                        <button type="button" class="btn btn-danger btn-sm"
+                                                            id="removeInstruction"
+                                                            x-on:click="newRecipe.instructions.splice(index,1)"
+                                                            tabindex="-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                                height="12" fill="currentColor"
+                                                                class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                <path
+                                                                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                                </path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                </template>
                                             </div>
-                                        </template>
-                                    </div>
+                                        </div>
+                                        <div class="form-group py-1">
+                                            <label for="recipeCategories">Categories</label>
+                                            <select class="form-control" id="recipeCategories"
+                                                x-model="newRecipe.categories" multiple>
+                                                <template x-for="category in myCategories">
+                                                    <option x-text="category.name"></option>
+                                                </template>
+                                            </select>
+                                        </div>
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                            <input type="submit" class="btn m-2" value="Create recipe" id="submitbutton"
+                                                style="color: white; background-color:#1c4d2d;" />
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="form-group py-1">
-                                    <label for="recipeInstructions">Instructions</label>
-                                    <button type="button" class="btn btn-sm mx-3 my-1"
-                                        style="background-color: #2C7A48; color:white;"
-                                        x-on:click="newRecipe.instructions.push(null)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
-                                            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
-                                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
-                                        0 1 8 2Z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    <div id="newRowIns py-1">
-                                        <input type="hidden" id="instructionsCount" value="0">
-                                        <template x-for="(instruction,index) in newRecipe.instructions">
-                                            <div class="input-group pb-1">
-                                                <input type="text" class="form-control py-1" id="recipeInstructions"
-                                                    name="recipeInstructions"
-                                                    x-model="newRecipe.instructions[index]"
-                                                    placeholder="Instruction" aria-describedby="removeInstruction"
-                                                    required>
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                    id="removeInstruction"
-                                                    x-on:click="newRecipe.instructions.splice(index,1)"
-                                                    tabindex="-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                                        fill="currentColor" class="bi bi-trash3-fill"
-                                                        viewBox="0 0 16 16">
-                                                        <path
-                                                            d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
-                                                        </path>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </template>
-                                    </div>
+                            </div>
+                            @*Categories Creation form*@
+                            <div class="col-md-5">
+                                <div x-data="{ newCategory: {id: '@Model.GetID()',name: ''}}">
+                                    <form method="post" class="form-control shadow-sm"
+                                        x-on:submit.prevent="async ()=>{await categoryToPostAsync(newCategory,tokens)}">
+                                        <div class="form-label text-center">
+                                            <h1 class="lead fs-3 ">Add new category
+                                            </h1>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="title">Name</label>
+                                            <input type="text" class="form-control" id="title" name="title"
+                                                placeholder="Type category name" x-model="newCategory.name" required>
+                                        </div>
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                            <input type="submit" class="btn m-2" value="Create category"
+                                                id="submitbutton" style="color: white; background-color:#1c4d2d;" />
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="form-group py-1">
-                                    <label for="recipeCategories">Categories</label>
-                                    <select class="form-control" id="recipeCategories"
-                                        x-model="newRecipe.categories" multiple>
-                                        <template x-for="category in myCategories">
-                                            <option x-text="category.name"></option>
-                                        </template>
-                                    </select>
-                                </div>
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                    <input type="submit" class="btn m-2" value="Create recipe" id="submitbutton"
-                                        style="color: white; background-color:#1c4d2d;" />
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
-                    @*Categories Creation form*@
-                    <div class="col-md-5">
-                        <div x-data="{ newCategory: {id: '@Model.GetID()',name: ''}}">
-                            <form method="post" class="form-control shadow-sm"
-                                x-on:submit.prevent="async ()=>{await categoryToPostAsync(newCategory,tokens)}">
-                                <div class="form-label text-center">
-                                    <h1 class="lead fs-3 ">Add new category
-                                    </h1>
-                                </div>
-                                <div class="form-group">
-                                    <label for="title">Name</label>
-                                    <input type="text" class="form-control" id="title" name="title"
-                                        placeholder="Type category name" x-model="newCategory.name" required>
-                                </div>
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                    <input type="submit" class="btn m-2" value="Create category" id="submitbutton"
-                                        style="color: white; background-color:#1c4d2d;" />
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                </section>
             </div>
-        </section>
+        </template>
     </div>
-    </template>
-</div>
+</body>

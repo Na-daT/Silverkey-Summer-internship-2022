@@ -7,12 +7,16 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Antiforgery;
 using SD.LLBLGen.Pro.ORMSupportClasses;
-using SD.LLBLGen.Pro.DQE.SqlServer;
-using System.Data.SqlClient;
-
-//using FromScratchDBFirst.DatabaseSpecific;
+using SD.LLBLGen.Pro.DQE.PostgreSql;
+using Npgsql;
+using recipesApp;
+using recipesApp.EntityClasses;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Store.PartnerCenter.Models.Query;
+using View.DtoClasses;
+using View.Persistence;
+//using recipesApp.Linq;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,13 +53,14 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin();
     });
 });
-RuntimeConfiguration.AddConnectionString("ConnectionString.SQL Server (SqlClient)",
-                                                     builder.Configuration.GetConnectionString("ConnectionString.SQL Server (SqlClient)"));
-RuntimeConfiguration.ConfigureDQE<SQLServerDQEConfiguration>(c =>
-{
-    // add more here...
-    c.AddDbProviderFactory(typeof(System.Data.SqlClient.SqlClientFactory));
-});
+//RuntimeConfiguration.AddConnectionString("ConnectionString.SQL Server (SqlClient)",
+//                                                     builder.Configuration.GetConnectionString("ConnectionString.SQL Server (SqlClient)"));
+//RuntimeConfiguration.ConfigureDQE<PostgreSqlDQEConfiguration>(c =>
+//{
+//    c.AddDbProviderFactory(typeof(NpgsqlFactory));
+//});
+builder.Services.AddDbContext<RecipesAppDataContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionString.SQL Server (SqlClient)")));
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -90,8 +95,6 @@ builder.Services.AddAuthorization();
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 builder.Logging.AddConsole();
 builder.Services.AddTransient<ITokenService, TokenService>();
-
-
 var app = builder.Build();
 app.UseCors();
 app.UseSwagger();
@@ -235,48 +238,53 @@ app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token)
     return Results.Ok();
 });
 
-// app.MapGet("/antiforgery", (IAntiforgery antiforgery, HttpContext context) =>
-// {
-//     var tokens = antiforgery.GetAndStoreTokens(context);
-//     context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions { HttpOnly = false });
-// });
-
-// app.MapPost("/validate", async (HttpContext context, IAntiforgery antiforgery) =>
-// {
-//     try
-//     {
-//         await antiforgery.ValidateRequestAsync(context);
-//         return Results.Ok();
-//     }
-//     catch (Exception ex)
-//     {
-//         return Results.Problem(ex?.Message ?? string.Empty);
-//     }
-// });
-
-app.MapGet("api/json/{fileName}", [Authorize] async Task<string> (string fileName) =>
+app.MapGet("api/json/recipes", [Authorize] async Task<List<RecipeMenuView>> (RecipesAppDataContext dbContext) =>
 {
-    var jsonFile = fileName + ".json";
-    return await FileHandler.ReadAsync(jsonFile);
-}).RequireAuthorization();
+    var recipes = await dbContext.Recipes.ProjectToRecipeMenuView().ToListAsync();
+    return recipes;
+});
 
-app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPost) =>
+app.MapGet("api/json/categories", [Authorize] async Task<List<recipesApp.EntityClasses.Category>> (RecipesAppDataContext dbContext) =>
 {
-    try
+    var categories = await dbContext.Categories.ToListAsync();
+    return categories;
+}); 
+
+app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPost, RecipesAppDataContext dbContext) =>
+{
+    using (var transaction = dbContext.Database.BeginTransaction())
     {
-        var recipes = await FileHandler.ReadAsync("recipe.json");
-        var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
-        if (recipesList is null)
-            throw new Exception("Could not deserialize recipes list");
-        recipesList.Add(recipeToPost);
-        var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipe.json", json);
-        return Results.Ok();
-    }
-    catch (Exception e)
-    {
-        app.Logger.LogError(e.Message);
-        return Results.StatusCode(500);
+        try
+        {
+            var rec = new recipesApp.EntityClasses.Recipe() { Title = recipeToPost.Title };
+            await dbContext.Recipes.AddAsync(rec);
+
+            var ingredientsList = new List<Ingredient>();
+            var instuctionsList = new List<Instruction>();
+            var recipeCategories = new List<RecipeCategory>();
+
+            foreach (var ingredient in recipeToPost.Ingredients)
+                ingredientsList.Add(new Ingredient() { Name = ingredient, RecipeId = rec.Id });
+            await dbContext.Ingredients.AddRangeAsync(ingredientsList);
+
+            foreach (var instruction in recipeToPost.Instructions)
+                instuctionsList.Add(new Instruction { Name = instruction, RecipeId = rec.Id });
+            await dbContext.Instructions.AddRangeAsync(instuctionsList);
+            
+            foreach (var category in recipeToPost.Categories)
+                recipeCategories.Add(new RecipeCategory { CategoryId = category.Id, RecipeId = rec.Id });
+            await dbContext.RecipeCategories.AddRangeAsync(recipeCategories);
+
+            await transaction.CommitAsync();
+            await dbContext.SaveChangesAsync();
+            return Results.Ok();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            app.Logger.LogError(e.Message);
+            return Results.StatusCode(500);
+        }
     }
 });
 

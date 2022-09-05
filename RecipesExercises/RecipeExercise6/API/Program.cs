@@ -33,14 +33,15 @@ builder.Services.AddSwaggerGen(c =>
         {securityScheme, new string[] { }}
     });
 });
+builder.Services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyOrigin()
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowAnyOrigin();
+            .AllowAnyMethod();
     });
 });
 
@@ -78,7 +79,6 @@ builder.Services.AddAuthorization();
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 builder.Logging.AddConsole();
 builder.Services.AddTransient<ITokenService, TokenService>();
-
 
 var app = builder.Build();
 app.UseCors();
@@ -223,35 +223,24 @@ app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token)
     return Results.Ok();
 });
 
-// app.MapGet("/antiforgery", (IAntiforgery antiforgery, HttpContext context) =>
-// {
-//     var tokens = antiforgery.GetAndStoreTokens(context);
-//     context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!, new CookieOptions { HttpOnly = false });
-// });
+app.MapGet("/antiforgery/token", [Authorize] (IAntiforgery forgeryService, HttpContext context) =>
+{
+    var tokens = forgeryService.GetAndStoreTokens(context);
+    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken!,
+            new CookieOptions { HttpOnly = false });
+});
 
-// app.MapPost("/validate", async (HttpContext context, IAntiforgery antiforgery) =>
-// {
-//     try
-//     {
-//         await antiforgery.ValidateRequestAsync(context);
-//         return Results.Ok();
-//     }
-//     catch (Exception ex)
-//     {
-//         return Results.Problem(ex?.Message ?? string.Empty);
-//     }
-// });
-
-app.MapGet("api/json/{fileName}", [Authorize] async Task<string> (string fileName) =>
+app.MapGet("api/json/{fileName}", [Authorize] async Task<string> (string fileName, HttpContext context) =>
 {
     var jsonFile = fileName + ".json";
     return await FileHandler.ReadAsync(jsonFile);
-}).RequireAuthorization();
+});
 
-app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPost) =>
+app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPost, HttpContext context, IAntiforgery forgeryService) =>
 {
     try
     {
+        await forgeryService.ValidateRequestAsync(context);
         var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
@@ -268,10 +257,11 @@ app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPos
     }
 });
 
-app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpdate) =>
+app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpdate, HttpContext context, IAntiforgery forgeryService) =>
 {
     try
     {
+        await forgeryService.ValidateRequestAsync(context);
         var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
@@ -291,10 +281,11 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
     }
 });
 
-app.MapDelete("api/json/recipes/{id}", [Authorize] async (Guid id) =>
+app.MapDelete("api/json/recipes/{id}", [Authorize] async (Guid id, HttpContext context, IAntiforgery forgeryService) =>
 {
     try
     {
+        await forgeryService.ValidateRequestAsync(context);
         var recipes = await FileHandler.ReadAsync("recipe.json");
         var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
         if (recipesList is null)
@@ -314,10 +305,11 @@ app.MapDelete("api/json/recipes/{id}", [Authorize] async (Guid id) =>
     }
 });
 
-app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category categoryToPost) =>
+app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category categoryToPost, HttpContext context, IAntiforgery forgeryService) =>
 {
     try
     {
+        await forgeryService.ValidateRequestAsync(context);
         var categories = await FileHandler.ReadAsync("category.json");
         var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
         if (categoriesList is null)
@@ -334,10 +326,11 @@ app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category catego
     }
 });
 
-app.MapPut("api/json/categories", [Authorize] async ([FromBody] Category categoryToUpdate) =>
+app.MapPut("api/json/categories", [Authorize] async ([FromBody] Category categoryToUpdate, HttpContext context, IAntiforgery forgeryService) =>
 {
     try
     {
+        await forgeryService.ValidateRequestAsync(context);
         var categories = await FileHandler.ReadAsync("category.json");
         var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
         if (categoriesList is null)
