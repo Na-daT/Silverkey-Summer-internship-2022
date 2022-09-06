@@ -5,9 +5,8 @@ using RecipesDB.Migrations;
 
 namespace RecipesDB.Seed
 {
-    public class User
+    public record User
     {
-        public int Id { get; set; } 
         public string Username { get; set; }
         public string Password { get; set; }
         public bool IsActive { get; set; }
@@ -20,11 +19,10 @@ namespace RecipesDB.Seed
     public class _101_UserTableSeed : Migration
     {
         public static PasswordHasher<User> hasher = new();
-        public static List<User> users = new ()
+        public static List<User> users = new()
         {
             new User
             {
-                Id = 1,
                 Username = "nada",
                 Password = hasher.HashPassword(new User(), "p@ssword"),
                 IsActive = true,
@@ -33,7 +31,6 @@ namespace RecipesDB.Seed
             },
             new User
             {
-                Id = 2,
                 Username = "test1",
                 Password = hasher.HashPassword(new User(), "p@ssword"),
                 IsActive = true,
@@ -42,7 +39,6 @@ namespace RecipesDB.Seed
             },
             new User
             {
-                Id = 3,
                 Username = "test2",
                 Password = hasher.HashPassword(new User(), "p@ssword"),
                 IsActive = true,
@@ -50,7 +46,7 @@ namespace RecipesDB.Seed
                 RefreshTokenExpiry = null
             }
         };
-        
+
         public override void Up()
         {
             foreach (var u in users)
@@ -58,7 +54,6 @@ namespace RecipesDB.Seed
                 Insert.IntoTable(Tables.User)
                     .Row(new
                     {
-                        id = u.Id,
                         username = u.Username,
                         password = u.Password,
                         is_active = u.IsActive,
@@ -70,7 +65,6 @@ namespace RecipesDB.Seed
 
         public override void Down()
         {
-            //Delete.FromTable(Tables.User).AllRows();
         }
     }
 }
