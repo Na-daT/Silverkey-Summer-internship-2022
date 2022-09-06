@@ -206,6 +206,8 @@ app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] Refresh
             user.RefreshToken = newRefreshToken;
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
             dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
+            transaction.Commit();
             return Results.Ok(new AuthenticatedResponse()
             {
                 Token = newAccessToken,
@@ -220,21 +222,30 @@ app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] Refresh
     }
 });
 
-app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token) =>
+app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token, RecipesAppDataContext dbContext) =>
 {
-    if (string.IsNullOrEmpty(token))
-        return Results.BadRequest(new { message = "Token is required" });
-    var usersJson = await FileHandler.ReadAsync("users.json");
-    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(usersJson);
-    if (usersList is null)
-        throw new Exception("Could not deserialize users list");
-    var user = usersList.FirstOrDefault(u => u.RefreshToken == token);
-    if (user == null)
-        return Results.BadRequest();
-    user.RefreshToken = null;
-    var json = await JsonHandler.SerializeAsync(usersList);
-    await FileHandler.WriteAsync("users.json", json);
-    return Results.Ok();
+    using(var transaction = dbContext.Database.BeginTransaction())
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(token))
+                return Results.BadRequest(new { message = "Token is required" });
+            var user = await dbContext.Users.FirstOrDefaultAsync(x => x.RefreshToken == token);
+            if(user is null)
+                return Results.BadRequest(new { message = "Invalid token" });
+            user.RefreshToken = null;
+            user.RefreshTokenExpiry = null;
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
+            transaction.Commit();
+            return Results.Ok(new { message = "Token revoked" });
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            return Results.BadRequest(ex.Message);
+        }
+    }
 });
 
 app.MapGet("api/json/recipes", [Authorize] async Task<List<RecipeMenuView>> (RecipesAppDataContext dbContext) =>
