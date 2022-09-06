@@ -113,112 +113,111 @@ var options = new JsonSerializerOptions
     WriteIndented = true,
 };
 
-app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel, HttpContext context) =>
+app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel, HttpContext context, RecipesAppDataContext dbContext) =>
 {
-    var hasher = new PasswordHasher<LoginModel>();
-    TokenService _tokenService = new TokenService();
-    var usersJson = await FileHandler.ReadAsync("users.json");
-    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(usersJson);
-    if (usersList is null)
-        throw new Exception("Could not deserialize users list");
-    var user = usersList.FirstOrDefault(u => u.UserName == loginModel.UserName);
-    if (user is null)
-        return Results.Unauthorized();
-    var isPasswordMatch = hasher.VerifyHashedPassword(new LoginModel(), user.Password, loginModel.Password);
-    if (isPasswordMatch == PasswordVerificationResult.Failed)
-        return Results.Unauthorized();
-
-    var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, loginModel.UserName)
-        };
-    var accessToken = _tokenService.GenerateAccessToken(claims);
-    var refreshToken = _tokenService.GenerateRefreshToken();
-
-    user.RefreshToken = refreshToken;
-
-    //var cookieOptions = new CookieOptions
-    //{
-    //    HttpOnly = true,
-    //    Expires = DateTime.Now.AddDays(7)
-    //};
-    //context.Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions { HttpOnly = true, Expires = DateTime.Now.AddMinutes(5) });
-    //context.Response.Cookies.Append("X-Refresh-Token", refreshToken, cookieOptions);
-
-    user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7).ToString();
-
-    var json = await JsonHandler.SerializeAsync(usersList);
-    await FileHandler.WriteAsync("users.json", json);
-
-    return Results.Ok(new AuthenticatedResponse { RefreshToken = refreshToken, Token = accessToken });
-});
-
-app.MapPost("api/json/register", async ([FromBody] RegisterModel newUser) =>
-{
-    var hasher = new PasswordHasher<LoginModel>();
-    var usersJson = await FileHandler.ReadAsync("users.json");
-    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(usersJson);
-    if (usersList is null)
-        throw new Exception("Could not deserialize users list");
-    if (usersList.Find(x => x.UserName == newUser.Username) != null)
-        return Results.BadRequest("username already exists");
-    var hashedPassword = hasher.HashPassword(new LoginModel(), newUser.Password);
-    LoginModel newLoginModel = new LoginModel(Guid.NewGuid().ToString(), newUser.Username, hashedPassword, string.Empty, string.Empty);
-    usersList.Add(newLoginModel);
-    var json = await JsonHandler.SerializeAsync(usersList);
-    await FileHandler.WriteAsync("users.json", json);
-
-    return Results.Ok();
-});
-
-app.MapPost("api/json/refresh-token", async ([FromBody] RefreshRequest request, HttpContext context) =>
-{
-    if (request is null)
-        return Results.BadRequest("Invalid client request");
-
-    string accessToken = request.Token;
-    string refreshToken = request.RefreshToken;
-    TokenService _tokenService = new TokenService();
-
-
-    //get principal from expired token
-    var principal = _tokenService.ValidateExpiredToken(accessToken);
-
-    //get username from claim
-    var username = principal.Identity.Name;
-
-    //deserialize and fetch user from json db
-    var usersJson = await FileHandler.ReadAsync("users.json");
-    var usersList = await JsonHandler.DeserializeAsync<List<LoginModel>>(usersJson);
-    if (usersList is null)
-        throw new Exception("Could not deserialize users list");
-    var user = usersList.FirstOrDefault(u => u.UserName == username);
-
-    //check if user exists, if refrsh tokens are the same and if refresh token is not expired yet.
-    if (user is null || user.RefreshToken != refreshToken || DateTime.Parse(user.RefreshTokenExpiryTime) <= DateTime.Now)
-        return Results.BadRequest("Invalid client request");
-
-    //create new tokens
-    var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
-    var newRefreshToken = _tokenService.GenerateRefreshToken();
-
-    //update refresh token of user and save json file
-    user.RefreshToken = newRefreshToken;
-    user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7).ToString();
-
-    context.Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions() { HttpOnly = false, Expires = DateTime.Now.AddMinutes(5) });
-    context.Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = false, Expires = DateTime.Now.AddDays(7) });
-
-    var json = await JsonHandler.SerializeAsync(usersList);
-    await FileHandler.WriteAsync("users.json", json);
-
-    //return new auth token and refresh token
-    return Results.Ok(new AuthenticatedResponse()
+    using (var trransaction = dbContext.Database.BeginTransaction())
     {
-        Token = newAccessToken,
-        RefreshToken = newRefreshToken
-    });
+        try
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == loginModel.UserName.ToLower());
+            if (user == null)
+                return Results.Unauthorized();
+            var hasher = new PasswordHasher<LoginModel>();
+            TokenService _tokenService = new TokenService();
+            var isPasswordMatch = hasher.VerifyHashedPassword(new LoginModel(), user.Password, loginModel.Password);
+            if (isPasswordMatch == PasswordVerificationResult.Failed)
+                return Results.Unauthorized();
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, loginModel.UserName.ToLower())
+            };
+            var accessToken = _tokenService.GenerateAccessToken(claims);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
+            trransaction.Commit();
+            return Results.Ok(new AuthenticatedResponse { RefreshToken = refreshToken, Token = accessToken });
+        }
+        catch (Exception ex)
+        {
+            trransaction.Rollback();
+            return Results.BadRequest(ex.Message);
+        }
+    }
+});
 
+app.MapPost("api/json/register", [AllowAnonymous] async ([FromBody] RegisterModel newUser, RecipesAppDataContext dbContext) =>
+{
+    using (var transaction = dbContext.Database.BeginTransaction())
+    {
+        try
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == newUser.Username.ToLower());
+            if (user != null)
+                return Results.BadRequest("User already exists");
+            var hasher = new PasswordHasher<LoginModel>();
+            var hashedPassword = hasher.HashPassword(new LoginModel(), newUser.Password);
+            var userEntity = new User
+            {
+                Username = newUser.Username.ToLower(),
+                Password = hashedPassword,
+                RefreshToken = null,
+                RefreshTokenExpiry = null
+            };
+            dbContext.Users.Add(userEntity);
+            await dbContext.SaveChangesAsync();
+            transaction.Commit();
+            return Results.Ok();
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            return Results.BadRequest(ex.Message);
+        }
+    }
+});
+
+app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] RefreshRequest request, HttpContext context, RecipesAppDataContext dbContext) =>
+{
+    using(var transaction = dbContext.Database.BeginTransaction())
+    {
+        try
+        {
+            if (request is null)
+                return Results.BadRequest("Invalid client request");
+
+            string accessToken = request.Token;
+            string refreshToken = request.RefreshToken;
+            TokenService _tokenService = new TokenService();
+            var principal = _tokenService.ValidateExpiredToken(accessToken);
+            if (principal == null)
+                return Results.BadRequest("Invalid token");
+            var username = principal.Identity.Name;
+
+            var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Username == username);
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.UtcNow)
+            {
+                return Results.BadRequest("Invalid client request");
+            }
+            var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            dbContext.Users.Update(user);
+            return Results.Ok(new AuthenticatedResponse()
+            {
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken
+            });
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            return Results.BadRequest(ex.Message);
+        }
+    }
 });
 
 app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token) =>
@@ -258,15 +257,12 @@ app.MapGet("api/json/categories", [Authorize] async Task<List<recipesApp.EntityC
 
 app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPost, RecipesAppDataContext dbContext) =>
 {
-    Console.WriteLine("abl l transaction");
     using (var transaction = dbContext.Database.BeginTransaction())
     {
-        Console.WriteLine("abl l try block");
         try
         {
             var recipe = new recipesApp.EntityClasses.Recipe() { Title = recipeToPost.Title, IsActive = true };
             await dbContext.Recipes.AddAsync(recipe);
-            Console.WriteLine(recipe.Id);
             
             var ingredientsList = new List<recipesApp.EntityClasses.Ingredient>();
             var instuctionsList = new List<recipesApp.EntityClasses.Instruction>();
@@ -274,9 +270,7 @@ app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPos
 
             foreach (var ingredient in recipeToPost.Ingredients)
                 ingredientsList.Add(new recipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe });
-            Console.WriteLine("abl el ingredients add");
             await dbContext.Ingredients.AddRangeAsync(ingredientsList);
-            Console.WriteLine("b3d el ingredients add");
 
             foreach (var instruction in recipeToPost.Instructions)
                 instuctionsList.Add(new recipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe });
