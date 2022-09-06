@@ -42,18 +42,22 @@ namespace View.Persistence
 				Id = p__0.Id,
 				Ingredients = p__0.Ingredients.Select(p__1 => new View.DtoClasses.RecipeMenuViewTypes.Ingredient()
 				{
+					IsActive = p__1.IsActive,
 					Name = p__1.Name,
 				}).ToList(),
 				Instructions = p__0.Instructions.Select(p__1 => new View.DtoClasses.RecipeMenuViewTypes.Instruction()
 				{
+					IsActive = p__1.IsActive,
 					Name = p__1.Name,
 				}).ToList(),
+				IsActive = p__0.IsActive,
 				RecipeCategories = p__0.RecipeCategories.Select(p__1 => new View.DtoClasses.RecipeMenuViewTypes.RecipeCategory()
 				{
 					Category = new View.DtoClasses.RecipeMenuViewTypes.RecipeCategoryTypes.Category()
 					{
 						Name = p__1.Category.Name,
 					},
+					IsActive = p__1.IsActive,
 				}).ToList(),
 				Title = p__0.Title,
 	// __LLBLGENPRO_USER_CODE_REGION_START ProjectionRegion_RecipeMenuView 

@@ -15,13 +15,16 @@ namespace View.DtoClasses
 	{
 		/// <summary>Gets or sets the Id field. Derived from Entity Model Field 'Recipe.Id'</summary>
 		[DataMember]
-		public System.Int64 Id { get; set; }
+		public System.Int32 Id { get; set; }
 		/// <summary>Gets or sets the Ingredients field. </summary>
 		[DataMember]
 		public List<RecipeMenuViewTypes.Ingredient> Ingredients { get; set; }
 		/// <summary>Gets or sets the Instructions field. </summary>
 		[DataMember]
 		public List<RecipeMenuViewTypes.Instruction> Instructions { get; set; }
+		/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'Recipe.IsActive'</summary>
+		[DataMember]
+		public System.Boolean IsActive { get; set; }
 		/// <summary>Gets or sets the RecipeCategories field. </summary>
 		[DataMember]
 		public List<RecipeMenuViewTypes.RecipeCategory> RecipeCategories { get; set; }
@@ -37,6 +40,9 @@ namespace View.DtoClasses
 		[DataContract]
 		public partial class Ingredient
 		{
+			/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'Ingredient.IsActive'</summary>
+			[DataMember]
+			public System.Boolean IsActive { get; set; }
 			/// <summary>Gets or sets the Name field. Derived from Entity Model Field 'Ingredient.Name'</summary>
 			[DataMember]
 			public System.String Name { get; set; }
@@ -47,6 +53,9 @@ namespace View.DtoClasses
 		[DataContract]
 		public partial class Instruction
 		{
+			/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'Instruction.IsActive'</summary>
+			[DataMember]
+			public System.Boolean IsActive { get; set; }
 			/// <summary>Gets or sets the Name field. Derived from Entity Model Field 'Instruction.Name'</summary>
 			[DataMember]
 			public System.String Name { get; set; }
@@ -60,6 +69,9 @@ namespace View.DtoClasses
 			/// <summary>Gets or sets the Category field. </summary>
 			[DataMember]
 			public RecipeCategoryTypes.Category Category { get; set; }
+			/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'RecipeCategory.IsActive'</summary>
+			[DataMember]
+			public System.Boolean IsActive { get; set; }
 		}
 
 		namespace RecipeCategoryTypes

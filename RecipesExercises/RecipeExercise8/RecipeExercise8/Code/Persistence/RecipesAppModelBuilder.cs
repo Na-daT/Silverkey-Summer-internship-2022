@@ -46,6 +46,7 @@ namespace recipesApp
 			config.Property(t => t.Id).HasColumnName("id").HasDefaultValueSql("nextval('\"public\".\"ingredient_id_seq\"')");
 			config.Property(t => t.RecipeId).HasColumnName("recipe_id");
 			config.Property(t => t.Name).HasColumnName("name").HasMaxLength(1000).IsRequired();
+			config.Property(t => t.IsActive).HasColumnName("is_active");
 			config.HasOne(t => t.Recipe).WithMany(t => t.Ingredients).HasForeignKey(t => t.RecipeId);
 		}
 
@@ -58,6 +59,7 @@ namespace recipesApp
 			config.Property(t => t.Id).HasColumnName("id").HasDefaultValueSql("nextval('\"public\".\"instruction_id_seq\"')");
 			config.Property(t => t.RecipeId).HasColumnName("recipe_id");
 			config.Property(t => t.Name).HasColumnName("name").HasMaxLength(1000).IsRequired();
+			config.Property(t => t.IsActive).HasColumnName("is_active");
 			config.HasOne(t => t.Recipe).WithMany(t => t.Instructions).HasForeignKey(t => t.RecipeId);
 		}
 
@@ -79,8 +81,9 @@ namespace recipesApp
 			config.ToTable("recipe_category");
 			config.HasKey(t => t.Id);
 			config.Property(t => t.Id).HasColumnName("id").HasDefaultValueSql("nextval('\"public\".\"recipe_category_id_seq\"')");
-			config.Property(t => t.RecipeId).HasColumnName("recipe_id").HasConversion(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.CastingConverter<System.Int64, System.Int32>());
-			config.Property(t => t.CategoryId).HasColumnName("category_id").HasConversion(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.CastingConverter<System.Int64, System.Int32>());
+			config.Property(t => t.RecipeId).HasColumnName("recipe_id");
+			config.Property(t => t.CategoryId).HasColumnName("category_id");
+			config.Property(t => t.IsActive).HasColumnName("is_active");
 			config.HasOne(t => t.Category).WithMany(t => t.RecipeCategories).HasForeignKey(t => t.CategoryId);
 			config.HasOne(t => t.Recipe).WithMany(t => t.RecipeCategories).HasForeignKey(t => t.RecipeId);
 		}

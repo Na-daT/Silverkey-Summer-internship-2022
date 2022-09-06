@@ -142,45 +142,39 @@
     <EntityDefinitions>
       <EntityDefinition Name="Category" ObjectID="4fb9644a-8a57-4ba8-a623-791251c5834c">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
+          <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Name" Type="string" MaxLength="100" />
         </Fields>
       </EntityDefinition>
       <EntityDefinition Name="Ingredient" ObjectID="9425a5d7-7754-4e73-81c7-c7eebe62bcae">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
-          <Field Name="IsActive" Type="bool" />
           <Field Name="Name" Type="string" MaxLength="1000" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="RecipeId" Type="long" Precision="20" />
         </Fields>
       </EntityDefinition>
       <EntityDefinition Name="Instruction" ObjectID="b2a09452-9a5a-48b7-823c-22cf66d96143">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
-          <Field Name="IsActive" Type="bool" />
           <Field Name="Name" Type="string" MaxLength="1000" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="RecipeId" Type="long" Precision="20" />
         </Fields>
       </EntityDefinition>
       <EntityDefinition Name="Recipe" ObjectID="7f6f3bc9-5c11-41c5-956f-9d45a7fce688">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
+          <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Title" Type="string" MaxLength="100" />
         </Fields>
       </EntityDefinition>
       <EntityDefinition Name="RecipeCategory" ObjectID="77277cc3-8fa8-4199-aebd-51c0904d7496">
         <Fields>
-          <Field Name="CategoryId" Type="int" />
-          <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
-          <Field Name="IsActive" Type="bool" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="CategoryId" Type="long" Precision="20" />
+          <Field Name="RecipeId" Type="long" Precision="20" />
         </Fields>
       </EntityDefinition>
       <EntityDefinition Name="User" ObjectID="dcefbf20-5018-469c-b73d-323dcb26fddc">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
+          <Field Name="Id" Type="long" IsReadOnly="true" Precision="20" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Password" Type="string" MaxLength="100" />
           <Field Name="RefreshToken" Type="string" IsOptional="true" MaxLength="1073741824" />
@@ -236,12 +230,9 @@
       <Catalogs>
         <Catalog Name="recipesapp">
           <Schemas>
-            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-06T17:45:22.3364457Z">
+            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-06T00:28:26.0138723Z">
               <Sequences>
                 <Sequence Name="category_id_seq" />
-                <Sequence Name="ingredient_id_seq" />
-                <Sequence Name="instruction_id_seq" />
-                <Sequence Name="recipe_category_id_seq" />
                 <Sequence Name="recipe_id_seq" />
                 <Sequence Name="user_id_seq" />
               </Sequences>
@@ -249,53 +240,44 @@
                 <Table Name="category">
                   <PkConstraintName Name="PK_category" />
                   <Fields>
-                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('category_id_seq'::regclass)" DefaultSequence="recipesapp:public:category_id_seq" DbType="9" Precision="10" />
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('category_id_seq'::regclass)" DefaultSequence="recipesapp:public:category_id_seq" DbType="10" Precision="20" />
                     <Field Name="name" Ordinal="2" DbType="24" Length="100" />
-                    <Field Name="is_active" Ordinal="3" HasDefaultValue="true" DefaultValue="true" DbType="0" />
+                    <Field Name="is_active" Ordinal="3" HasDefaultValue="true" DefaultValue="false" DbType="0" />
                   </Fields>
                 </Table>
                 <Table Name="ingredient">
-                  <PkConstraintName Name="PK_ingredient" />
                   <Fields>
-                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('ingredient_id_seq'::regclass)" DefaultSequence="recipesapp:public:ingredient_id_seq" DbType="9" Precision="10" />
-                    <Field Name="recipe_id" Ordinal="2" DbType="9" Precision="10" />
-                    <Field Name="name" Ordinal="3" DbType="24" Length="1000" />
-                    <Field Name="is_active" Ordinal="4" HasDefaultValue="true" DefaultValue="true" DbType="0" />
+                    <Field Name="recipe_id" Ordinal="1" DbType="10" Precision="20" />
+                    <Field Name="name" Ordinal="2" DbType="24" Length="1000" />
                   </Fields>
                 </Table>
                 <Table Name="instruction">
-                  <PkConstraintName Name="PK_instruction" />
                   <Fields>
-                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('instruction_id_seq'::regclass)" DefaultSequence="recipesapp:public:instruction_id_seq" DbType="9" Precision="10" />
-                    <Field Name="recipe_id" Ordinal="2" DbType="9" Precision="10" />
-                    <Field Name="name" Ordinal="3" DbType="24" Length="1000" />
-                    <Field Name="is_active" Ordinal="4" HasDefaultValue="true" DefaultValue="true" DbType="0" />
+                    <Field Name="recipe_id" Ordinal="1" DbType="10" Precision="20" />
+                    <Field Name="name" Ordinal="2" DbType="24" Length="1000" />
                   </Fields>
                 </Table>
                 <Table Name="recipe">
                   <PkConstraintName Name="PK_recipe" />
                   <Fields>
-                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('recipe_id_seq'::regclass)" DefaultSequence="recipesapp:public:recipe_id_seq" DbType="9" Precision="10" />
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('recipe_id_seq'::regclass)" DefaultSequence="recipesapp:public:recipe_id_seq" DbType="10" Precision="20" />
                     <Field Name="title" Ordinal="2" DbType="24" Length="100" />
-                    <Field Name="is_active" Ordinal="3" HasDefaultValue="true" DefaultValue="true" DbType="0" />
+                    <Field Name="is_active" Ordinal="3" HasDefaultValue="true" DefaultValue="false" DbType="0" />
                   </Fields>
                 </Table>
                 <Table Name="recipe_category">
-                  <PkConstraintName Name="PK_recipe_category" />
                   <Fields>
-                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('recipe_category_id_seq'::regclass)" DefaultSequence="recipesapp:public:recipe_category_id_seq" DbType="9" Precision="10" />
-                    <Field Name="recipe_id" Ordinal="2" DbType="9" Precision="10" />
-                    <Field Name="category_id" Ordinal="3" DbType="9" Precision="10" />
-                    <Field Name="is_active" Ordinal="4" HasDefaultValue="true" DefaultValue="true" DbType="0" />
+                    <Field Name="recipe_id" Ordinal="1" DbType="9" Precision="10" />
+                    <Field Name="category_id" Ordinal="2" DbType="9" Precision="10" />
                   </Fields>
                 </Table>
                 <Table Name="user">
                   <PkConstraintName Name="PK_user" />
                   <Fields>
-                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('user_id_seq'::regclass)" DefaultSequence="recipesapp:public:user_id_seq" DbType="9" Precision="10" />
+                    <Field Name="id" Ordinal="1" IsIdentity="true" IsPrimaryKey="true" HasDefaultValue="true" DefaultValue="nextval('user_id_seq'::regclass)" DefaultSequence="recipesapp:public:user_id_seq" DbType="10" Precision="20" />
                     <Field Name="username" Ordinal="2" DbType="24" Length="100" />
                     <Field Name="password" Ordinal="3" DbType="24" Length="100" />
-                    <Field Name="is_active" Ordinal="4" HasDefaultValue="true" DefaultValue="true" DbType="0" />
+                    <Field Name="is_active" Ordinal="4" HasDefaultValue="true" DefaultValue="false" DbType="0" />
                     <Field Name="refresh_token" Ordinal="5" IsOptional="true" DbType="19" Length="1073741824" />
                     <Field Name="refresh_token_expiry" Ordinal="6" IsOptional="true" DbType="22" />
                   </Fields>
@@ -348,16 +330,12 @@
         </EntityMapping>
         <EntityMapping EntityName=":Ingredient" TargetName="recipesapp:public:ingredient">
           <FieldMappings>
-            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:ingredient_id_seq" />
-            <FieldMapping FieldName="IsActive" TargetFieldName="is_active" />
             <FieldMapping FieldName="Name" TargetFieldName="name" />
             <FieldMapping FieldName="RecipeId" TargetFieldName="recipe_id" />
           </FieldMappings>
         </EntityMapping>
         <EntityMapping EntityName=":Instruction" TargetName="recipesapp:public:instruction">
           <FieldMappings>
-            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:instruction_id_seq" />
-            <FieldMapping FieldName="IsActive" TargetFieldName="is_active" />
             <FieldMapping FieldName="Name" TargetFieldName="name" />
             <FieldMapping FieldName="RecipeId" TargetFieldName="recipe_id" />
           </FieldMappings>
@@ -372,8 +350,6 @@
         <EntityMapping EntityName=":RecipeCategory" TargetName="recipesapp:public:recipe_category">
           <FieldMappings>
             <FieldMapping FieldName="CategoryId" TargetFieldName="category_id" />
-            <FieldMapping FieldName="Id" TargetFieldName="id" SequenceToUse="recipesapp:public:recipe_category_id_seq" />
-            <FieldMapping FieldName="IsActive" TargetFieldName="is_active" />
             <FieldMapping FieldName="RecipeId" TargetFieldName="recipe_id" />
           </FieldMappings>
         </EntityMapping>
@@ -504,9 +480,6 @@
               <Document Name="Ingredient">
                 <RootEntity Entity=":Ingredient" NavigatorPath="Ingredients" />
                 <Fields>
-                  <Field Name="IsActive">
-                    <EntityField Name="IsActive" />
-                  </Field>
                   <Field Name="Name">
                     <EntityField Name="Name" />
                   </Field>
@@ -517,17 +490,11 @@
               <Document Name="Instruction">
                 <RootEntity Entity=":Instruction" NavigatorPath="Instructions" />
                 <Fields>
-                  <Field Name="IsActive">
-                    <EntityField Name="IsActive" />
-                  </Field>
                   <Field Name="Name">
                     <EntityField Name="Name" />
                   </Field>
                 </Fields>
               </Document>
-            </Field>
-            <Field Name="IsActive">
-              <EntityField Name="IsActive" />
             </Field>
             <Field Name="RecipeCategories">
               <Document Name="RecipeCategory">
@@ -542,9 +509,6 @@
                         </Field>
                       </Fields>
                     </Document>
-                  </Field>
-                  <Field Name="IsActive">
-                    <EntityField Name="IsActive" />
                   </Field>
                 </Fields>
               </Document>

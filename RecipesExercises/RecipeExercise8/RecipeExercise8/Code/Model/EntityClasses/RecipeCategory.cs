@@ -21,11 +21,13 @@ namespace recipesApp.EntityClasses
 		}
 
 		/// <summary>Gets or sets the CategoryId field. </summary>
-		public System.Int64 CategoryId { get; set; }
+		public System.Int32 CategoryId { get; set; }
 		/// <summary>Gets the Id field. </summary>
 		public System.Int32 Id => _id;
+		/// <summary>Gets or sets the IsActive field. </summary>
+		public System.Boolean IsActive { get; set; }
 		/// <summary>Gets or sets the RecipeId field. </summary>
-		public System.Int64 RecipeId { get; set; }
+		public System.Int32 RecipeId { get; set; }
 		/// <summary>Represents the navigator which is mapped onto the association 'RecipeCategory.Category - Category.RecipeCategories (m:1)'</summary>
 		public virtual Category Category { get; set; } = null!;
 		/// <summary>Represents the navigator which is mapped onto the association 'RecipeCategory.Recipe - Recipe.RecipeCategories (m:1)'</summary>

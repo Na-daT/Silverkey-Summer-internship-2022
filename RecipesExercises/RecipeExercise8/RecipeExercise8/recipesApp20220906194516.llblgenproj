@@ -152,7 +152,7 @@
           <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Name" Type="string" MaxLength="1000" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="RecipeId" Type="long" Precision="10" />
         </Fields>
       </EntityDefinition>
       <EntityDefinition Name="Instruction" ObjectID="b2a09452-9a5a-48b7-823c-22cf66d96143">
@@ -160,7 +160,7 @@
           <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Name" Type="string" MaxLength="1000" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="RecipeId" Type="long" Precision="10" />
         </Fields>
       </EntityDefinition>
       <EntityDefinition Name="Recipe" ObjectID="7f6f3bc9-5c11-41c5-956f-9d45a7fce688">
@@ -175,7 +175,7 @@
           <Field Name="CategoryId" Type="int" />
           <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="RecipeId" Type="long" Precision="20" />
         </Fields>
       </EntityDefinition>
       <EntityDefinition Name="User" ObjectID="dcefbf20-5018-469c-b73d-323dcb26fddc">
@@ -236,7 +236,7 @@
       <Catalogs>
         <Catalog Name="recipesapp">
           <Schemas>
-            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-06T17:45:22.3364457Z">
+            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-06T17:41:17.9050476Z">
               <Sequences>
                 <Sequence Name="category_id_seq" />
                 <Sequence Name="ingredient_id_seq" />

@@ -12,7 +12,7 @@ namespace recipesApp.EntityClasses
 	{
 		/// <summary>Method called from the constructor</summary>
 		partial void OnCreated();
-		private System.Int64 _id = default(System.Int64);
+		private System.Int32 _id = default(System.Int32);
 
 		/// <summary>Initializes a new instance of the <see cref="User"/> class.</summary>
 		public User() : base()
@@ -23,7 +23,7 @@ namespace recipesApp.EntityClasses
 		}
 
 		/// <summary>Gets the Id field. </summary>
-		public System.Int64 Id => _id;
+		public System.Int32 Id => _id;
 		/// <summary>Gets or sets the IsActive field. </summary>
 		public System.Boolean IsActive { get; set; }
 		/// <summary>Gets or sets the Password field. </summary>
