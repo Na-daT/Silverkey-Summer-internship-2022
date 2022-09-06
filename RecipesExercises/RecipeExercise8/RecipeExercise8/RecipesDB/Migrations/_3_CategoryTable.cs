@@ -8,9 +8,9 @@ namespace RecipesDB.Migrations
         public override void Up()
         {
             Create.Table(Tables.Category)
-                .WithColumn("id").AsInt64().PrimaryKey().Identity().Indexed()
+                .WithColumn("id").AsInt32().PrimaryKey().Identity().Indexed()
                 .WithColumn("name").AsString(100).NotNullable().Unique()
-                .WithColumn("is_active").AsBoolean().NotNullable().WithDefaultValue(false);
+                .WithColumn("is_active").AsBoolean().NotNullable().WithDefaultValue(true);
 
         }
     }
