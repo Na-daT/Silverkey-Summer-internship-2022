@@ -21,28 +21,7 @@ using View.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen(c =>
-//{
-//    var securityScheme = new OpenApiSecurityScheme
-//    {
-//        Name = "JWT Authentication",
-//        Description = "Enter JWT Bearer token",
-//        In = ParameterLocation.Header,
-//        Type = SecuritySchemeType.Http,
-//        Scheme = "bearer",
-//        BearerFormat = "JWT",
-//        Reference = new OpenApiReference
-//        {
-//            Id = JwtBearerDefaults.AuthenticationScheme,
-//            Type = ReferenceType.SecurityScheme
-//        }
-//    };
-//    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
-//    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-//    {
-//        {securityScheme, new string[] { }}
-//    });
-//});
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -53,12 +32,7 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin();
     });
 });
-//RuntimeConfiguration.AddConnectionString("ConnectionString.SQL Server (SqlClient)",
-//                                                     builder.Configuration.GetConnectionString("ConnectionString.SQL Server (SqlClient)"));
-//RuntimeConfiguration.ConfigureDQE<PostgreSqlDQEConfiguration>(c =>
-//{
-//    c.AddDbProviderFactory(typeof(NpgsqlFactory));
-//});
+
 builder.Services.AddDbContext<RecipesAppDataContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionString.SQL Server (SqlClient)")));
 
 builder.Services.AddAuthentication(options =>
@@ -97,15 +71,8 @@ builder.Logging.AddConsole();
 builder.Services.AddTransient<ITokenService, TokenService>();
 var app = builder.Build();
 app.UseCors();
-//app.UseSwagger();
-//app.UseSwaggerUI();
 app.UseAuthentication();
 app.UseAuthorization();
-//app.UseSwaggerUI(options =>
-//{
-//    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-//    options.RoutePrefix = String.Empty;
-//});
 var options = new JsonSerializerOptions
 {
     PropertyNameCaseInsensitive = true,
@@ -187,7 +154,6 @@ app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] Refresh
         {
             if (request is null)
                 return Results.BadRequest("Invalid client request");
-
             string accessToken = request.Token;
             string refreshToken = request.RefreshToken;
             TokenService _tokenService = new TokenService();
@@ -195,12 +161,9 @@ app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] Refresh
             if (principal == null)
                 return Results.BadRequest("Invalid token");
             var username = principal.Identity.Name;
-
             var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Username == username);
             if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.UtcNow)
-            {
                 return Results.BadRequest("Invalid client request");
-            }
             var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
             var newRefreshToken = _tokenService.GenerateRefreshToken();
             user.RefreshToken = newRefreshToken;
@@ -316,11 +279,10 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
                 
             recipe.Title = recipeToUpdate.Title;
             dbContext.Update(recipe);
-                
             var ingredientsList = new List<recipesApp.EntityClasses.Ingredient>();
             var instuctionsList = new List<recipesApp.EntityClasses.Instruction>();
             var recipeCategories = new List<RecipeCategory>();
-
+            
             foreach (var ingredient in recipeToUpdate.Ingredients)
             {
                 var ingredientToUpdate = await dbContext.Ingredients.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == ingredient.Name);
@@ -364,7 +326,6 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
             }
             
             await dbContext.RecipeCategories.AddRangeAsync(recipeCategories);
-            
             await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
             return Results.Ok();
