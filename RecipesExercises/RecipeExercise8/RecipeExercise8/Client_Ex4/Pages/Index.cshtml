@@ -272,8 +272,7 @@
             body: JSON.stringify(newCategory),
             headers: {
                 'Content-Type': 'application/json',
-                @* 'RequestVerificationToken': '@requestToken', *@
-            'Authorization': 'Bearer ' + localStorage.token
+                'Authorization': 'Bearer ' + localStorage.token
             }
         }).then(res => { return res })
     if (response.ok) {
@@ -328,9 +327,9 @@
     if (response.ok) {
         whichCategory = 0;
         for (let i = 0; i < recipesDataTemp.length; i++) {
-            if (recipesDataTemp[i].categories.find(category => category.id === categoryToUpdate.id) !== undefined) {
-                recipesDataTemp[i].categories = recipesDataTemp[i].categories.filter(category => category.id !== categoryToUpdate.id);
-                recipesDataTemp[i].categories.push(categoryToUpdate);
+            if (recipesDataTemp[i].recipeCategories.find(category => category.id === categoryToUpdate.id) !== undefined) {
+                recipesDataTemp[i].recipeCategories = recipesDataTemp[i].recipeCategories.filter(category => category.id !== categoryToUpdate.id);
+                recipesDataTemp[i].recipeCategories.push(categoryToUpdate);
                 await fetch('@recipePostUrl', {
                     method: 'PUT',
                     body: JSON.stringify(recipesDataTemp[i]),
@@ -701,9 +700,11 @@
                                                     x-on:click="whichRecipe=item.id;updateRecipe = 0;detailCards=false; window.location.hash = '#recipeSection'">
                                                     <h5 class="card-title fs-4 mx-1" x-text="item.title"></h5>
                                                     <template x-for="categoryName in item.recipeCategories">
-                                                        <span class="badge rounded-pill p-1 mx-1"
-                                                            style="background-color:#135C2D;"
-                                                            x-text="categoryName.category.name"></span>
+                                                        <template x-if="categoryName.isActive">
+                                                            <span class="badge rounded-pill p-1 mx-1"
+                                                                style="background-color:#135C2D;"
+                                                                x-text="categoryName.category.name"></span>
+                                                        </template>
                                                     </template>
                                                 </div>
                                             </div>
@@ -714,7 +715,7 @@
                             @*update recipe forms*@
                             <template x-for="recipePicked in loadedRecipes">
                                 <div class="row justify-content-center p-3 pb-4"
-                                    x-data="{myCategories: [],recipeToUpdate: {id: '',title: '',ingredients: [],instructions: [],categories: []},selectedCategories: {names: []}}"
+                                    x-data="{myCategories: [],recipeToUpdate: {id: '',title: '',ingredients: [],instructions: [],categories: [], isActive: true},selectedCategories: {names: []}}"
                                     x-init="myCategories = await getCategoriesAsync(tokens)"
                                     x-show="updateRecipe === recipePicked.id" x-transition.duration.600ms x-cloak>
                                     <div style="background-color: white;" id="recipePicked.id"
@@ -748,7 +749,7 @@
                                                 <label for="recipeIngredients">Ingredients</label>
                                                 <button type="button" class="btn btn-sm mx-3 my-1"
                                                     style="background-color: #2C7A48; color:white;"
-                                                    x-on:click="recipeToUpdate.ingredients.push(null)">
+                                                    x-on:click="recipeToUpdate.ingredients.push({name:'', isActive:true})">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                         fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
                                                         <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
@@ -760,24 +761,26 @@
                                                 <div id="newRowIng py-1">
                                                     <input type="hidden" id="ingredientsCount" value="0">
                                                     <template x-for="(ingredient,index) in recipeToUpdate.ingredients">
-                                                        <div class="input-group pb-1">
-                                                            <input type="text" class="form-control py-1"
-                                                                id="recipeIngredients" name="recipeIngredients"
-                                                                x-model="recipeToUpdate.ingredients[index]"
-                                                                placeholder="Ingredients"
-                                                                aria-describedby="removeIngredient" required>
-                                                            <button type="button" class="btn btn-danger btn-sm"
-                                                                id="removeIngredient" tabindex="-1"
-                                                                x-on:click="recipeToUpdate.ingredients.splice(index,1)">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12"
-                                                                    height="12" fill="currentColor"
-                                                                    class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                                                    <path
-                                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
-                                                                    </path>
-                                                                </svg>
-                                                            </button>
-                                                        </div>
+                                                        <template x-if="recipeToUpdate.ingredients[index].isActive">
+                                                            <div class="input-group pb-1">
+                                                                <input type="text" class="form-control py-1"
+                                                                    id="recipeIngredients" name="recipeIngredients"
+                                                                    x-model="recipeToUpdate.ingredients[index].name"
+                                                                    placeholder="Ingredients"
+                                                                    aria-describedby="removeIngredient" required />
+                                                                <button type="button" class="btn btn-danger btn-sm"
+                                                                    id="removeIngredient" tabindex="-1"
+                                                                    x-on:click="recipeToUpdate.ingredients[index].isActive = false">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                                        height="12" fill="currentColor"
+                                                                        class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                        <path
+                                                                            d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                                        </path>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </template>
                                                     </template>
                                                 </div>
                                             </div>
@@ -785,12 +788,12 @@
                                                 <label for="recipeInstructions">Instructions</label>
                                                 <button type="button" class="btn btn-sm mx-3 my-1"
                                                     style="background-color: #2C7A48; color:white;"
-                                                    x-on:click="recipeToUpdate.instructions.push(null)">
+                                                    x-on:click="recipeToUpdate.instructions.push({name:'', isActive: true})">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                         fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
                                                         <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
-                                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
-                                        0 1 8 2Z">
+                                                            0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                                            0 1 8 2Z">
                                                         </path>
                                                     </svg>
                                                 </button>
@@ -798,24 +801,26 @@
                                                     <input type="hidden" id="instructionsCount" value="0">
                                                     <template
                                                         x-for="(instruction,index) in recipeToUpdate.instructions">
-                                                        <div class="input-group pb-1">
-                                                            <input type="text" class="form-control py-1"
-                                                                id="recipeInstructions" name="recipeInstructions"
-                                                                x-model="recipeToUpdate.instructions[index]"
-                                                                placeholder="Instruction"
-                                                                aria-describedby="removeInstruction" required>
-                                                            <button type="button" class="btn btn-danger btn-sm"
-                                                                id="removeInstruction" tabindex="-1"
-                                                                x-on:click="recipeToUpdate.instructions.splice(index,1)">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12"
-                                                                    height="12" fill="currentColor"
-                                                                    class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                                                    <path
-                                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
-                                                                    </path>
-                                                                </svg>
-                                                            </button>
-                                                        </div>
+                                                        <template x-if="recipeToUpdate.instructions[index].isActive">
+                                                            <div class="input-group pb-1">
+                                                                <input type="text" class="form-control py-1"
+                                                                    id="recipeInstructions" name="recipeInstructions"
+                                                                    x-model="recipeToUpdate.instructions[index].name"
+                                                                    placeholder="Instruction"
+                                                                    aria-describedby="removeInstruction" required>
+                                                                <button type="button" class="btn btn-danger btn-sm"
+                                                                    id="removeInstruction" tabindex="-1"
+                                                                    x-on:click="recipeToUpdate.instructions[index].isActive = false">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                                        height="12" fill="currentColor"
+                                                                        class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                        <path
+                                                                            d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                                        </path>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </template>
                                                     </template>
                                                 </div>
                                             </div>
@@ -823,11 +828,13 @@
                                                 <label for="recipeCategories">Categories</label>
                                                 <select class="form-control" id="recipeCategories"
                                                     x-model="selectedCategories.names" multiple>
-                                                    <template x-for="category in myCategories">
-                                                        <option x-text="category.name" x-bind:value="category.name"
-                                                            x-bind:label="category.name"
-                                                            x-bind:selected="recipeToUpdate.categories.find(myCategory=>myCategory.name === category.name) !==undefined?true:false">
-                                                        </option>
+                                                    <template x-for="thisCategory in myCategories">
+                                                        <template x-if="thisCategory.isActive">
+                                                            <option x-text="thisCategory.name" x-bind:value="thisCategory.name"
+                                                                x-bind:label="thisCategory.name"
+                                                                x-bind:selected="recipeToUpdate.recipeCategories.find(myCategory=>myCategory.category.name === thisCategory.name ) !==undefined?true:false">
+                                                            </option>
+                                                        </template>
                                                     </template>
                                                 </select>
                                             </div>
@@ -891,7 +898,7 @@
                                             </div>
                                         </div>
                                         <div class="row justify-content-center">
-                                            <div class=" col-lg-4 rounded ps-5 pt-4">
+                                            <div class=" col-lg-4 rounded pt-4">
                                                 <table class="table table-hover rounded shadow-sm text-center"
                                                     style="background-color:#F1EEE8 ;">
                                                     <thead>
@@ -901,9 +908,11 @@
                                                     </thead>
                                                     <tbody>
                                                         <template x-for="ingName in recipePicked.ingredients">
-                                                            <tr>
-                                                                <td x-text="ingName.name"></td>
-                                                            </tr>
+                                                            <template x-if="ingName.isActive">
+                                                                <tr>
+                                                                    <td x-text="ingName.name"></td>
+                                                                </tr>
+                                                            </template>
                                                         </template>
                                                     </tbody>
                                                 </table>
@@ -917,9 +926,11 @@
                                                     </thead>
                                                     <tbody>
                                                         <template x-for="instruction in recipePicked.instructions">
-                                                            <tr>
-                                                                <td x-text="instruction.name"></td>
-                                                            </tr>
+                                                            <template x-if="instruction.isActive">
+                                                                <tr>
+                                                                    <td x-text="instruction.name"></td>
+                                                                </tr>
+                                                            </template>
                                                         </template>
                                                     </tbody>
                                                 </table>
@@ -1005,7 +1016,7 @@
                         <div class="row justify-content-center p-4">
                             @*Recipes Creation form*@
                             <div class="col-md-5">
-                                <div x-data="{newRecipe: {id: '@Model.GetID()',title: '',ingredients: [],instructions: [],categories: []},myCategories: []}"
+                                <div x-data="{newRecipe: {title: '',ingredients: [],instructions: [],categories: []},myCategories: []}"
                                     x-init="myCategories = await getCategoriesAsync(tokens)">
                                     <form method="post"
                                         x-on:submit.prevent="async()=>{await recipeToPostAsync(newRecipe,myCategories,tokens)}"
@@ -1023,7 +1034,7 @@
                                             <label for="recipeIngredients">Ingredients</label>
                                             <button type="button" class="btn btn-sm mx-3 my-1"
                                                 style="background-color: #2C7A48; color:white;"
-                                                x-on:click="newRecipe.ingredients.push(null)">
+                                                x-on:click="newRecipe.ingredients.push({name:'', isActive: true})">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
                                                     <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
@@ -1035,24 +1046,26 @@
                                             <div id="newRowIng py-1">
                                                 <input type="hidden" id="ingredientsCount" value="0">
                                                 <template x-for="(ingredient,index) in newRecipe.ingredients">
-                                                    <div class="input-group pb-1">
-                                                        <input type="text" class="form-control py-1"
-                                                            id="recipeIngredients" name="recipeIngredients"
-                                                            x-model="newRecipe.ingredients[index]"
-                                                            placeholder="Ingredients"
-                                                            aria-describedby="removeIngredient" required>
-                                                        <button type="button" tabindex="-1"
-                                                            class="btn btn-danger btn-sm" id="removeIngredient"
-                                                            x-on:click="newRecipe.ingredients.splice(index,1)">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12"
-                                                                height="12" fill="currentColor"
-                                                                class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                                                <path
-                                                                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
-                                                                </path>
-                                                            </svg>
-                                                        </button>
-                                                    </div>
+                                                    <template x-if="newRecipe.ingredients[index].isActive = true">
+                                                        <div class="input-group pb-1">
+                                                            <input type="text" class="form-control py-1"
+                                                                id="recipeIngredients" name="recipeIngredients"
+                                                                x-model="newRecipe.ingredients[index].name"
+                                                                placeholder="Ingredients"
+                                                                aria-describedby="removeIngredient" required>
+                                                            <button type="button" tabindex="-1"
+                                                                class="btn btn-danger btn-sm" id="removeIngredient"
+                                                                x-on:click="newRecipe.ingredients.splice(index,1)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                                    height="12" fill="currentColor"
+                                                                    class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                    <path
+                                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </template>
                                                 </template>
                                             </div>
                                         </div>
@@ -1060,7 +1073,7 @@
                                             <label for="recipeInstructions">Instructions</label>
                                             <button type="button" class="btn btn-sm mx-3 my-1"
                                                 style="background-color: #2C7A48; color:white;"
-                                                x-on:click="newRecipe.instructions.push(null)">
+                                                x-on:click="newRecipe.instructions.push({name:'', isActive: true})">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
                                                     <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
@@ -1072,25 +1085,27 @@
                                             <div id="newRowIns py-1">
                                                 <input type="hidden" id="instructionsCount" value="0">
                                                 <template x-for="(instruction,index) in newRecipe.instructions">
-                                                    <div class="input-group pb-1">
-                                                        <input type="text" class="form-control py-1"
-                                                            id="recipeInstructions" name="recipeInstructions"
-                                                            x-model="newRecipe.instructions[index]"
-                                                            placeholder="Instruction"
-                                                            aria-describedby="removeInstruction" required>
-                                                        <button type="button" class="btn btn-danger btn-sm"
-                                                            id="removeInstruction"
-                                                            x-on:click="newRecipe.instructions.splice(index,1)"
-                                                            tabindex="-1">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12"
-                                                                height="12" fill="currentColor"
-                                                                class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                                                <path
-                                                                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
-                                                                </path>
-                                                            </svg>
-                                                        </button>
-                                                    </div>
+                                                    <template x-if="newRecipe.instructions[index] = true">
+                                                        <div class="input-group pb-1">
+                                                            <input type="text" class="form-control py-1"
+                                                                id="recipeInstructions" name="recipeInstructions"
+                                                                x-model="newRecipe.instructions[index].name"
+                                                                placeholder="Instruction"
+                                                                aria-describedby="removeInstruction" required>
+                                                            <button type="button" class="btn btn-danger btn-sm"
+                                                                id="removeInstruction"
+                                                                x-on:click="newRecipe.instructions.splice(index,1)"
+                                                                tabindex="-1">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                                    height="12" fill="currentColor"
+                                                                    class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                                    <path
+                                                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </template>
                                                 </template>
                                             </div>
                                         </div>
@@ -1112,7 +1127,7 @@
                             </div>
                             @*Categories Creation form*@
                             <div class="col-md-5">
-                                <div x-data="{ newCategory: {id: '@Model.GetID()',name: ''}}">
+                                <div x-data="{ newCategory: {name: ''}}">
                                     <form method="post" class="form-control shadow-sm"
                                         x-on:submit.prevent="async ()=>{await categoryToPostAsync(newCategory,tokens)}">
                                         <div class="form-label text-center">
