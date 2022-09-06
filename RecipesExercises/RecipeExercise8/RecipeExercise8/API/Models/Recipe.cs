@@ -1,23 +1,24 @@
 public class Recipe
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public string Title { get; set; }
-    public List<string> Ingredients { get; set; } = new List<string>();
-    public List<string> Instructions { get; set; } = new List<string>();
-    public List<Category> Categories { get; set; } = new List<Category>();
+    public List<Ingredient> Ingredients { get; set; } = new ();
+    public List<Instruction> Instructions { get; set; } = new ();
+    public List<Category> Categories { get; set; } = new ();
+    public bool IsActive { get; set; }
 
     public Recipe()
     {
-        Id = Guid.NewGuid(); // Generate a unique ID for each recipe
         Title = string.Empty;
     }
 
-    public Recipe(Guid id, string title, List<string> ingredients, List<string> instructions, List<Category> categories)
+    public Recipe(int id, string title, List<Ingredient> ingredients, List<Instruction> instructions, List<Category> categories, bool isActive)
     {
         Id = id;
         Title = title;
         Ingredients = ingredients;
         Instructions = instructions;
         Categories = categories;
+        IsActive = isActive;
     }
 }

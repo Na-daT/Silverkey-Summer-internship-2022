@@ -1,23 +1,23 @@
-using System.ComponentModel.DataAnnotations;
-using FluentValidation.AspNetCore;
-using FluentValidation;
-
-
-namespace Client_Ex4.Models;
 public class Category
 {
-    [Key]
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
+    public bool IsActive { get; set; }
 
     public Category()
     {
+        Name = string.Empty;
     }
-}
-public class CategoryValidator : AbstractValidator<Category>
-{
-    public CategoryValidator()
+
+    public Category(int id, string name, bool isActive)
     {
-        RuleFor(_ => _.Name).NotNull().Length(3, 50);
+        Id = id;
+        Name = name;
+        IsActive = isActive;
+    }
+
+    public Category(string name)
+    {
+        Name = name;
     }
 }
