@@ -21,28 +21,28 @@ using View.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    var securityScheme = new OpenApiSecurityScheme
-    {
-        Name = "JWT Authentication",
-        Description = "Enter JWT Bearer token",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        Reference = new OpenApiReference
-        {
-            Id = JwtBearerDefaults.AuthenticationScheme,
-            Type = ReferenceType.SecurityScheme
-        }
-    };
-    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {securityScheme, new string[] { }}
-    });
-});
+//builder.Services.AddSwaggerGen(c =>
+//{
+//    var securityScheme = new OpenApiSecurityScheme
+//    {
+//        Name = "JWT Authentication",
+//        Description = "Enter JWT Bearer token",
+//        In = ParameterLocation.Header,
+//        Type = SecuritySchemeType.Http,
+//        Scheme = "bearer",
+//        BearerFormat = "JWT",
+//        Reference = new OpenApiReference
+//        {
+//            Id = JwtBearerDefaults.AuthenticationScheme,
+//            Type = ReferenceType.SecurityScheme
+//        }
+//    };
+//    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+//    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+//    {
+//        {securityScheme, new string[] { }}
+//    });
+//});
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -97,15 +97,15 @@ builder.Logging.AddConsole();
 builder.Services.AddTransient<ITokenService, TokenService>();
 var app = builder.Build();
 app.UseCors();
-app.UseSwagger();
-app.UseSwaggerUI();
+//app.UseSwagger();
+//app.UseSwaggerUI();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix = String.Empty;
-});
+//app.UseSwaggerUI(options =>
+//{
+//    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+//    options.RoutePrefix = String.Empty;
+//});
 var options = new JsonSerializerOptions
 {
     PropertyNameCaseInsensitive = true,
@@ -240,43 +240,54 @@ app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token)
 
 app.MapGet("api/json/recipes", [Authorize] async Task<List<RecipeMenuView>> (RecipesAppDataContext dbContext) =>
 {
-    var recipes = await dbContext.Recipes.ProjectToRecipeMenuView().ToListAsync();
-    return recipes;
+    var recipes = await dbContext.Recipes.Where(x => x.IsActive).ProjectToRecipeMenuView().ToListAsync();
+    foreach(var recipe in recipes)
+    {
+        recipe.Instructions = recipe.Instructions.Where(x => x.IsActive).ToList();
+        recipe.Ingredients = recipe.Ingredients.Where(x => x.IsActive).ToList();
+        recipe.RecipeCategories = recipe.RecipeCategories.Where(x => x.IsActive).ToList();
+    }
+    return recipes.OrderBy(x => x.Title).ToList();
 });
 
 app.MapGet("api/json/categories", [Authorize] async Task<List<recipesApp.EntityClasses.Category>> (RecipesAppDataContext dbContext) =>
 {
-    var categories = await dbContext.Categories.ToListAsync();
-    return categories;
+    var categories = await dbContext.Categories.Where(x=>x.IsActive).ToListAsync();
+    return categories.OrderBy(x => x.Name).ToList();
 }); 
 
 app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPost, RecipesAppDataContext dbContext) =>
 {
+    Console.WriteLine("abl l transaction");
     using (var transaction = dbContext.Database.BeginTransaction())
     {
+        Console.WriteLine("abl l try block");
         try
         {
-            var rec = new recipesApp.EntityClasses.Recipe() { Title = recipeToPost.Title };
-            await dbContext.Recipes.AddAsync(rec);
-
-            var ingredientsList = new List<Ingredient>();
-            var instuctionsList = new List<Instruction>();
+            var recipe = new recipesApp.EntityClasses.Recipe() { Title = recipeToPost.Title, IsActive = true };
+            await dbContext.Recipes.AddAsync(recipe);
+            Console.WriteLine(recipe.Id);
+            
+            var ingredientsList = new List<recipesApp.EntityClasses.Ingredient>();
+            var instuctionsList = new List<recipesApp.EntityClasses.Instruction>();
             var recipeCategories = new List<RecipeCategory>();
 
             foreach (var ingredient in recipeToPost.Ingredients)
-                ingredientsList.Add(new Ingredient() { Name = ingredient, RecipeId = rec.Id });
-            await dbContext.Ingredients.AddRangeAsync(ingredientsList.ToArray());
+                ingredientsList.Add(new recipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe });
+            Console.WriteLine("abl el ingredients add");
+            await dbContext.Ingredients.AddRangeAsync(ingredientsList);
+            Console.WriteLine("b3d el ingredients add");
 
             foreach (var instruction in recipeToPost.Instructions)
-                instuctionsList.Add(new Instruction { Name = instruction, RecipeId = rec.Id });
-            await dbContext.Instructions.AddRangeAsync(instuctionsList.ToArray());
-            
-            foreach (var category in recipeToPost.Categories)
-                recipeCategories.Add(new RecipeCategory { CategoryId = category.Id, RecipeId = rec.Id });
-            await dbContext.RecipeCategories.AddRangeAsync(recipeCategories.ToArray());
+                instuctionsList.Add(new recipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe });
+            await dbContext.Instructions.AddRangeAsync(instuctionsList);
 
-            await transaction.CommitAsync();
+            foreach (var category in recipeToPost.Categories)
+                recipeCategories.Add(new RecipeCategory { CategoryId = category.Id, Recipe = recipe });
+            await dbContext.RecipeCategories.AddRangeAsync(recipeCategories);
+
             await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
             return Results.Ok();
         }
         catch (Exception e)
@@ -288,92 +299,146 @@ app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPos
     }
 });
 
-app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpdate) =>
+app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpdate, RecipesAppDataContext dbContext) =>
 {
-    try
+    using (var transaction = dbContext.Database.BeginTransaction())
     {
-        var recipes = await FileHandler.ReadAsync("recipe.json");
-        var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
-        if (recipesList is null)
-            throw new Exception("Could not deserialize recipes list");
-        var recipe = recipesList.FirstOrDefault(x => x.Id == recipeToUpdate.Id);
-        if (recipe is null)
-            return Results.StatusCode(404);
-        recipesList[recipesList.IndexOf(recipe)] = recipeToUpdate;
-        var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipe.json", json);
-        return Results.Ok();
-    }
-    catch (Exception e)
-    {
-        app.Logger.LogError(e.Message);
-        return Results.StatusCode(500);
+        try
+        {
+            var recipe = await dbContext.Recipes.FindAsync(recipeToUpdate.Id);
+            if (recipe is null)
+                throw new Exception("Recipe not found");
+                
+            recipe.Title = recipeToUpdate.Title;
+            dbContext.Update(recipe);
+                
+            var ingredientsList = new List<recipesApp.EntityClasses.Ingredient>();
+            var instuctionsList = new List<recipesApp.EntityClasses.Instruction>();
+            var recipeCategories = new List<RecipeCategory>();
+
+            foreach (var ingredient in recipeToUpdate.Ingredients)
+            {
+                var ingredientToUpdate = await dbContext.Ingredients.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == ingredient.Name);
+                if (ingredientToUpdate is null && ingredient.IsActive)
+                    ingredientsList.Add(new recipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe, IsActive = true });
+                else
+                {
+                    ingredientToUpdate!.Name = ingredient.Name;
+                    ingredientToUpdate.IsActive = ingredient.IsActive;
+                    dbContext.Update(ingredientToUpdate);
+                }
+            }
+            await dbContext.Ingredients.AddRangeAsync(ingredientsList);
+
+            foreach (var instruction in recipeToUpdate.Instructions)
+            {
+                var instructionToUpdate = await dbContext.Instructions.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == instruction.Name);
+                if (instructionToUpdate is null && instruction.IsActive)
+                    instuctionsList.Add(new recipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe, IsActive = true });
+                else
+                {
+                    instructionToUpdate!.Name = instruction.Name;
+                    instructionToUpdate.IsActive = instruction.IsActive;
+                    dbContext.Update(instructionToUpdate);
+                }
+            }
+            await dbContext.Instructions.AddRangeAsync(instuctionsList);
+
+            foreach (var recipeCategory in dbContext.RecipeCategories.Where(x => x.RecipeId == recipeToUpdate.Id))
+                if (!recipeToUpdate.Categories.Any(x => x.Id == recipeCategory.CategoryId))
+                    recipeCategory.IsActive = false;
+            dbContext.UpdateRange(dbContext.RecipeCategories.Where(x => x.RecipeId == recipeToUpdate.Id));
+
+            foreach (var category in recipeToUpdate.Categories)
+            {
+                var dbCategory = await dbContext.Categories.FindAsync(category.Id);
+                if (dbCategory is null)
+                    throw new Exception("Category not found");
+                else if (!dbContext.RecipeCategories.Any(x => x.RecipeId == recipeToUpdate.Id && x.CategoryId == category.Id && x.IsActive))
+                    recipeCategories.Add(new RecipeCategory { Category = dbCategory!, Recipe = recipe, IsActive = true });
+            }
+            
+            await dbContext.RecipeCategories.AddRangeAsync(recipeCategories);
+            
+            await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return Results.Ok();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            app.Logger.LogError(e.Message);
+            return Results.StatusCode(500);
+        }
     }
 });
 
-app.MapDelete("api/json/recipes/{id}", [Authorize] async (Guid id) =>
+app.MapDelete("api/json/recipes/{id}", [Authorize] async (int id, RecipesAppDataContext dbContext) =>
 {
-    try
+    using (var transaction = dbContext.Database.BeginTransaction())
     {
-        var recipes = await FileHandler.ReadAsync("recipe.json");
-        var recipesList = await JsonHandler.DeserializeAsync<List<Recipe>>(recipes);
-        if (recipesList is null)
-            throw new Exception("Could not deserialize recipes list");
-        var recipe = recipesList.FirstOrDefault(x => x.Id == id);
-        if (recipe is null)
-            return Results.StatusCode(404);
-        recipesList.Remove(recipe);
-        var json = await JsonHandler.SerializeAsync(recipesList);
-        await FileHandler.WriteAsync("recipe.json", json);
-        return Results.Ok();
-    }
-    catch (Exception e)
-    {
-        app.Logger.LogError(e.Message);
-        return Results.StatusCode(500);
+        try
+        {
+            var recipe = await dbContext.Recipes.FindAsync(id);
+            if (recipe is null)
+                throw new Exception("Recipe not found");
+            recipe.IsActive = false;
+            dbContext.Update(recipe);
+            await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return Results.Ok();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            app.Logger.LogError(e.Message);
+            return Results.StatusCode(500);
+        }
     }
 });
 
-app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category categoryToPost) =>
+app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category categoryToPost, RecipesAppDataContext dbContext) =>
 {
-    try
+    using (var transaction = dbContext.Database.BeginTransaction())
     {
-        var categories = await FileHandler.ReadAsync("category.json");
-        var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
-        if (categoriesList is null)
-            throw new Exception("Could not deserialize categories list");
-        categoriesList.Add(categoryToPost);
-        var json = await JsonHandler.SerializeAsync(categoriesList);
-        await FileHandler.WriteAsync("category.json", json);
-        return Results.Ok();
-    }
-    catch (Exception e)
-    {
-        app.Logger.LogError(e.Message);
-        return Results.StatusCode(500);
+        try
+        {
+            var category = new recipesApp.EntityClasses.Category() { Name = categoryToPost.Name, IsActive = true };
+            await dbContext.Categories.AddAsync(category);
+            await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return Results.Ok();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            app.Logger.LogError(e.Message);
+            return Results.StatusCode(500);
+        }
     }
 });
 
-app.MapPut("api/json/categories", [Authorize] async ([FromBody] Category categoryToUpdate) =>
+app.MapPut("api/json/categories", [Authorize] async ([FromBody] Category categoryToUpdate, RecipesAppDataContext dbContext) =>
 {
-    try
+    using (var transaction = dbContext.Database.BeginTransaction())
     {
-        var categories = await FileHandler.ReadAsync("category.json");
-        var categoriesList = await JsonHandler.DeserializeAsync<List<Category>>(categories);
-        if (categoriesList is null)
-            throw new Exception("Could not deserialize categories list");
-        var category = categoriesList.FirstOrDefault(x => x.Id == categoryToUpdate.Id);
-        if (category is null)
-            return Results.StatusCode(404);
-        category.Name = categoryToUpdate.Name;
-        var json = await JsonHandler.SerializeAsync(categoriesList);
-        await FileHandler.WriteAsync("category.json", json);
-        return Results.Ok();
-    }
-    catch (Exception e)
-    {
-        app.Logger.LogError(e.Message);
-        return Results.StatusCode(500);
+        try
+        {
+            var category = await dbContext.Categories.FindAsync(categoryToUpdate.Id);
+            if (category is null)
+                throw new Exception("Category not found");
+            category.Name = categoryToUpdate.Name;
+            dbContext.Update(category);
+            await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return Results.Ok();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            app.Logger.LogError(e.Message);
+            return Results.StatusCode(500);
+        }
     }
 });
 
