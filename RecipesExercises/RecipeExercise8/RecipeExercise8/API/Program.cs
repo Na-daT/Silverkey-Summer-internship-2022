@@ -265,15 +265,15 @@ app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPos
 
             foreach (var ingredient in recipeToPost.Ingredients)
                 ingredientsList.Add(new Ingredient() { Name = ingredient, RecipeId = rec.Id });
-            await dbContext.Ingredients.AddRangeAsync(ingredientsList);
+            await dbContext.Ingredients.AddRangeAsync(ingredientsList.ToArray());
 
             foreach (var instruction in recipeToPost.Instructions)
                 instuctionsList.Add(new Instruction { Name = instruction, RecipeId = rec.Id });
-            await dbContext.Instructions.AddRangeAsync(instuctionsList);
+            await dbContext.Instructions.AddRangeAsync(instuctionsList.ToArray());
             
             foreach (var category in recipeToPost.Categories)
                 recipeCategories.Add(new RecipeCategory { CategoryId = category.Id, RecipeId = rec.Id });
-            await dbContext.RecipeCategories.AddRangeAsync(recipeCategories);
+            await dbContext.RecipeCategories.AddRangeAsync(recipeCategories.ToArray());
 
             await transaction.CommitAsync();
             await dbContext.SaveChangesAsync();
