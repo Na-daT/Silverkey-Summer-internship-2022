@@ -19,5 +19,5 @@ A collection of projects using Asp.Net, Razor pages, Minimal APIs and grpc servi
 - ### [Exercise 6](https://github.com/Na-daT/Silverkey-Summer-internship-2022/tree/main/RecipesExercises/RecipeExercise6)
   Secured API using JWT and Refresh tokens.
   
-- ### [Exercise 8]()
+- ### [Exercise 8](https://github.com/Na-daT/Silverkey-Summer-internship-2022/tree/main/RecipesExercises/RecipeExercise8/RecipeExercise8)
   Changed the JSON API to use my database instead. Used PostgreSQL and FluentMigrator to generate the database and LLBLGEN PRO as the ORM.
