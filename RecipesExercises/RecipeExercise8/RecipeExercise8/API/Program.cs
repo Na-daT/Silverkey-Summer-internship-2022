@@ -5,18 +5,12 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
-using SD.LLBLGen.Pro.ORMSupportClasses;
-using SD.LLBLGen.Pro.DQE.PostgreSql;
-using Npgsql;
-using recipesApp;
-using recipesApp.EntityClasses;
+using RecipesApp;
+using RecipesApp.EntityClasses;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Store.PartnerCenter.Models.Query;
 using View.DtoClasses;
 using View.Persistence;
-//using recipesApp.Linq;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -223,7 +217,7 @@ app.MapGet("api/json/recipes", [Authorize] async Task<List<RecipeMenuView>> (Rec
     return recipes.OrderBy(x => x.Title).ToList();
 });
 
-app.MapGet("api/json/categories", [Authorize] async Task<List<recipesApp.EntityClasses.Category>> (RecipesAppDataContext dbContext) =>
+app.MapGet("api/json/categories", [Authorize] async Task<List<RecipesApp.EntityClasses.Category>> (RecipesAppDataContext dbContext) =>
 {
     var categories = await dbContext.Categories.Where(x=>x.IsActive).ToListAsync();
     return categories.OrderBy(x => x.Name).ToList();
@@ -235,19 +229,19 @@ app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPos
     {
         try
         {
-            var recipe = new recipesApp.EntityClasses.Recipe() { Title = recipeToPost.Title, IsActive = true };
+            var recipe = new RecipesApp.EntityClasses.Recipe() { Title = recipeToPost.Title, IsActive = true };
             await dbContext.Recipes.AddAsync(recipe);
             
-            var ingredientsList = new List<recipesApp.EntityClasses.Ingredient>();
-            var instuctionsList = new List<recipesApp.EntityClasses.Instruction>();
+            var ingredientsList = new List<RecipesApp.EntityClasses.Ingredient>();
+            var instuctionsList = new List<RecipesApp.EntityClasses.Instruction>();
             var recipeCategories = new List<RecipeCategory>();
 
             foreach (var ingredient in recipeToPost.Ingredients)
-                ingredientsList.Add(new recipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe });
+                ingredientsList.Add(new RecipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe });
             await dbContext.Ingredients.AddRangeAsync(ingredientsList);
 
             foreach (var instruction in recipeToPost.Instructions)
-                instuctionsList.Add(new recipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe });
+                instuctionsList.Add(new RecipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe });
             await dbContext.Instructions.AddRangeAsync(instuctionsList);
 
             foreach (var category in recipeToPost.Categories)
@@ -279,15 +273,15 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
                 
             recipe.Title = recipeToUpdate.Title;
             dbContext.Update(recipe);
-            var ingredientsList = new List<recipesApp.EntityClasses.Ingredient>();
-            var instuctionsList = new List<recipesApp.EntityClasses.Instruction>();
+            var ingredientsList = new List<RecipesApp.EntityClasses.Ingredient>();
+            var instuctionsList = new List<RecipesApp.EntityClasses.Instruction>();
             var recipeCategories = new List<RecipeCategory>();
             
             foreach (var ingredient in recipeToUpdate.Ingredients)
             {
                 var ingredientToUpdate = await dbContext.Ingredients.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == ingredient.Name);
                 if (ingredientToUpdate is null && ingredient.IsActive)
-                    ingredientsList.Add(new recipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe, IsActive = true });
+                    ingredientsList.Add(new RecipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe, IsActive = true });
                 else
                 {
                     ingredientToUpdate!.Name = ingredient.Name;
@@ -301,7 +295,7 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
             {
                 var instructionToUpdate = await dbContext.Instructions.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == instruction.Name);
                 if (instructionToUpdate is null && instruction.IsActive)
-                    instuctionsList.Add(new recipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe, IsActive = true });
+                    instuctionsList.Add(new RecipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe, IsActive = true });
                 else
                 {
                     instructionToUpdate!.Name = instruction.Name;
@@ -369,7 +363,7 @@ app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category catego
     {
         try
         {
-            var category = new recipesApp.EntityClasses.Category() { Name = categoryToPost.Name, IsActive = true };
+            var category = new RecipesApp.EntityClasses.Category() { Name = categoryToPost.Name, IsActive = true };
             await dbContext.Categories.AddAsync(category);
             await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();

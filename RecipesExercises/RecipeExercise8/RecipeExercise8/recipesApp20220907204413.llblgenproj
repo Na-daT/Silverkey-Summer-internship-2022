@@ -234,7 +234,7 @@
       <Catalogs>
         <Catalog Name="recipesapp">
           <Schemas>
-            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-07T18:44:24.3854303Z">
+            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-06T17:45:22.3364457Z">
               <Sequences>
                 <Sequence Name="category_id_seq" />
                 <Sequence Name="ingredient_id_seq" />
