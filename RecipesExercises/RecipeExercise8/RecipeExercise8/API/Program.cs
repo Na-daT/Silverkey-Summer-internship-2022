@@ -59,16 +59,6 @@ builder.Services.AddAuthentication(options =>
              IssuerSigningKey = new SymmetricSecurityKey
                (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
          };
-         //  c.Events.OnMessageReceived = context =>
-         //  {
-
-         //      if (context.Request.Cookies.ContainsKey("X-Access-Token"))
-         //      {
-         //          context.Token = context.Request.Cookies["X-Access-Token"];
-         //      }
-
-         //      return Task.CompletedTask;
-         //  };
      });
 
 builder.Services.AddAuthorization();
@@ -85,10 +75,11 @@ var options = new JsonSerializerOptions
     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     WriteIndented = true,
 };
+var connectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("ConnectionStrings")["ConnectionString.Postgres Server"];
 
 app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel) =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
@@ -121,7 +112,7 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
 
 app.MapPost("api/json/register", [AllowAnonymous] async ([FromBody] RegisterModel newUser) =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
@@ -150,7 +141,7 @@ app.MapPost("api/json/register", [AllowAnonymous] async ([FromBody] RegisterMode
 
 app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] RefreshRequest request, HttpContext context) =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
@@ -187,7 +178,7 @@ app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] Refresh
 
 app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token) =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
@@ -209,25 +200,25 @@ app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token)
     }
 });
 
-app.MapGet("api/json/recipes", [AllowAnonymous] async Task<List<RecipeMenu>> () =>
+app.MapGet("api/json/recipes", [Authorize] async Task<List<RecipeMenu>> () =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         var metaData = new LinqMetaData(adapter);
         var recipes = await metaData.Recipe.Where(x => x.IsActive).ProjectToRecipeMenu().ToListAsync();
         foreach (var recipe in recipes)
         {
-            recipe.Instructions = recipe.Instructions.Where(x => x.IsActive).ToList();
-            recipe.Ingredients = recipe.Ingredients.Where(x => x.IsActive).ToList();
+            recipe.Instructions = recipe.Instructions.Where(x => x.IsActive).OrderBy(x=>x.Id).ToList();
+            recipe.Ingredients = recipe.Ingredients.Where(x => x.IsActive).OrderBy(x => x.Id).ToList();
             recipe.RecipeCategories = recipe.RecipeCategories.Where(x => x.IsActive).ToList();
         }
         return recipes.OrderBy(x => x.Title).ToList();
     }
 });
 
-app.MapGet("api/json/categories", [AllowAnonymous] async Task<List<CategoryEntity>> () =>
+app.MapGet("api/json/categories", [Authorize] async Task<List<CategoryEntity>> () =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         var metaData = new LinqMetaData(adapter);
         var categories = await metaData.Category.Where(x => x.IsActive).ToListAsync();
@@ -235,10 +226,10 @@ app.MapGet("api/json/categories", [AllowAnonymous] async Task<List<CategoryEntit
     }
 }); 
 
-app.MapPost("api/json/recipes", [AllowAnonymous] async ([FromBody] Recipe recipeToPost) =>
+app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPost) =>
 {
     
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
@@ -272,7 +263,7 @@ app.MapPost("api/json/recipes", [AllowAnonymous] async ([FromBody] Recipe recipe
 
 app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpdate) =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
@@ -283,13 +274,13 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
             recipeFetched.Title = recipeToUpdate.Title;
             await adapter.SaveEntityAsync(recipeFetched);
             
-            var ingredientsList = new EntityCollection<IngredientEntity>();
-            var instuctionsList = new EntityCollection<InstructionEntity>();
-            var recipeCategories = new EntityCollection<RecipeCategoryEntity>();
+            var ingredientsList = new List<IngredientEntity>();
+            var instuctionsList = new List<InstructionEntity>();
+            var recipeCategories = new List<RecipeCategoryEntity>();
 
             foreach (var ingredient in recipeToUpdate.Ingredients)
             {
-                var ingredientToUpdate = await metaData.Ingredient.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == ingredient.Name);
+                var ingredientToUpdate = await metaData.Ingredient.FirstOrDefaultAsync(x => x.Id == ingredient.Id && x.IsActive);
                 if (ingredientToUpdate is null && ingredient.IsActive)
                     ingredientsList.Add(new IngredientEntity() { Name = ingredient.Name, Recipe = recipeFetched, IsActive = true });
                 else
@@ -299,11 +290,12 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
                     await adapter.SaveEntityAsync(ingredientToUpdate);
                 }
             }
-            await adapter.SaveEntityCollectionAsync(ingredientsList);
+            foreach (var i in ingredientsList)
+                await adapter.SaveEntityAsync(i);
 
             foreach (var instruction in recipeToUpdate.Instructions)
             {
-                var instructionToUpdate = await metaData.Instruction.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == instruction.Name);
+                var instructionToUpdate = await metaData.Instruction.FirstOrDefaultAsync(x => x.Id == instruction.Id && x.IsActive);
                 if (instructionToUpdate is null && instruction.IsActive)
                     instuctionsList.Add(new InstructionEntity { Name = instruction.Name, Recipe = recipeFetched, IsActive = true });
                 else
@@ -313,15 +305,16 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
                     await adapter.SaveEntityAsync(instructionToUpdate);
                 }
             }
-            await adapter.SaveEntityCollectionAsync(instuctionsList);
+            foreach (var i in instuctionsList)
+                await adapter.SaveEntityAsync(i);
 
             foreach (var recipeCategory in metaData.RecipeCategory.Where(x => x.RecipeId == recipeToUpdate.Id))
                 if (!recipeToUpdate.Categories.Any(x => x.Id == recipeCategory.CategoryId))
                     recipeCategory.IsActive = false;
-            var idk = metaData.RecipeCategory.Where(x => x.RecipeId == recipeToUpdate.Id).ToList();
-            foreach (var c in idk)
+            var newCategories = metaData.RecipeCategory.Where(x => x.RecipeId == recipeToUpdate.Id).ToList();
+            foreach (var c in newCategories)
                await adapter.SaveEntityAsync(c);
-
+            
             foreach (var category in recipeToUpdate.Categories)
             {
                 var dbCategory = await metaData.Category.FirstOrDefaultAsync(c=> c.Id == category.Id);
@@ -330,11 +323,13 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
                 else if (!metaData.RecipeCategory.Any(x => x.RecipeId == recipeToUpdate.Id && x.CategoryId == category.Id && x.IsActive))
                     recipeCategories.Add(new RecipeCategoryEntity { Category = dbCategory, Recipe = recipeFetched, IsActive = true });
             }
-            await adapter.SaveEntityCollectionAsync(recipeCategories);
+            foreach (var c in recipeCategories)
+                await adapter.SaveEntityAsync(c);
             return Results.Ok();
         }
         catch (Exception e)
         {
+            app.Logger.LogError(e.Message);
             return Results.BadRequest(e.Message);
         }
     }
@@ -342,7 +337,7 @@ app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpda
 
 app.MapDelete("api/json/recipes/{id}", [Authorize] async (int id) =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
@@ -364,7 +359,7 @@ app.MapDelete("api/json/recipes/{id}", [Authorize] async (int id) =>
 
 app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category categoryToPost) =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
@@ -381,7 +376,7 @@ app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category catego
 
 app.MapPut("api/json/categories", [Authorize] async ([FromBody] Category categoryToUpdate) =>
 {
-    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    using (var adapter = new DataAccessAdapter(connectionString))
     {
         try
         {
