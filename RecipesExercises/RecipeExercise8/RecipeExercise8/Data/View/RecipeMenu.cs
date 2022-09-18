@@ -11,35 +11,38 @@ namespace View.DtoClasses
 	/// <summary> DTO class which is derived from the entity 'Recipe'.</summary>
 	[Serializable]
 	[DataContract]
-	public partial class RecipeMenuView
+	public partial class RecipeMenu
 	{
 		/// <summary>Gets or sets the Id field. Derived from Entity Model Field 'Recipe.Id'</summary>
 		[DataMember]
 		public System.Int32 Id { get; set; }
 		/// <summary>Gets or sets the Ingredients field. </summary>
 		[DataMember]
-		public List<RecipeMenuViewTypes.Ingredient> Ingredients { get; set; }
+		public List<RecipeMenuTypes.Ingredient> Ingredients { get; set; }
 		/// <summary>Gets or sets the Instructions field. </summary>
 		[DataMember]
-		public List<RecipeMenuViewTypes.Instruction> Instructions { get; set; }
+		public List<RecipeMenuTypes.Instruction> Instructions { get; set; }
 		/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'Recipe.IsActive'</summary>
 		[DataMember]
 		public System.Boolean IsActive { get; set; }
 		/// <summary>Gets or sets the RecipeCategories field. </summary>
 		[DataMember]
-		public List<RecipeMenuViewTypes.RecipeCategory> RecipeCategories { get; set; }
+		public List<RecipeMenuTypes.RecipeCategory> RecipeCategories { get; set; }
 		/// <summary>Gets or sets the Title field. Derived from Entity Model Field 'Recipe.Title'</summary>
 		[DataMember]
 		public System.String Title { get; set; }
 	}
 
-	namespace RecipeMenuViewTypes
+	namespace RecipeMenuTypes
 	{
 		/// <summary> DTO class which is derived from the entity 'Ingredient (Ingredients)'.</summary>
 		[Serializable]
 		[DataContract]
 		public partial class Ingredient
 		{
+			/// <summary>Gets or sets the Id field. Derived from Entity Model Field 'Ingredient.Id'</summary>
+			[DataMember]
+			public System.Int32 Id { get; set; }
 			/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'Ingredient.IsActive'</summary>
 			[DataMember]
 			public System.Boolean IsActive { get; set; }
@@ -53,6 +56,9 @@ namespace View.DtoClasses
 		[DataContract]
 		public partial class Instruction
 		{
+			/// <summary>Gets or sets the Id field. Derived from Entity Model Field 'Instruction.Id'</summary>
+			[DataMember]
+			public System.Int32 Id { get; set; }
 			/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'Instruction.IsActive'</summary>
 			[DataMember]
 			public System.Boolean IsActive { get; set; }
@@ -69,6 +75,9 @@ namespace View.DtoClasses
 			/// <summary>Gets or sets the Category field. </summary>
 			[DataMember]
 			public RecipeCategoryTypes.Category Category { get; set; }
+			/// <summary>Gets or sets the CategoryId field. Derived from Entity Model Field 'RecipeCategory.CategoryId (FK)'</summary>
+			[DataMember]
+			public System.Int32 CategoryId { get; set; }
 			/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'RecipeCategory.IsActive'</summary>
 			[DataMember]
 			public System.Boolean IsActive { get; set; }
@@ -81,6 +90,9 @@ namespace View.DtoClasses
 			[DataContract]
 			public partial class Category
 			{
+				/// <summary>Gets or sets the IsActive field. Derived from Entity Model Field 'Category.IsActive'</summary>
+				[DataMember]
+				public System.Boolean IsActive { get; set; }
 				/// <summary>Gets or sets the Name field. Derived from Entity Model Field 'Category.Name'</summary>
 				[DataMember]
 				public System.String Name { get; set; }

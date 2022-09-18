@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--LLBLGen Pro v5.9 project file. Do not manually edit this file. Incorrect references could lead to an unloadable project file.-->
-<Project Version="5.9" TargetFrameworkName="Entity Framework Core v6" UseLegacyDefaults="false">
+<Project Version="5.9" TargetFrameworkName="LLBLGen Pro Runtime Framework" UseLegacyDefaults="false">
   <Properties>
     <Abbreviations />
     <Property Name="AdditionalTaskPerformerFolder" Value="" />
@@ -52,7 +52,7 @@
     <Property Name="PreferVariableLengthTypes" Value="true" />
     <Property Name="PrimaryKeyConstraintPattern" Value="PK_{$Guid}" />
     <Property Name="ProjectCreator" Value="nada" />
-    <Property Name="ProjectName" Value="recipesApp" />
+    <Property Name="ProjectName" Value="recipeDatabase" />
     <Property Name="ReflectNullabilityOfElementFieldInTargetField_v5" Value="false" />
     <Property Name="ReflectTypeOfElementFieldInTargetField_v5" Value="true" />
     <Property Name="RelationalModelDataElementNameCasingCaseInsensitiveDBs" Value="3" />
@@ -96,89 +96,76 @@
   <CodeGenerationCyclePreferences>
     <OutputType Value="3">
       <LastUsedPreferences>
-        <DestinationRootFolder Value="D:\Work_exercises\Silverkey-Summer-internship-2022\RecipesExercises\RecipeExercise8\RecipeExercise8\Data" />
-        <FrameworkName Value="Entity Framework Core v6" />
+        <DestinationRootFolder Value=".\Data" />
+        <FrameworkName Value="LLBLGen Pro Runtime Framework" />
         <LanguageName Value="C#" />
         <PlatformName Value=".NET 6" />
-        <PresetName Value="SD.EntityFramework.Core v6" />
-        <RootNamespace Value="RecipesApp" />
-        <TemplateGroup Value="General" />
+        <PresetName Value="SD.Presets.Adapter.General.Netstandard" />
+        <RootNamespace Value="recipeDatabase" />
+        <TemplateGroup Value="Adapter" />
         <TemplateBindings>
-          <Binding Name="SD.EntityFramework.Core.v6.PostgreSql" />
-          <Binding Name="SD.EntityFramework.Core v6" />
-          <Binding Name="SD.EntityFramework.NET6" />
-          <Binding Name="SD.EntityFramework.Shared" />
+          <Binding Name="SD.TemplateBindings.PostgreSqlSpecific" />
+          <Binding Name="SD.TemplateBindings.SharedTemplates.Net6" />
+          <Binding Name="SD.TemplateBindings.SharedTemplates" />
           <Binding Name="SD.TemplateBindings.General" />
         </TemplateBindings>
         <AdhocTemplateSets />
       </LastUsedPreferences>
     </OutputType>
   </CodeGenerationCyclePreferences>
-  <OutputSettingValues>
-    <SettingValues>
-      <SettingValue Name="1:CollectionNavigatorTypeDefault" Value="List&lt;T&gt;" Type="18" />
-      <SettingValue Name="1:EmitForeignKeyFields" Value="true" Type="3" />
-      <SettingValue Name="1:EntityBaseClassNameDefault" Value="CommonEntityBase" Type="18" />
-      <SettingValue Name="1:GenerateAsVirtualPropertyDefault" Value="true" Type="3" />
-      <SettingValue Name="1:GenerateDbContextOptionsCtorInDbContext" Value="true" Type="3" />
-      <SettingValue Name="1:GenerateReadOnlyFieldsAsReadOnlyProperties" Value="true" Type="3" />
-      <SettingValue Name="1:MapUnmappedFieldsAsShadowPropertiesDefault" Value="false" Type="3" />
-      <SettingValue Name="1:SupportedActionCombinations" Value="0,4" Type="18" />
-      <SettingValue Name="1:SupportsKeyLessEntities" Value="true" Type="3" />
-      <SettingValue Name="1:SupportsManyToManyRelationships" Value="true" Type="3" />
-      <SettingValue Name="1:SupportsRequiredValueTypes" Value="true" Type="3" />
-      <SettingValue Name="1:SupportsTemporalTables" Value="true" Type="3" />
-      <SettingValue Name="1:SupportsTPEInheritance" Value="true" Type="3" />
-      <SettingValue Name="1:UseNullableReferenceTypes" Value="true" Type="3" />
-      <SettingValue Name="1:UsePrivateBackingFieldDefault" Value="false" Type="3" />
-      <SettingValue Name="1:ValueTypeBaseClassNameDefault" Value="CommonValueTypeBase" Type="18" />
-    </SettingValues>
-  </OutputSettingValues>
-  <CodeGenerationMetaDataDefaults />
+  <CodeGenerationMetaDataDefaults>
+    <TargetElement Type="256">
+      <Defaults>
+        <Attributes>
+          <Attribute Value="Browsable($false)" />
+        </Attributes>
+      </Defaults>
+    </TargetElement>
+  </CodeGenerationMetaDataDefaults>
   <EntityModel>
     <ValueTypeDefinitions />
     <EntityDefinitions>
-      <EntityDefinition Name="Category" ObjectID="4fb9644a-8a57-4ba8-a623-791251c5834c">
+      <EntityDefinition Name="Category" ObjectID="a6365d8d-2282-4572-9f18-c44728fdda00">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
+          <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Name" Type="string" MaxLength="100" />
         </Fields>
       </EntityDefinition>
-      <EntityDefinition Name="Ingredient" ObjectID="9425a5d7-7754-4e73-81c7-c7eebe62bcae">
+      <EntityDefinition Name="Ingredient" ObjectID="50d5a8a0-9457-4065-ac0d-2602291e3a85">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
+          <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Name" Type="string" MaxLength="1000" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="RecipeId" Type="int" Precision="10" />
         </Fields>
       </EntityDefinition>
-      <EntityDefinition Name="Instruction" ObjectID="b2a09452-9a5a-48b7-823c-22cf66d96143">
+      <EntityDefinition Name="Instruction" ObjectID="1cf0f5e4-3db4-4234-a077-97613a5971fb">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
+          <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Name" Type="string" MaxLength="1000" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="RecipeId" Type="int" Precision="10" />
         </Fields>
       </EntityDefinition>
-      <EntityDefinition Name="Recipe" ObjectID="7f6f3bc9-5c11-41c5-956f-9d45a7fce688">
+      <EntityDefinition Name="Recipe" ObjectID="9cab94ec-3e91-4b74-bdfe-9add48bec4e3">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
+          <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Title" Type="string" MaxLength="100" />
         </Fields>
       </EntityDefinition>
-      <EntityDefinition Name="RecipeCategory" ObjectID="77277cc3-8fa8-4199-aebd-51c0904d7496">
+      <EntityDefinition Name="RecipeCategory" ObjectID="5ab999db-5aa9-4882-919e-dd29ef4eb812">
         <Fields>
-          <Field Name="CategoryId" Type="int" />
+          <Field Name="CategoryId" Type="int" Precision="10" />
           <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
-          <Field Name="RecipeId" Type="int" />
+          <Field Name="RecipeId" Type="int" Precision="10" />
         </Fields>
       </EntityDefinition>
-      <EntityDefinition Name="User" ObjectID="dcefbf20-5018-469c-b73d-323dcb26fddc">
+      <EntityDefinition Name="User" ObjectID="91f3c3c0-5768-4ecb-8338-2621eb031ccc">
         <Fields>
-          <Field Name="Id" Type="int" IsReadOnly="true" IsPrimaryKey="true" />
+          <Field Name="Id" Type="int" IsReadOnly="true" Precision="10" IsPrimaryKey="true" />
           <Field Name="IsActive" Type="bool" />
           <Field Name="Password" Type="string" MaxLength="100" />
           <Field Name="RefreshToken" Type="string" IsOptional="true" MaxLength="1073741824" />
@@ -186,7 +173,7 @@
           <Field Name="Username" Type="string" MaxLength="100" />
         </Fields>
       </EntityDefinition>
-      <EntityDefinition Name="VersionInfo" ObjectID="f47caf67-63f6-43b6-8295-a00e77eea6dd">
+      <EntityDefinition Name="VersionInfo" ObjectID="5246ecf6-939b-40c9-a947-2a1d4e32ed8e">
         <Fields>
           <Field Name="AppliedOn" Type="datetime" IsOptional="true" />
           <Field Name="Description" Type="string" IsOptional="true" MaxLength="1024" />
@@ -232,9 +219,9 @@
         <Sequence Name="SystemIdentity" />
       </SystemSequences>
       <Catalogs>
-        <Catalog Name="recipesapp">
+        <Catalog Name="recipesapp" SyncSource="2">
           <Schemas>
-            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-07T18:44:24.3854303Z">
+            <Schema Name="public" SyncSource="2" LastSyncWithDatabase="2022-09-15T16:11:06.6562514Z">
               <Sequences>
                 <Sequence Name="category_id_seq" />
                 <Sequence Name="ingredient_id_seq" />
@@ -385,7 +372,7 @@
             <FieldMapping FieldName="Username" TargetFieldName="username" />
           </FieldMappings>
         </EntityMapping>
-        <EntityMapping EntityName=":VersionInfo" TargetName="recipesapp:public:VersionInfo">
+        <EntityMapping EntityName=":VersionInfo" TargetName="recipesapp:public:VersionInfo" ActionCombination="2">
           <FieldMappings>
             <FieldMapping FieldName="AppliedOn" TargetFieldName="AppliedOn" />
             <FieldMapping FieldName="Description" TargetFieldName="Description" />
@@ -401,7 +388,7 @@
   </MappingStores>
   <ModelViews />
   <DerivedModels>
-    <DerivedModel Name="View" ObjectID="491fc076-00dc-418e-9432-f60c5f3b2ae4" TargetFrameworkName="DTO Class Model" UseLegacyDefaults="false">
+    <DerivedModel Name="View" ObjectID="d6cbbe3d-4989-4608-81b8-f7d5154fad27" TargetFrameworkName="DTO Class Model" UseLegacyDefaults="false">
       <CodeGenerationMetaDataDefaults>
         <TargetElement Type="32768">
           <Defaults>
@@ -448,7 +435,7 @@
       </Settings>
       <CodeGenerationCyclePreferences OutputType="3">
         <LastUsedPreferences>
-          <DestinationRootFolder Value="D:\Work_exercises\Silverkey-Summer-internship-2022\RecipesExercises\RecipeExercise8\RecipeExercise8\Data" />
+          <DestinationRootFolder Value=".\Data" />
           <FrameworkName Value="DTO Class Model" />
           <LanguageName Value="C#" />
           <PlatformName Value=".NET 6" />
@@ -464,35 +451,7 @@
         </LastUsedPreferences>
       </CodeGenerationCyclePreferences>
       <Documents>
-        <Document Name="RecipeDetailsView">
-          <RootEntity Entity=":Recipe" />
-          <Fields>
-            <Field Name="Ingredients">
-              <Document Name="Ingredient">
-                <RootEntity Entity=":Ingredient" NavigatorPath="Ingredients" />
-                <Fields>
-                  <Field Name="Name">
-                    <EntityField Name="Name" />
-                  </Field>
-                </Fields>
-              </Document>
-            </Field>
-            <Field Name="Instructions">
-              <Document Name="Instruction">
-                <RootEntity Entity=":Instruction" NavigatorPath="Instructions" />
-                <Fields>
-                  <Field Name="Name">
-                    <EntityField Name="Name" />
-                  </Field>
-                </Fields>
-              </Document>
-            </Field>
-            <Field Name="Title">
-              <EntityField Name="Title" />
-            </Field>
-          </Fields>
-        </Document>
-        <Document Name="RecipeMenuView">
+        <Document Name="RecipeMenu">
           <RootEntity Entity=":Recipe" />
           <Fields>
             <Field Name="Id">
@@ -502,6 +461,9 @@
               <Document Name="Ingredient">
                 <RootEntity Entity=":Ingredient" NavigatorPath="Ingredients" />
                 <Fields>
+                  <Field Name="Id">
+                    <EntityField Name="Id" />
+                  </Field>
                   <Field Name="IsActive">
                     <EntityField Name="IsActive" />
                   </Field>
@@ -515,6 +477,9 @@
               <Document Name="Instruction">
                 <RootEntity Entity=":Instruction" NavigatorPath="Instructions" />
                 <Fields>
+                  <Field Name="Id">
+                    <EntityField Name="Id" />
+                  </Field>
                   <Field Name="IsActive">
                     <EntityField Name="IsActive" />
                   </Field>
@@ -535,11 +500,17 @@
                     <Document Name="Category">
                       <RootEntity Entity=":Category" NavigatorPath="RecipeCategories,Category" />
                       <Fields>
+                        <Field Name="IsActive">
+                          <EntityField Name="IsActive" />
+                        </Field>
                         <Field Name="Name">
                           <EntityField Name="Name" />
                         </Field>
                       </Fields>
                     </Document>
+                  </Field>
+                  <Field Name="CategoryId">
+                    <EntityField Name="CategoryId" />
                   </Field>
                   <Field Name="IsActive">
                     <EntityField Name="IsActive" />

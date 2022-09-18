@@ -23,10 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Data\DatabaseGeneric\recipeDatabase.csproj" />
+    <ProjectReference Include="..\Data\DatabaseSpecific\recipeDatabaseDBSpecific.csproj" />
     <ProjectReference Include="..\Data\Model\RecipesApp.Model.csproj" />
     <ProjectReference Include="..\Data\Persistence\RecipesApp.Persistence.csproj" />
     <ProjectReference Include="..\Data\View.Persistence\View.Persistence.csproj" />
     <ProjectReference Include="..\Data\View\View.csproj" />
-    <ProjectReference Include="..\RecipesDB\Recipe.Migration.csproj" />
   </ItemGroup>
 </Project>

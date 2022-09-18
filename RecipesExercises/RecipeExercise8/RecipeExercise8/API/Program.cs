@@ -6,11 +6,20 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using RecipesApp;
-using RecipesApp.EntityClasses;
+using recipeDatabase;
+using recipeDatabase.EntityClasses;
+using recipeDatabase.Linq;
+using recipeDatabase.HelperClasses;
+using recipeDatabase.FactoryClasses;
+using recipeDatabase.DatabaseSpecific;
 using Microsoft.EntityFrameworkCore;
 using View.DtoClasses;
 using View.Persistence;
+using SD.LLBLGen.Pro.ORMSupportClasses;
+using SD.LLBLGen.Pro.DQE.PostgreSql;
+using Npgsql;
+using SD.LLBLGen.Pro.LinqSupportClasses;
+using System.Xml.Linq;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,8 +35,11 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin();
     });
 });
-
-builder.Services.AddDbContext<RecipesAppDataContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionString.SQL Server (SqlClient)")));
+RuntimeConfiguration.AddConnectionString("ConnectionString.Postgres Server", builder.Configuration.GetConnectionString("ConnectionString.Postgres Server"));
+RuntimeConfiguration.ConfigureDQE<PostgreSqlDQEConfiguration>(c =>
+{
+    c.AddDbProviderFactory(typeof(NpgsqlFactory));
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -74,13 +86,14 @@ var options = new JsonSerializerOptions
     WriteIndented = true,
 };
 
-app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel, HttpContext context, RecipesAppDataContext dbContext) =>
+app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel loginModel) =>
 {
-    using (var trransaction = dbContext.Database.BeginTransaction())
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == loginModel.UserName.ToLower());
+            var metaData = new LinqMetaData(adapter);
+            var user = await metaData.User.FirstOrDefaultAsync(u => u.Username == loginModel.UserName.ToLower());
             if (user == null)
                 return Results.Unauthorized();
             var hasher = new PasswordHasher<LoginModel>();
@@ -89,63 +102,59 @@ app.MapPost("api/json/login", [AllowAnonymous] async ([FromBody] LoginModel logi
             if (isPasswordMatch == PasswordVerificationResult.Failed)
                 return Results.Unauthorized();
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, loginModel.UserName.ToLower())
-            };
+                    {
+                        new Claim(ClaimTypes.Name, loginModel.UserName.ToLower())
+                    };
             var accessToken = _tokenService.GenerateAccessToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-            dbContext.Users.Update(user);
-            await dbContext.SaveChangesAsync();
-            trransaction.Commit();
+            user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
+            await adapter.SaveEntityAsync(user);
             return Results.Ok(new AuthenticatedResponse { RefreshToken = refreshToken, Token = accessToken });
         }
         catch (Exception ex)
         {
-            trransaction.Rollback();
             return Results.BadRequest(ex.Message);
         }
     }
 });
 
-app.MapPost("api/json/register", [AllowAnonymous] async ([FromBody] RegisterModel newUser, RecipesAppDataContext dbContext) =>
+app.MapPost("api/json/register", [AllowAnonymous] async ([FromBody] RegisterModel newUser) =>
 {
-    using (var transaction = dbContext.Database.BeginTransaction())
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
-            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Username == newUser.Username.ToLower());
+            var metaData = new LinqMetaData(adapter);
+            var user = await metaData.User.FirstOrDefaultAsync(u => u.Username == newUser.Username.ToLower());
             if (user != null)
-                return Results.BadRequest("User already exists");
-            var hasher = new PasswordHasher<LoginModel>();
-            var hashedPassword = hasher.HashPassword(new LoginModel(), newUser.Password);
-            var userEntity = new User
+                return Results.BadRequest("Username already exists");
+            var hasher = new PasswordHasher<RegisterModel>();
+            var hashedPassword = hasher.HashPassword(newUser, newUser.Password);
+            var newUserEntity = new UserEntity
             {
                 Username = newUser.Username.ToLower(),
                 Password = hashedPassword,
                 RefreshToken = null,
                 RefreshTokenExpiry = null
             };
-            dbContext.Users.Add(userEntity);
-            await dbContext.SaveChangesAsync();
-            transaction.Commit();
+            await adapter.SaveEntityAsync(newUserEntity);
             return Results.Ok();
         }
         catch (Exception ex)
         {
-            transaction.Rollback();
             return Results.BadRequest(ex.Message);
         }
     }
 });
 
-app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] RefreshRequest request, HttpContext context, RecipesAppDataContext dbContext) =>
+app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] RefreshRequest request, HttpContext context) =>
 {
-    using(var transaction = dbContext.Database.BeginTransaction())
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
+            var metaData = new LinqMetaData(adapter);
             if (request is null)
                 return Results.BadRequest("Invalid client request");
             string accessToken = request.Token;
@@ -155,16 +164,14 @@ app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] Refresh
             if (principal == null)
                 return Results.BadRequest("Invalid token");
             var username = principal.Identity.Name;
-            var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Username == username);
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.UtcNow)
+            var user = await metaData.User.FirstOrDefaultAsync(x => x.Username == username);
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTime.Now)
                 return Results.BadRequest("Invalid client request");
             var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
             var newRefreshToken = _tokenService.GenerateRefreshToken();
             user.RefreshToken = newRefreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-            dbContext.Users.Update(user);
-            await dbContext.SaveChangesAsync();
-            transaction.Commit();
+            user.RefreshTokenExpiry = DateTime.Now.AddDays(7);
+            await adapter.SaveEntityAsync(user);
             return Results.Ok(new AuthenticatedResponse()
             {
                 Token = newAccessToken,
@@ -173,231 +180,222 @@ app.MapPost("api/json/refresh-token", [AllowAnonymous] async ([FromBody] Refresh
         }
         catch (Exception ex)
         {
-            transaction.Rollback();
             return Results.BadRequest(ex.Message);
         }
     }
 });
 
-app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token, RecipesAppDataContext dbContext) =>
+app.MapPost("api/json/revoke-token", [Authorize] async ([FromBody] string token) =>
 {
-    using(var transaction = dbContext.Database.BeginTransaction())
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
+            var metaData = new LinqMetaData(adapter);
             if (string.IsNullOrEmpty(token))
                 return Results.BadRequest(new { message = "Token is required" });
-            var user = await dbContext.Users.FirstOrDefaultAsync(x => x.RefreshToken == token);
-            if(user is null)
+            var user = await metaData.User.FirstOrDefaultAsync(x => x.RefreshToken == token);
+            if (user is null)
                 return Results.BadRequest(new { message = "Invalid token" });
             user.RefreshToken = null;
             user.RefreshTokenExpiry = null;
-            dbContext.Users.Update(user);
-            await dbContext.SaveChangesAsync();
-            transaction.Commit();
+            await adapter.SaveEntityAsync(user);
             return Results.Ok(new { message = "Token revoked" });
         }
         catch (Exception ex)
         {
-            transaction.Rollback();
             return Results.BadRequest(ex.Message);
         }
     }
 });
 
-app.MapGet("api/json/recipes", [Authorize] async Task<List<RecipeMenuView>> (RecipesAppDataContext dbContext) =>
+app.MapGet("api/json/recipes", [AllowAnonymous] async Task<List<RecipeMenu>> () =>
 {
-    var recipes = await dbContext.Recipes.Where(x => x.IsActive).ProjectToRecipeMenuView().ToListAsync();
-    foreach(var recipe in recipes)
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
-        recipe.Instructions = recipe.Instructions.Where(x => x.IsActive).ToList();
-        recipe.Ingredients = recipe.Ingredients.Where(x => x.IsActive).ToList();
-        recipe.RecipeCategories = recipe.RecipeCategories.Where(x => x.IsActive).ToList();
+        var metaData = new LinqMetaData(adapter);
+        var recipes = await metaData.Recipe.Where(x => x.IsActive).ProjectToRecipeMenu().ToListAsync();
+        foreach (var recipe in recipes)
+        {
+            recipe.Instructions = recipe.Instructions.Where(x => x.IsActive).ToList();
+            recipe.Ingredients = recipe.Ingredients.Where(x => x.IsActive).ToList();
+            recipe.RecipeCategories = recipe.RecipeCategories.Where(x => x.IsActive).ToList();
+        }
+        return recipes.OrderBy(x => x.Title).ToList();
     }
-    return recipes.OrderBy(x => x.Title).ToList();
 });
 
-app.MapGet("api/json/categories", [Authorize] async Task<List<RecipesApp.EntityClasses.Category>> (RecipesAppDataContext dbContext) =>
+app.MapGet("api/json/categories", [AllowAnonymous] async Task<List<CategoryEntity>> () =>
 {
-    var categories = await dbContext.Categories.Where(x=>x.IsActive).ToListAsync();
-    return categories.OrderBy(x => x.Name).ToList();
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
+    {
+        var metaData = new LinqMetaData(adapter);
+        var categories = await metaData.Category.Where(x => x.IsActive).ToListAsync();
+        return categories.OrderBy(x => x.Name).ToList();
+    }
 }); 
 
-app.MapPost("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToPost, RecipesAppDataContext dbContext) =>
+app.MapPost("api/json/recipes", [AllowAnonymous] async ([FromBody] Recipe recipeToPost) =>
 {
-    using (var transaction = dbContext.Database.BeginTransaction())
+    
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
-            var recipe = new RecipesApp.EntityClasses.Recipe() { Title = recipeToPost.Title, IsActive = true };
-            await dbContext.Recipes.AddAsync(recipe);
-            
-            var ingredientsList = new List<RecipesApp.EntityClasses.Ingredient>();
-            var instuctionsList = new List<RecipesApp.EntityClasses.Instruction>();
-            var recipeCategories = new List<RecipeCategory>();
+            var recipe = new RecipeEntity() { Title = recipeToPost.Title, IsActive = true };
+            adapter.SaveEntity(recipe);
+
+            var ingredientsList = new EntityCollection<IngredientEntity>();
+            var instuctionsList = new EntityCollection<InstructionEntity>();
+            var recipeCategories = new EntityCollection<RecipeCategoryEntity>();
 
             foreach (var ingredient in recipeToPost.Ingredients)
-                ingredientsList.Add(new RecipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe });
-            await dbContext.Ingredients.AddRangeAsync(ingredientsList);
+                ingredientsList.Add(new IngredientEntity() { Name = ingredient.Name, Recipe = recipe });
+            await adapter.SaveEntityCollectionAsync(ingredientsList);
 
             foreach (var instruction in recipeToPost.Instructions)
-                instuctionsList.Add(new RecipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe });
-            await dbContext.Instructions.AddRangeAsync(instuctionsList);
+                instuctionsList.Add(new InstructionEntity { Name = instruction.Name, Recipe = recipe });
+            await adapter.SaveEntityCollectionAsync(instuctionsList);
 
             foreach (var category in recipeToPost.Categories)
-                recipeCategories.Add(new RecipeCategory { CategoryId = category.Id, Recipe = recipe });
-            await dbContext.RecipeCategories.AddRangeAsync(recipeCategories);
+                recipeCategories.Add(new RecipeCategoryEntity { CategoryId = category.Id, Recipe = recipe });
+            await adapter.SaveEntityCollectionAsync(recipeCategories);
 
-            await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
             return Results.Ok();
         }
-        catch (Exception e)
+        catch(Exception e)
         {
-            await transaction.RollbackAsync();
-            app.Logger.LogError(e.Message);
-            return Results.StatusCode(500);
+            return Results.BadRequest(e.Message);
         }
     }
 });
 
-app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpdate, RecipesAppDataContext dbContext) =>
+app.MapPut("api/json/recipes", [Authorize] async ([FromBody] Recipe recipeToUpdate) =>
 {
-    using (var transaction = dbContext.Database.BeginTransaction())
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
-            var recipe = await dbContext.Recipes.FindAsync(recipeToUpdate.Id);
-            if (recipe is null)
-                throw new Exception("Recipe not found");
-                
-            recipe.Title = recipeToUpdate.Title;
-            dbContext.Update(recipe);
-            var ingredientsList = new List<RecipesApp.EntityClasses.Ingredient>();
-            var instuctionsList = new List<RecipesApp.EntityClasses.Instruction>();
-            var recipeCategories = new List<RecipeCategory>();
+            var metaData = new LinqMetaData(adapter);
+            RecipeEntity recipeFetched = await metaData.Recipe.FirstOrDefaultAsync(x => x.Id == recipeToUpdate.Id);
+            if (recipeFetched is null)
+                return Results.BadRequest("Recipe not found");
+            recipeFetched.Title = recipeToUpdate.Title;
+            await adapter.SaveEntityAsync(recipeFetched);
             
+            var ingredientsList = new EntityCollection<IngredientEntity>();
+            var instuctionsList = new EntityCollection<InstructionEntity>();
+            var recipeCategories = new EntityCollection<RecipeCategoryEntity>();
+
             foreach (var ingredient in recipeToUpdate.Ingredients)
             {
-                var ingredientToUpdate = await dbContext.Ingredients.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == ingredient.Name);
+                var ingredientToUpdate = await metaData.Ingredient.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == ingredient.Name);
                 if (ingredientToUpdate is null && ingredient.IsActive)
-                    ingredientsList.Add(new RecipesApp.EntityClasses.Ingredient() { Name = ingredient.Name, Recipe = recipe, IsActive = true });
+                    ingredientsList.Add(new IngredientEntity() { Name = ingredient.Name, Recipe = recipeFetched, IsActive = true });
                 else
                 {
                     ingredientToUpdate!.Name = ingredient.Name;
                     ingredientToUpdate.IsActive = ingredient.IsActive;
-                    dbContext.Update(ingredientToUpdate);
+                    await adapter.SaveEntityAsync(ingredientToUpdate);
                 }
             }
-            await dbContext.Ingredients.AddRangeAsync(ingredientsList);
+            await adapter.SaveEntityCollectionAsync(ingredientsList);
 
             foreach (var instruction in recipeToUpdate.Instructions)
             {
-                var instructionToUpdate = await dbContext.Instructions.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == instruction.Name);
+                var instructionToUpdate = await metaData.Instruction.Where(x => x.RecipeId == recipeToUpdate.Id && x.IsActive).FirstOrDefaultAsync(x => x.Name == instruction.Name);
                 if (instructionToUpdate is null && instruction.IsActive)
-                    instuctionsList.Add(new RecipesApp.EntityClasses.Instruction { Name = instruction.Name, Recipe = recipe, IsActive = true });
+                    instuctionsList.Add(new InstructionEntity { Name = instruction.Name, Recipe = recipeFetched, IsActive = true });
                 else
                 {
                     instructionToUpdate!.Name = instruction.Name;
                     instructionToUpdate.IsActive = instruction.IsActive;
-                    dbContext.Update(instructionToUpdate);
+                    await adapter.SaveEntityAsync(instructionToUpdate);
                 }
             }
-            await dbContext.Instructions.AddRangeAsync(instuctionsList);
+            await adapter.SaveEntityCollectionAsync(instuctionsList);
 
-            foreach (var recipeCategory in dbContext.RecipeCategories.Where(x => x.RecipeId == recipeToUpdate.Id))
+            foreach (var recipeCategory in metaData.RecipeCategory.Where(x => x.RecipeId == recipeToUpdate.Id))
                 if (!recipeToUpdate.Categories.Any(x => x.Id == recipeCategory.CategoryId))
                     recipeCategory.IsActive = false;
-            dbContext.UpdateRange(dbContext.RecipeCategories.Where(x => x.RecipeId == recipeToUpdate.Id));
+            var idk = metaData.RecipeCategory.Where(x => x.RecipeId == recipeToUpdate.Id).ToList();
+            foreach (var c in idk)
+               await adapter.SaveEntityAsync(c);
 
             foreach (var category in recipeToUpdate.Categories)
             {
-                var dbCategory = await dbContext.Categories.FindAsync(category.Id);
+                var dbCategory = await metaData.Category.FirstOrDefaultAsync(c=> c.Id == category.Id);
                 if (dbCategory is null)
                     throw new Exception("Category not found");
-                else if (!dbContext.RecipeCategories.Any(x => x.RecipeId == recipeToUpdate.Id && x.CategoryId == category.Id && x.IsActive))
-                    recipeCategories.Add(new RecipeCategory { Category = dbCategory!, Recipe = recipe, IsActive = true });
+                else if (!metaData.RecipeCategory.Any(x => x.RecipeId == recipeToUpdate.Id && x.CategoryId == category.Id && x.IsActive))
+                    recipeCategories.Add(new RecipeCategoryEntity { Category = dbCategory, Recipe = recipeFetched, IsActive = true });
             }
-            
-            await dbContext.RecipeCategories.AddRangeAsync(recipeCategories);
-            await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
+            await adapter.SaveEntityCollectionAsync(recipeCategories);
             return Results.Ok();
         }
         catch (Exception e)
         {
-            await transaction.RollbackAsync();
-            app.Logger.LogError(e.Message);
-            return Results.StatusCode(500);
+            return Results.BadRequest(e.Message);
         }
     }
 });
 
-app.MapDelete("api/json/recipes/{id}", [Authorize] async (int id, RecipesAppDataContext dbContext) =>
+app.MapDelete("api/json/recipes/{id}", [Authorize] async (int id) =>
 {
-    using (var transaction = dbContext.Database.BeginTransaction())
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
-            var recipe = await dbContext.Recipes.FindAsync(id);
-            if (recipe is null)
-                throw new Exception("Recipe not found");
-            recipe.IsActive = false;
-            dbContext.Update(recipe);
-            await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
+            var metaData = new LinqMetaData(adapter);
+            RecipeEntity recipeFetched = await metaData.Recipe.FirstOrDefaultAsync(x => x.Id == id);
+            if (recipeFetched is null)
+                return Results.BadRequest("Recipe not found");
+            recipeFetched.IsActive = false;
+            await adapter.SaveEntityAsync(recipeFetched);
             return Results.Ok();
         }
         catch (Exception e)
         {
-            await transaction.RollbackAsync();
             app.Logger.LogError(e.Message);
-            return Results.StatusCode(500);
+            return Results.BadRequest(e.Message);
         }
     }
 });
 
-app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category categoryToPost, RecipesAppDataContext dbContext) =>
+app.MapPost("api/json/categories", [Authorize] async ([FromBody] Category categoryToPost) =>
 {
-    using (var transaction = dbContext.Database.BeginTransaction())
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
-            var category = new RecipesApp.EntityClasses.Category() { Name = categoryToPost.Name, IsActive = true };
-            await dbContext.Categories.AddAsync(category);
-            await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
+            var category = new CategoryEntity() { Name = categoryToPost.Name, IsActive = true };
+            await adapter.SaveEntityAsync(category);
             return Results.Ok();
         }
         catch (Exception e)
         {
-            await transaction.RollbackAsync();
-            app.Logger.LogError(e.Message);
-            return Results.StatusCode(500);
+            return Results.BadRequest(e.Message);
         }
     }
 });
 
-app.MapPut("api/json/categories", [Authorize] async ([FromBody] Category categoryToUpdate, RecipesAppDataContext dbContext) =>
+app.MapPut("api/json/categories", [Authorize] async ([FromBody] Category categoryToUpdate) =>
 {
-    using (var transaction = dbContext.Database.BeginTransaction())
+    using (var adapter = new DataAccessAdapter("Database=recipesapp;Server=localhost;Port=5432;User Id=postgres;Password=1234567890"))
     {
         try
         {
-            var category = await dbContext.Categories.FindAsync(categoryToUpdate.Id);
-            if (category is null)
-                throw new Exception("Category not found");
-            category.Name = categoryToUpdate.Name;
-            dbContext.Update(category);
-            await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
+            var metaData = new LinqMetaData(adapter);
+            CategoryEntity categoryFetched = await metaData.Category.FirstOrDefaultAsync(x => x.Id == categoryToUpdate.Id);
+            if (categoryFetched is null)
+                return Results.BadRequest("Category not found");
+            categoryFetched.Name = categoryToUpdate.Name;
+            await adapter.SaveEntityAsync(categoryFetched);
             return Results.Ok();
         }
         catch (Exception e)
         {
-            await transaction.RollbackAsync();
-            app.Logger.LogError(e.Message);
-            return Results.StatusCode(500);
+            return Results.BadRequest(e.Message);
         }
     }
 });
