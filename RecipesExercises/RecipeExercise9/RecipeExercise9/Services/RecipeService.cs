@@ -44,7 +44,7 @@ public class RecipeService : IRecipeService
     {
         try
         {
-            return await _httpClient.PutAsJsonAsync($"recipes/{recipe.Id}", recipe);
+            return await _httpClient.PutAsJsonAsync($"recipes", recipe);
         }
         catch (Exception ex)
         {
