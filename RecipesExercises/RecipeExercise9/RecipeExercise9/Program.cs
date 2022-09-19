@@ -5,8 +5,12 @@ using RecipeExercise9;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-var baseAddress = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("BaseUrl")["DbApiUrl"];
 
+var baseAddress = builder.Configuration["BaseAddress"] ?? builder.HostEnvironment.BaseAddress;
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
+
+builder.Services.AddSingleton<IRecipeService,RecipeService>();
+builder.Services.AddSingleton<ICategoryService, CategoryService>();
+builder.Services.AddSingleton<IUserService, UserService>();
 
 await builder.Build().RunAsync();
