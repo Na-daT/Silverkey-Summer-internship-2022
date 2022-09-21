@@ -174,24 +174,12 @@
         if (auth.IsSuccessStatusCode)
         {
             IsLoggedIn = true;
-            await jsRuntime.InvokeVoidAsync(@"await Swal.fire({
-                title: 'Success!',
-                icon: 'success',
-                confirmButtonText: 'Ok'
-                });"
-            );
+            Console.WriteLine("Logged in");
         }
         else
         {
             IsLoggedIn = false;
-            await jsRuntime.InvokeVoidAsync(@" 
-                await Swal.fire({
-                title: 'Invalid login!',
-                text: 'Username or password incorrect',
-                icon: 'error',
-                confirmButtonText: 'Ok'
-                });"
-            );
+            Console.WriteLine("Failed to log in");
         }
         StateHasChanged();
     }
