@@ -1,4 +1,7 @@
 ﻿using System.Net.Http.Json;
+using Microsoft.JSInterop;
+using System.Net.Http.Headers;
+
 namespace RecipeExercise9;
 public interface ICategoryService
 {
@@ -10,14 +13,30 @@ public interface ICategoryService
 public class CategoryService : ICategoryService
 {
     private readonly HttpClient _httpClient;
-    public CategoryService(HttpClient httpClient)
+    private readonly IJSRuntime _jsRuntime;
+
+    public CategoryService(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         _httpClient = httpClient;
+        _jsRuntime = jsRuntime;
     }
+
+    public async Task<bool> CheckAuthentication()
+    {
+        var token = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("bearer", token);
+
+        return !string.IsNullOrEmpty(token);
+    }
+
     public async Task<List<Category>> GetCategories()
     {
         try
         {
+            if (!await CheckAuthentication())
+                throw (new Exception("Not authenticated"));
+
             var categories = await _httpClient.GetFromJsonAsync<List<Category>>("categories");
             if (categories is null)
                 return new List<Category>();
@@ -28,10 +47,13 @@ public class CategoryService : ICategoryService
             throw new Exception(ex.Message);
         }
     }
+
     public async Task<HttpResponseMessage> AddCategory(Category category)
     {
         try
         {
+            if (!await CheckAuthentication())
+                throw (new Exception("Not authenticated"));
             return await _httpClient.PostAsJsonAsync("categories", category);
         }
         catch (Exception ex)
@@ -39,10 +61,13 @@ public class CategoryService : ICategoryService
             throw new Exception(ex.Message);
         }
     }
+
     public async Task<HttpResponseMessage> UpdateCategory(Category category)
     {
         try
         {
+            if (!await CheckAuthentication())
+                throw (new Exception("Not authenticated"));
             return await _httpClient.PutAsJsonAsync($"categories", category);
         }
         catch (Exception ex)
