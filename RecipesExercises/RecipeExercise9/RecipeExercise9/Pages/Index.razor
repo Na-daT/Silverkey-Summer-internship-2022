@@ -7,7 +7,6 @@
 
 <PageTitle>Nada's Recipe App</PageTitle>
 
-
 @if (!IsLoggedIn)
 {
     <div>
@@ -33,7 +32,7 @@
                         <div class="row mt-3">
                             <div class="col"></div>
                             <div class="col">
-                                <div id="welcomeIndicator" class="carousel slide" data-bs-ride="carousel">
+                                <div id="@carouselName" class="carousel slide" data-bs-ride="carousel">
                                     <div class="carousel-inner">
                                         <div class="carousel-item active">
                                             <p class="lead text-center">Save your favourite recipes in details.</p>
@@ -154,8 +153,8 @@
     </div>
 }
 
-
 @code {
+    const string carouselName = "welcomeIndicator";
     private bool IsLoggedIn { get; set; } = false;
     private bool NewUser { get; set; } = false;
     private LoginModel User { get; set; } = new LoginModel();
@@ -166,6 +165,11 @@
         RecipesList = await recipeData.GetRecipes();
         await base.OnInitializedAsync();
     }
+    	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		object[] args = { carouselName };
+		await jsRuntime.InvokeVoidAsync("startCarousel", args);
+	}
 
     public async Task SubmitLogin()
     {

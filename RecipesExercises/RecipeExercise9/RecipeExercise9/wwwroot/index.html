@@ -9,6 +9,14 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="RecipeExercise9.styles.css" rel="stylesheet" />
+    <link href="BlazorCarousel.Client.styles.css" rel="stylesheet" />
+    <script type="text/javascript">
+        function startCarousel(carouselId) {
+            var myCarousel = document.getElementById(carouselId);
+            var carousel = new bootstrap.Carousel(myCarousel);
+            carousel.cycle();
+        }
+    </script>
 </head>
 
 <body>
@@ -21,6 +29,7 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
