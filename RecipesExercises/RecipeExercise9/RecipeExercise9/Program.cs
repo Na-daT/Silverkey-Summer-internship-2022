@@ -6,8 +6,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-var baseAddress = builder.Configuration["BaseAddress"] ?? builder.HostEnvironment.BaseAddress;
-builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7047/api/json/") });
+var baseAddress = builder.Configuration.GetValue<string>("BaseAdress");
+builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(baseAddress) });
 
 builder.Services.AddSingleton<IRecipeService, RecipeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
