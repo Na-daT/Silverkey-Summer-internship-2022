@@ -24,7 +24,7 @@ public class RecipeService : IRecipeService
 
     public async Task<bool> CheckAuthentication()
     {
-        var token = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+        var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "token");
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("bearer", token);
 

@@ -8,6 +8,7 @@ public interface IUserService
     Task<HttpResponseMessage> Login(LoginModel loginDetails);
     Task<HttpResponseMessage> Register(RegisterModel userDetails);
     Task<HttpResponseMessage> RefreshToken(RefreshRequest request);
+    Task<bool> CheckAuthentication();
 }
 
 public class UserService : IUserService
@@ -23,7 +24,7 @@ public class UserService : IUserService
 
     public async Task<bool> CheckAuthentication()
     {
-        var token = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+        var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "token");
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("bearer", token);
 
