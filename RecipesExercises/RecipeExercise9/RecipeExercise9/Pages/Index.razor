@@ -4,11 +4,12 @@
 @inject ICategoryService categoryData
 @inject IUserService userData
 @inject IJSRuntime jsRuntime
+@inject NavigationManager NavManager
+
 
 <PageTitle>Nada's Recipe App</PageTitle>
 
-@if (!IsLoggedIn)
-{
+<body>
     <div>
         @*
         @if(RecipesList.Any())
@@ -18,177 +19,21 @@
             }
         }
         *@
-        <div>
-            <div class="container">
-                <div class="row justify-content-center m-3 shadow-lg" style="transform: translateY(20%);">
-                    <div class="col-lg-5 p-5 " style="background-color: #2C7A48; color:white;">
-                        <div class="row">
-                            <div class="col-2"></div>
-                            <div class="col-8" style="display: flex; justify-content: center;">
-                                <img src="images/login-logo.png" alt="logo" class="img-fluid mb-3">
-                            </div>
-                            <div class="col-2"></div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col"></div>
-                            <div class="col">
-                                <div id="@carouselName" class="carousel slide" data-bs-ride="carousel">
-                                    <div class="carousel-inner">
-                                        <div class="carousel-item active">
-                                            <p class="lead text-center">Save your favourite recipes in details.</p>
-                                            <object data="/images/reminder_white.svg" width="200" height="200">
-                                            </object>
-                                        </div>
-                                        <div class="carousel-item">
-                                            <p class="lead text-center">Properly sort them into categories.</p>
-                                            <object data="/images/diet_white.svg" width="200" height="200">
-                                            </object>
-                                        </div>
-                                        <div class="carousel-item">
-                                            <p class="lead text-center">Search for any recipe you need.</p>
-                                            <object data="/images/Loving_it_white.svg" width="200" height="200">
-                                            </object>
-                                        </div>
-                                        <div class="carousel-item">
-                                            <p class="lead text-center">Start cooking!</p>
-                                            <object data="/images/cooking_white.svg" width="200" height="200">
-                                            </object>
-                                        </div>
-                                    </div>
-                                    <button class="carousel-control-prev" type="button"
-                                        data-bs-target="#welcomeIndicator" data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Previous</span>
-                                    </button>
-                                    <button class="carousel-control-next" type="button"
-                                        data-bs-target="#welcomeIndicator" data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Next</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col"></div>
-                        </div>
-                    </div>
-                    <div class="col-lg-7 p-3">
-                        @if (NewUser)
-                        {
-                            <div class="row text-center p-3 m-2" x-show="registerOpen">
-                                <h1 class="display-6 text-center">Welcome!</h1>
-                                <p class="lead text-center">We are glad you are joining us today!</p>
-                            </div>
-                            <div class="row p-2 m-2 align-items-center">
-                                <div class="col"></div>
-                                <div class="col-9">
-                                    <EditForm id="login-form" Model="@User" OnSubmit="SubmitRegister">
-                                        <DataAnnotationsValidator />
-                                        <div class="form-group py-2">
-                                            <label for="username">Username</label>
-                                            <InputText type="text" class="form-control" id="username" name="username"
-                                                @bind-value="User.UserName" placeholder="enter username" required />
-                                        </div>
-                                        <div class="form-group py-2">
-                                            <label for="registerpassword">Password</label>
-                                            <InputText type="password" class="form-control" id="registerpassword"
-                                                name="password" @bind-Value="User.Password" placeholder="enter password"
-                                                required />
-                                        </div>
-                                        <div class="form-group" style="display: flex; justify-content: center;">
-                                            <input type="submit" class="btn m-2"
-                                                style="background-color:#2C7A48; color:white;" value="Register" />
-                                        </div>
-                                    </EditForm>
-                                </div>
-                                <div class="col"></div>
-                            </div>
-                            <div class="row text-center p-2 m-2" x-show="registerOpen" x-cloak>
-                                <p class="lead text-center p-0 m-0">Already a user?</p>
-                                <a class="lead text-center p-0 m-0" href="#"
-                                    style="color: #2C7A48; background-color:white;"
-                                    @onclick="(() => NewUser = false)">Log in</a>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="row text-center p-3 m-2" x-show="!registerOpen">
-                                <h1 class="display-6 text-center">Welcome back!</h1>
-                                <p class="lead text-center">Please log in using your username and password</p>
-                            </div>
-                            <div class="row p-2 m-2 align-items-center">
-                                <div class="col"></div>
-                                <div class="col-9">
-                                    <EditForm id="login-form" Model="@User" OnSubmit="SubmitLogin">
-                                        <DataAnnotationsValidator />
-                                        <div class="form-group py-2">
-                                            <label for="username">Username</label>
-                                            <InputText type="text" class="form-control" 
-                                                @bind-Value="User.UserName" id="username" name="username"
-                                                placeholder="enter username" required />
-                                        </div>
-                                        <div class="form-group py-2">
-                                            <label for="Loginpassword">Password</label>
-                                            <InputText type="password" class="form-control" id="Loginpassword" 
-                                                @bind-Value="User.Password" name="password" placeholder="enter password"
-                                                required />
-                                        </div>
-                                        <div class="form-group" style="display: flex; justify-content: center;">
-                                            <input type="submit" class="btn m-2"
-                                                style="background-color:#2C7A48; color:white;" value="Log in" />
-                                        </div>
-                                    </EditForm>
-                                </div>
-                                <div class="col"></div>
-                            </div>
-                            <div class="row text-center p-2 m-2">
-                                <p class="lead text-center p-0 m-0">Not a user?</p>
-                                <a class="lead text-center p-0 m-0" href="#"
-                                    style="color: #2C7A48; background-color:white;"
-                                    @onclick="(() => NewUser = true)">Join us!</a>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
+        <h1>Welcome to Nada's Recipe App</h1>
+            <a href="homePage">login</a>
     </div>
-}
-
+</body>
 @code {
-    const string carouselName = "welcomeIndicator";
-    private bool IsLoggedIn { get; set; } = false;
-    private bool NewUser { get; set; } = false;
-    private LoginModel User { get; set; } = new LoginModel();
     private List<Recipe> RecipesList { get; set; } = new List<Recipe>();
 
     protected override async Task OnInitializedAsync()
     {
-        RecipesList = await recipeData.GetRecipes();
-        await base.OnInitializedAsync();
-    }
-    	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		object[] args = { carouselName };
-		await jsRuntime.InvokeVoidAsync("startCarousel", args);
-	}
-
-    public async Task SubmitLogin()
-    {
-        var auth = await userData.Login(User);
-
-        if (auth.IsSuccessStatusCode)
+        if(await userData.CheckAuthentication())
         {
-            IsLoggedIn = true;
-            Console.WriteLine("Logged in");
+            RecipesList = await recipeData.GetRecipes();
+            await base.OnInitializedAsync();
         }
         else
-        {
-            IsLoggedIn = false;
-            Console.WriteLine("Failed to log in");
-        }
-        StateHasChanged();
-    }
-
-    public async Task SubmitRegister()
-    {
+            NavManager.NavigateTo("loginPage");
     }
 }
