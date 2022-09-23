@@ -1,13 +1,12 @@
-﻿@page "/loginPage"
+﻿@page "/"
 @inject IRecipeService recipeData
 @inject ICategoryService categoryData
 @inject IUserService userData
 @inject IJSRuntime jsRuntime
 @inject NavigationManager NavManager
+@inject SweetAlertService Swal
 
 <PageTitle>Home Page</PageTitle>
-@if (!IsLoggedIn)
-{
     <div>
         <div>
             <div class="container">
@@ -76,7 +75,7 @@
                                         <div class="form-group py-2">
                                             <label for="username">Username</label>
                                             <InputText type="text" class="form-control" id="username" name="username"
-                                                @bind-value="NewUserData.Username" placeholder="enter username" required />
+                                                @bind-Value="NewUserData.Username" placeholder="enter username" required />
                                         </div>
                                         <div class="form-group py-2">
                                             <label for="registerpassword">Password</label>
@@ -142,7 +141,6 @@
             </div>
         </div>
     </div>
-}
 @code {
 
     const string carouselName = "welcomeIndicator";
@@ -164,12 +162,19 @@
 
         if (auth)
         {
-            NavManager.NavigateTo("");
+            NavManager.NavigateTo("homepage");
         }
         else
         {
-            IsLoggedIn = false;
-            Console.WriteLine("Failed to log in");
+           await Swal.FireAsync(new SweetAlertOptions
+                {
+                Title = "Error",
+                Text = "Invalid username or password",
+                Icon = SweetAlertIcon.Error,
+                ConfirmButtonText = "Ok",
+                ConfirmButtonColor = "#2C7A48"
+                }
+           );
         }
         StateHasChanged();
     }

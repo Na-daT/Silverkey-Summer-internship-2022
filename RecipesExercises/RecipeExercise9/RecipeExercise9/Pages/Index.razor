@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/homepage"
 
 @inject IRecipeService recipeData
 @inject ICategoryService categoryData
@@ -34,6 +34,6 @@
             await base.OnInitializedAsync();
         }
         else
-            NavManager.NavigateTo("loginPage");
+            NavManager.NavigateTo("");
     }
 }
