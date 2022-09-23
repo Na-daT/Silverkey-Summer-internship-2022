@@ -9,14 +9,6 @@
 @if (!IsLoggedIn)
 {
     <div>
-        @*
-        @if(RecipesList.Any())
-        {
-            @foreach(var recipe in RecipesList)
-            {
-            }
-        }
-        *@
         <div>
             <div class="container">
                 <div class="row justify-content-center m-3 shadow-lg" style="transform: translateY(20%);">
@@ -72,24 +64,24 @@
                     <div class="col-lg-7 p-3">
                         @if (NewUser)
                         {
-                            <div class="row text-center p-3 m-2" x-show="registerOpen">
+                            <div class="row text-center p-3 m-2">
                                 <h1 class="display-6 text-center">Welcome!</h1>
                                 <p class="lead text-center">We are glad you are joining us today!</p>
                             </div>
                             <div class="row p-2 m-2 align-items-center">
                                 <div class="col"></div>
                                 <div class="col-9">
-                                    <EditForm id="login-form" Model="@User" OnSubmit="SubmitRegister">
+                                    <EditForm id="login-form" Model="@NewUserData" OnSubmit="SubmitRegister">
                                         <DataAnnotationsValidator />
                                         <div class="form-group py-2">
                                             <label for="username">Username</label>
                                             <InputText type="text" class="form-control" id="username" name="username"
-                                                @bind-value="User.UserName" placeholder="enter username" required />
+                                                @bind-value="NewUserData.Username" placeholder="enter username" required />
                                         </div>
                                         <div class="form-group py-2">
                                             <label for="registerpassword">Password</label>
                                             <InputText type="password" class="form-control" id="registerpassword"
-                                                name="password" @bind-Value="User.Password" placeholder="enter password"
+                                                name="password" @bind-Value="NewUserData.Password" placeholder="enter password"
                                                 required />
                                         </div>
                                         <div class="form-group" style="display: flex; justify-content: center;">
@@ -157,6 +149,7 @@
     private bool IsLoggedIn { get; set; } = false;
     private bool NewUser { get; set; } = false;
     private LoginModel User { get; set; } = new LoginModel();
+    private RegisterModel NewUserData { get; set; } = new RegisterModel();
     private List<Recipe> RecipesList { get; set; } = new List<Recipe>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -168,14 +161,9 @@
     public async Task SubmitLogin()
     {
         var auth = await userData.Login(User);
-        var tokens = await auth.Content.ReadAsAsync<AuthenticatedResponse>();
 
-        if (auth.IsSuccessStatusCode)
+        if (auth)
         {
-            var token = tokens.Token;
-            var refreshToken = tokens.RefreshToken;
-            await jsRuntime.InvokeAsync<string>("localStorage.setItem", "token", token);
-            await jsRuntime.InvokeAsync<string>("localStorage.setItem", "refreshToken", refreshToken);
             NavManager.NavigateTo("");
         }
         else
@@ -188,6 +176,17 @@
 
     public async Task SubmitRegister()
     {
+        var auth = await userData.Register(NewUserData);
+        if (auth.IsSuccessStatusCode)
+        {
+            //success alert
+            NewUser = false;
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("Failed to register");
+        }
     }
 
 }
