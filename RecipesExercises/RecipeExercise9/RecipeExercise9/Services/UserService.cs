@@ -5,7 +5,7 @@ using System.Net.Http.Json;
 namespace RecipeExercise9;
 public interface IUserService
 {
-    Task<HttpResponseMessage> Login(LoginModel loginDetails);
+    Task<bool> Login(LoginModel loginDetails);
     Task<HttpResponseMessage> Register(RegisterModel userDetails);
     Task<HttpResponseMessage> RefreshToken(RefreshRequest request);
     Task<bool> CheckAuthentication();
@@ -24,18 +24,49 @@ public class UserService : IUserService
 
     public async Task<bool> CheckAuthentication()
     {
-        var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "token");
+        var checktoken = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "token");
+        if (string.IsNullOrEmpty(checktoken))
+        { 
+            var auth = await RefreshToken();
+            if (auth.IsSuccessStatusCode)
+            {
+                var tokens = await auth.Content.ReadAsAsync<AuthenticatedResponse>();
+                checktoken = tokens.Token;
+                var refreshToken = tokens.RefreshToken;
+                await _jsRuntime.InvokeAsync<string>("sessionStorage.setItem", "token", checktoken);
+                await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "refreshToken", refreshToken);
+            }
+        }
         _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("bearer", token);
+            new AuthenticationHeaderValue("bearer", checktoken);
 
-        return !string.IsNullOrEmpty(token);
+        return !string.IsNullOrEmpty(checktoken);
     }
-
-    public async Task<HttpResponseMessage> Login(LoginModel loginDetails)
+    
+    private async Task<HttpResponseMessage> RefreshToken()
+    {
+        var refreshToken = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "refreshToken");
+        var request = new RefreshRequest { RefreshToken = refreshToken };
+        return await _httpClient.PostAsJsonAsync("refresh", request);
+    }
+    
+    public async Task<bool> Login(LoginModel loginDetails)
     {
         try
         {
-            return await _httpClient.PostAsJsonAsync("login", loginDetails);
+            var auth = await _httpClient.PostAsJsonAsync("login", loginDetails);
+            if (auth.IsSuccessStatusCode)
+            {
+                var tokens = await auth.Content.ReadAsAsync<AuthenticatedResponse>();
+                var token = tokens.Token;
+                var refreshToken = tokens.RefreshToken;
+                await _jsRuntime.InvokeAsync<string>("sessionStorage.setItem", "token", token);
+                await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "refreshToken", refreshToken);
+                return true;
+            }
+            else
+                return false;
+
         }
         catch (Exception ex)
         {
