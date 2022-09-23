@@ -184,13 +184,30 @@
         var auth = await userData.Register(NewUserData);
         if (auth.IsSuccessStatusCode)
         {
-            //success alert
             NewUser = false;
+             await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Success",
+                    Text = "You have successfully registered, please log in",
+                    Icon = SweetAlertIcon.Success,
+                    ConfirmButtonText = "Ok",
+                    ConfirmButtonColor = "#2C7A48"
+                }
+           );
             StateHasChanged();
         }
         else
         {
             Console.WriteLine("Failed to register");
+             await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "Username already exists",
+                    Icon = SweetAlertIcon.Error,
+                    ConfirmButtonText = "Ok",
+                    ConfirmButtonColor = "#2C7A48"
+                }
+           );
         }
     }
 
