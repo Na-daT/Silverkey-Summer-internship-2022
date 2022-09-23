@@ -47,7 +47,7 @@ public class UserService : IUserService
     {
         var refreshToken = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "refreshToken");
         var request = new RefreshRequest { RefreshToken = refreshToken };
-        return await _httpClient.PostAsJsonAsync("refresh", request);
+        return await _httpClient.PostAsJsonAsync("refresh-token", request);
     }
     
     public async Task<bool> Login(LoginModel loginDetails)
