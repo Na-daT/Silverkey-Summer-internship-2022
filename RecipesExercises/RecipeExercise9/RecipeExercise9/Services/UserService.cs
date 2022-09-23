@@ -8,6 +8,7 @@ public interface IUserService
     Task<bool> Login(LoginModel loginDetails);
     Task<HttpResponseMessage> Register(RegisterModel userDetails);
     Task<HttpResponseMessage> RefreshToken(RefreshRequest request);
+    Task LogOut();
     Task<bool> CheckAuthentication();
 }
 
@@ -98,5 +99,11 @@ public class UserService : IUserService
         {
             throw new Exception(ex.Message);
         }
+    }
+
+    public async Task LogOut()
+    {
+        await _jsRuntime.InvokeAsync<string>("sessionStorage.removeItem", "token");
+        await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "refreshToken");
     }
 }
