@@ -9,31 +9,126 @@
 
 <PageTitle>Nada's Recipe App</PageTitle>
 
-<body>
-    <div>
-        @*
-        @if(RecipesList.Any())
-        {
-            @foreach(var recipe in RecipesList)
-            {
-            }
-        }
-        *@
-        <h1>Welcome to Nada's Recipe App</h1>
-            <a href="homePage">login</a>
+
+<div>
+    <header>
+        <div class=" container-fluid text-center">
+            <div class="row justify-content-center border-bottom">
+                <div class="col-md-4 m-2">
+                    <img src="images/logo-black.png" alt="logo" class="img-fluid">
+                </div>
+            </div>
+            <div class="row justify-content-center border-bottom py-2">
+                <div class=" col-sm-1">
+                    <a href="#" class="text-black">Home</a>
+                </div>
+                <div class=" col-sm-1">
+                    <a href="#recipeSection" class="text-black">Recipes</a>
+                </div>
+                <div class=" col-sm-1">
+                    <a href="#categoriesSection" class="text-black">Categories</a>
+                </div>
+                <div class=" col-sm-1">
+                    <a class="text-black" href="#" @onclick="(()=>LogOut())">Log out</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="row pt-5 pb-3 mb-1 my-3 text-center justify-content-center">
+        <div class="col-md-6 px-0">
+            <h3 class="display-6" style="color: #135C2D;">Welcome</h3>
+            <h1 class="display-4 fst-italic" style="color: #135C2D;">Nada's Recipes Wesbsite</h1>
+            <p class="lead my-3" style="color: #135C2D;">A simple website where you can store, edit, and
+                delete
+                your
+                recipes and their
+                different
+                categories.</p>
+            <p class="lead mb-3 mt-3" style="color: #135C2D;"><a href="#recipeSection"
+                    class="link-dark fw-bold" style="color: #135C2D;">Check
+                    out your Recipes</a></p>
+            <img src="/images/ArrowDown.svg" id="mainJump" />
+        </div>
     </div>
-</body>
+    @*Recipe Section*@
+    <section style="background-color:#F1EEE8;" id="recipeSection">
+        <div class="container text-center" id="recipesTitle">
+            <h1 class="display-4 pt-4 lead">Recipes</h1>
+            <p class="lead mt-3 mb-0">Here you can find all the recipes you have stored in our website.
+            </p>
+        </div>
+        @*All recipes cards*@
+        <div id="recipesCards">
+            <div class="container pb-4 pt-2">
+                <div class="row justify-content-end">
+                    <div class="col col-sm-3 justify-content-end align-content-end m-2">
+                        <input @bind="SearchQuery"
+                            placeholder="Search for a recipe..." type="search" class="form-control" @oninput="(()=>LoadRecipes())" />
+                    </div>
+                </div>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3">
+                    @foreach(var item in SearchList)
+                    {
+                        <div class="col">
+                            <div class="card shadow-sm rounded-0" id="cardHover">
+                                <div class="card-body"
+                                    @onclick="()=>{WhichRecipe=item.Id; UpdateRecipe = 0;DetailCards=false;}" >
+                                    <h5 class="card-title fs-4 mx-1" >@item.Title</h5>
+                                    @foreach(var categoryName in item.Categories)
+                                    {
+                                        @if(categoryName.IsActive)
+                                        {
+                                            <span class="badge rounded-pill p-1 mx-1"
+                                                style="background-color:#135C2D;"
+                                                >@categoryName.Name</span>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+         @*update recipe forms*@
+        </div>
+    </section>
+</div>
+
 @code {
     private List<Recipe> RecipesList { get; set; } = new List<Recipe>();
-
+    private List<Recipe> SearchList { get; set; } = new();
+    private string SearchQuery { get; set; } = string.Empty;
+    private int WhichRecipe { get; set; } = new();
+    private int UpdateRecipe { get; set; } = new();
+    private bool DetailCards { get; set; }
     protected override async Task OnInitializedAsync()
     {
         if(await userData.CheckAuthentication())
         {
             RecipesList = await recipeData.GetRecipes();
+            SearchList = RecipesList;
             await base.OnInitializedAsync();
         }
         else
             NavManager.NavigateTo("");
+    }
+
+    private async Task LogOut()
+    {
+        await userData.LogOut();
+        NavManager.NavigateTo("");
+    }
+
+    private void LoadRecipes()
+    {
+        if (SearchQuery == string.Empty)
+        { 
+            SearchList = RecipesList;
+            return;
+        }
+
+        foreach (var x in RecipesList)
+            if (x.Title.Contains(SearchQuery))
+                SearchList.Add(x);
     }
 }
