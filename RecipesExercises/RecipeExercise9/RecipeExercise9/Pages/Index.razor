@@ -56,12 +56,15 @@
             </p>
         </div>
         @*All recipes cards*@
+        @{
+            SearchList = RecipesList.Where(r => r.Title.ToLower().Contains(SearchQuery.ToLower())).ToList();
+        }
         <div id="recipesCards">
             <div class="container pb-4 pt-2">
                 <div class="row justify-content-end">
                     <div class="col col-sm-3 justify-content-end align-content-end m-2">
-                        <input @bind="SearchQuery" placeholder="Search for a recipe..." type="search"
-                            class="form-control" @oninput="(()=>LoadRecipes())" />
+                        <input @bind-value="SearchQuery" placeholder="Search for a recipe..."
+           @bind-value:event="oninput" class="form-control" />
                     </div>
                 </div>
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3">
@@ -271,7 +274,7 @@
 @code {
     private List<Recipe> RecipesList { get; set; } = new List<Recipe>();
     private List<Recipe> SearchList { get; set; } = new();
-    private string SearchQuery { get; set; } = string.Empty;
+    private string SearchQuery { get; set; } = "";
     private int WhichRecipe { get; set; } = new();
     private int UpdateRecipe { get; set; } = new();
     private bool DetailCards { get; set; } = true;
@@ -294,18 +297,18 @@
         NavManager.NavigateTo("");
     }
 
-    private void LoadRecipes()
-    {
-        if (SearchQuery == string.Empty)
-        {
-            SearchList = RecipesList;
-            return;
-        }
+    //private void LoadRecipes()
+    //{
+    //    if (SearchQuery == string.Empty)
+    //    {
+    //        SearchList = RecipesList;
+    //        return;
+    //    }
 
-        foreach (var x in RecipesList)
-            if (x.Title.Contains(SearchQuery))
-                SearchList.Add(x);
-    }
+    //    foreach (var x in RecipesList)
+    //        if (x.Title.Contains(SearchQuery))
+    //            SearchList.Add(x);
+    //}
 
     public async Task DeleteRecipe(int Id)
     {
