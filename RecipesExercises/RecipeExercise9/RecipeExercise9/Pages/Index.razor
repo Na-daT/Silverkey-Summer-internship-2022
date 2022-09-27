@@ -8,6 +8,7 @@
 @inject SweetAlertService Swal
 
 <PageTitle>Nada's Recipe App</PageTitle>
+
 <div>
     <header>
         <div class=" container-fluid text-center">
@@ -18,7 +19,7 @@
             </div>
             <div class="row justify-content-center border-bottom py-2">
                 <div class=" col-sm-1">
-                    <a href="#" class="text-black">Home</a>
+                    <a class="text-black">Home</a>
                 </div>
                 <div class=" col-sm-1">
                     <a href="#recipeSection" class="text-black">Recipes</a>
@@ -64,7 +65,7 @@
                 <div class="row justify-content-end">
                     <div class="col col-sm-3 justify-content-end align-content-end m-2">
                         <input @bind-value="SearchQuery" placeholder="Search for a recipe..."
-           @bind-value:event="oninput" class="form-control" />
+                            @bind-value:event="oninput" class="form-control" />
                     </div>
                 </div>
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 g-3">
@@ -97,7 +98,7 @@
             {
                 @if (UpdateRecipe == recipePicked.Id)
                 {
-                    recipeToUpdate = recipePicked;
+                    RecipeToUpdate = recipePicked;
                     <div class="row justify-content-center p-3 pb-4">
                         <div style="background-color: white;" id="recipePicked.id"
                     class="border-bottom round col-md-5 shadow-lg py-2">
@@ -112,21 +113,21 @@
                                     </button>
                                 </div>
                             </div>
-                            <EditForm method="post" class="form-control shadow-sm" Model="recipeToUpdate"
-                                OnSubmit="SubmitUpdateRecipe">
+                            <EditForm method="post" class="form-control shadow-sm" Model="RecipeToUpdate"
+                        OnSubmit="SubmitUpdateRecipe">
                                 <div class="form-label text-center">
-                                    <h1 class="lead fs-3 "> @recipeToUpdate.Title
+                                    <h1 class="lead fs-3 "> @RecipeToUpdate.Title
                                     </h1>
                                 </div>
-                                <InputNumber aria-hidden="true" @bind-Value="recipeToUpdate.Id" hidden />
+                                <InputNumber aria-hidden="true" @bind-Value="RecipeToUpdate.Id" hidden />
                                 <div class="form-group py-1">
                                     <label for="title">Title</label>
                                     <InputText type="text" class="form-control" id="title" name="title"
-                                @bind-Value="recipeToUpdate.Title" placeholder="Title" required />
+                                @bind-Value="RecipeToUpdate.Title" placeholder="Title" required />
                                 </div>
                                 @*ingredients update*@
                                 @{
-                                    int ingredientsCount = recipeToUpdate.Ingredients.Count;
+                                    int ingredientsCount = RecipeToUpdate.Ingredients.Count;
                                     for (int i = 0; i < ingredientsCount; i++)
                                     {
                                         <div class="form-group py-1">
@@ -136,20 +137,20 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                         class="bi bi-plus-lg" viewBox="0 1 16 16">
                                                     <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
-                                                        0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
-                                                        0 1 8 2Z">
+                                                                0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                                                                0 1 8 2Z">
                                                     </path>
                                                 </svg>
                                             </button>
                                             <div id="newRowIng py-1">
-                                                @if (recipeToUpdate.Ingredients[i].IsActive)
+                                                @if (RecipeToUpdate.Ingredients[i].IsActive)
                                                 {
                                                     <div class="input-group pb-1">
                                                         <InputText type="text" class="form-control py-1" id="recipeIngredients"
-                                            name="recipeIngredients" @bind-Value="recipeToUpdate.Ingredients[i].Name"
+                                            name="recipeIngredients" @bind-Value="RecipeToUpdate.Ingredients[i].Name"
                                             placeholder="Ingredients" aria-describedby="removeIngredient" required />
                                                         <button type="button" class="btn btn-danger btn-sm" id="removeIngredient"
-                                            tabindex="-1" @onclick="()=>recipeToUpdate.Ingredients[i].IsActive = false">
+                                            tabindex="-1" @onclick="()=>RecipeToUpdate.Ingredients[i].IsActive = false">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                                 fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
                                                                 <path
@@ -168,23 +169,22 @@
                     </div>
                 }
             }
-            
+
             @*Single recipe deials*@
-            @foreach(var recipePicked in SearchList)
+            @foreach (var recipePicked in SearchList)
             {
-                @if(WhichRecipe == recipePicked.Id)
+                @if (WhichRecipe == recipePicked.Id)
                 {
                     <div class="row justify-content-center p-3 pb-4">
                         <div style="background-color: white;" id="@recipePicked.Id"
-                            class="border-bottom round col-lg-9 shadow-lg pb-2">
+                    class="border-bottom round col-lg-9 shadow-lg pb-2">
                             <div class="row justify-content-end">
                                 <div class="col-sm-auto align-self-end">
-                                    <button class="btn"
-                                        @onclick="()=>{WhichRecipe = 0;DetailCards = true;}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <button class="btn" @onclick="()=>{WhichRecipe = 0;DetailCards = true;}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-x-lg" viewBox="0 0 16 16">
                                             <path
-                                                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+                                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
                                         </svg>
                                     </button>
                                 </div>
@@ -195,25 +195,24 @@
                                 </div>
                                 <div class="col-sm-auto p-0">
                                     <button class="btn btn-sm my-2"
-                                    @onclick="()=>{UpdateRecipe = recipePicked.Id;WhichRecipe = 0;}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" class="bi bi-pencil-square"
-                                            viewBox="0 0 16 16">
+                                @onclick="()=>{UpdateRecipe = recipePicked.Id;WhichRecipe = 0;}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-pencil-square" viewBox="0 0 16 16">
                                             <path
-                                                d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                        d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                                             <path fill-rule="evenodd"
-                                                d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                                         </svg>
                                     </button>
                                 </div>
                                 <div class="col-sm-auto p-0">
                                     <div>
                                         <button class="btn btn-sm my-2"
-                                        @onclick="async ()=>{await DeleteRecipe(recipePicked.Id); WhichRecipe = 0;}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="red" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    @onclick="async ()=>{await DeleteRecipe(recipePicked.Id); WhichRecipe = 0;}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red"
+                                        class="bi bi-trash3-fill" viewBox="0 0 16 16">
                                                 <path
-                                                    d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                            d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
                                                 </path>
                                             </svg>
                                         </button>
@@ -223,16 +222,16 @@
                             <div class="row justify-content-center">
                                 <div class=" col-lg-4 rounded pt-4">
                                     <table class="table table-hover rounded shadow-sm text-center"
-                                        style="background-color:#F1EEE8 ;">
+                                style="background-color:#F1EEE8 ;">
                                         <thead>
                                             <tr>
                                                 <th class="fs-4" style="color: #135C2D;">Ingredients</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach(var ingredient in recipePicked.Ingredients)
+                                            @foreach (var ingredient in recipePicked.Ingredients)
                                             {
-                                                @if(ingredient.IsActive)
+                                                @if (ingredient.IsActive)
                                                 {
                                                     <tr>
                                                         <td>@ingredient.Name</td>
@@ -250,9 +249,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                             @foreach(var instruction in recipePicked.Instructions)
+                                            @foreach (var instruction in recipePicked.Instructions)
                                             {
-                                                @if(instruction.IsActive)
+                                                @if (instruction.IsActive)
                                                 {
                                                     <tr>
                                                         <td>@instruction.Name</td>
@@ -269,21 +268,233 @@
             }
         </div>
     </section>
+
+    @*Categories section*@
+    <div style="background-color: white;" class="p-5" id="categoriesSection">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-5" style="background-color: #2C7A48; color:white;">
+                    <h1 class=" fs-3 fw-bold lead p-3">Categories</h1>
+                    <p class="lead mt-3 px-3 fs-5">Here you can find all the categories you have stored in
+                        our
+                        website.
+                        You
+                        can update each category by clicking on it, or add a new category by clicking the
+                        button
+                        below.
+                    </p>
+                    <div class="row justify-content-center">
+                        <div class="col justify-content-end">
+                            <a class="btn btn-dark m-2" href="#creationForms" style="opacity:80%;">Add a new
+                                Category</a>
+                        </div>
+                        <div class="col-sm-4 p-0">
+                            <object data="/images/online-grocery.svg" width="150" height="150"> </object>
+                        </div>
+                    </div>
+                </div>
+                @*Categories cards*@
+                <div class="col-lg-5">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-md-4 pt-4">
+                        @foreach (var category in CategoriesList)
+                        {
+                            <div class="col">
+                                @if (WhichCategory != category.Id)
+                                {
+                                    <div class="card shadow-sm myCard mb-3"
+                                @onclick="()=>{WhichCategory = category.Id; CategoryToUpdate = category;}">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title fs-6">@category.Name</h5>
+                                        </div>
+                                    </div>
+                                }
+                                @if (WhichCategory == category.Id)
+                                {
+                                    <div class="card shadow-sm myCard mb-3">
+                                        <div class="card-body text-center">
+                                            <EditForm Model="CategoryToUpdate" OnSubmit="UpdateCategoryAsync">
+                                                <InputText class="form-control" @bind-Value="CategoryToUpdate.Name" />
+                                                <button type="submit" class="btn btn-sm btn-dark mt-2">Update</button>
+                                                <a class="link-dark" @onclick="()=>{WhichCategory = 0;}">Cancel</a>
+                                            </EditForm>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <section style="background-image: url('images/formmd.jpg');" id="creationForms">
+        <div class="container-fluid">
+            <div class="row justify-content-center p-4">
+                @*Recipes Creation form*@
+                <div class="col-md-5">
+                    <div>
+                        <EditForm method="post" Model="@NewRecipe" OnSubmit="SubmitNewRecipe"
+                            class="form-control shadow-sm">
+                            <div class="form-label text-center">
+                                <h1 class="lead fs-3 ">Add new recipe
+                                </h1>
+                            </div>
+                            <div class="form-group py-1">
+                                <label for="title">Title</label>
+                                <InputText type="text" class="form-control" id="title" name="title"
+                                   @bind-Value="NewRecipe.Title" placeholder="Title" required />
+                            </div>
+                            <div class="form-group py-1">
+                                <label for="recipeIngredients">Ingredients</label>
+                                <button type="button" class="btn btn-sm mx-3 my-1"
+                                    style="background-color: #2C7A48; color:white;" @onclick="()=>Increment(NewIngredientsCount)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                            0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                            0 1 8 2Z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <div id="newRowIng py-1">
+                                    @for(int i = 0; i<NewIngredientsCount; i++)
+                                    {
+                                        int j = i;
+                                        NewRecipe.Ingredients.Add(new Ingredient());
+                                        @if(NewRecipe.Ingredients[j].IsActive)
+                                        {
+                                            <div class="input-group pb-1">
+                                                <InputText type="text" class="form-control py-1"
+                                                    id="recipeIngredients" name="recipeIngredients"
+                                                    @bind-Value="NewRecipe.Ingredients[j].Name"
+                                                    placeholder="Ingredients"
+                                                    aria-describedby="removeIngredient" required />
+                                                <button type="button" tabindex="-1"
+                                                    class="btn btn-danger btn-sm" id="removeIngredient"
+                                                    @onclick="()=>{NewRecipe.Ingredients.Remove(NewRecipe.Ingredients[j]); StateHasChanged();}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                        height="12" fill="currentColor"
+                                                        class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                            <div class="form-group py-1">
+                                <label for="recipeInstructions">Instructions</label>
+                                <button type="button" class="btn btn-sm mx-3 my-1"
+                                    style="background-color: #2C7A48; color:white;"
+                                    x-on:click="NewRecipe.instructions.push({name:'', isActive: true})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        fill="currentColor" class="bi bi-plus-lg" viewBox="0 1 16 16">
+                                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1
+                            0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0
+                            0 1 8 2Z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <div id="newRowIns py-1">
+                                    <input type="hidden" id="instructionsCount" value="0">
+                                    <template x-for="(instruction,index) in NewRecipe.instructions">
+                                        <template x-if="NewRecipe.instructions[index] = true">
+                                            <div class="input-group pb-1">
+                                                <input type="text" class="form-control py-1"
+                                                    id="recipeInstructions" name="recipeInstructions"
+                                                    x-model="NewRecipe.instructions[index].name"
+                                                    placeholder="Instruction"
+                                                    aria-describedby="removeInstruction" required>
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    id="removeInstruction"
+                                                    x-on:click="NewRecipe.instructions.splice(index,1)"
+                                                    tabindex="-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12"
+                                                        height="12" fill="currentColor"
+                                                        class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="form-group py-1">
+                                <label for="recipeCategories">Categories</label>
+                              @*  <select class="form-control" id="recipeCategories"
+                                    x-model="NewRecipe.categories" multiple>
+                                    <template x-for="category in myCategories">
+                                        <option x-text="category.name"></option>
+                                    </template>
+                                </select>*@
+@*                                <InputSelect multiple @bind-Value="NewRecipe.RecipeCategories">
+                                    @foreach(var category in CategoriesList)
+                                    {
+                                        <option value="category.Name">@category.Name
+                                        </option>
+                                    }
+                                </InputSelect>*@
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <input type="submit" class="btn m-2" value="Create recipe" id="submitbutton"
+                                    style="color: white; background-color:#1c4d2d;" />
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+                @*Categories Creation form*@
+                <div class="col-md-5">
+                    <div>
+                        <EditForm class="form-control shadow-sm" OnSubmit="SubmitNewCategory" Model="@NewCategory">
+                            <div class="form-label text-center">
+                                <h1 class="lead fs-3 ">Add new category
+                                </h1>
+                            </div>
+                            <div class="form-group">
+                                <label for="title">Name</label>
+                                <InputText type="text" class="form-control" id="title" name="title" @bind-Value="NewCategory.Name"
+                                    placeholder="Type category name" required />
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <input type="submit" class="btn m-2" value="Create category"
+                                    id="submitbutton" style="color: white; background-color:#1c4d2d;" />
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 @code {
     private List<Recipe> RecipesList { get; set; } = new List<Recipe>();
+    private List<Category> CategoriesList { get; set; } = new List<Category>();
     private List<Recipe> SearchList { get; set; } = new();
     private string SearchQuery { get; set; } = "";
     private int WhichRecipe { get; set; } = new();
     private int UpdateRecipe { get; set; } = new();
     private bool DetailCards { get; set; } = true;
-    private Recipe recipeToUpdate { get; set; } = new();
+    private Recipe RecipeToUpdate { get; set; } = new();
+    private Recipe NewRecipe { get; set; } = new();
+    private int NewIngredientsCount = 0;
+    private int WhichCategory { get; set; } = new();
+    private Category CategoryToUpdate { get; set; } = new();
+    private Category NewCategory { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         if (await userData.CheckAuthentication())
         {
             RecipesList = await recipeData.GetRecipes();
+            CategoriesList = await categoryData.GetCategories();
             SearchList = RecipesList;
             await base.OnInitializedAsync();
         }
@@ -297,23 +508,10 @@
         NavManager.NavigateTo("");
     }
 
-    //private void LoadRecipes()
-    //{
-    //    if (SearchQuery == string.Empty)
-    //    {
-    //        SearchList = RecipesList;
-    //        return;
-    //    }
-
-    //    foreach (var x in RecipesList)
-    //        if (x.Title.Contains(SearchQuery))
-    //            SearchList.Add(x);
-    //}
-
     public async Task DeleteRecipe(int Id)
     {
         var auth = await recipeData.DeleteRecipe(Id);
-        if(auth.IsSuccessStatusCode)
+        if (auth.IsSuccessStatusCode)
         {
             await Swal.FireAsync(new SweetAlertOptions
             {
@@ -342,7 +540,7 @@
 
     public async Task SubmitUpdateRecipe()
     {
-        var auth = await recipeData.UpdateRecipe(recipeToUpdate);
+        var auth = await recipeData.UpdateRecipe(RecipeToUpdate);
         if (auth.IsSuccessStatusCode)
         {
             await Swal.FireAsync(new SweetAlertOptions
@@ -367,6 +565,112 @@
             }
             );
         }
+        StateHasChanged();
+    }
+
+    public async Task UpdateCategoryAsync()
+    {
+        var auth = await categoryData.UpdateCategory(CategoryToUpdate);
+        if (auth.IsSuccessStatusCode)
+        {
+            await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "sucess",
+                Text = "category updated!",
+                Icon = SweetAlertIcon.Success,
+                ConfirmButtonText = "Ok",
+                ConfirmButtonColor = "#2C7A48"
+            }
+            );
+        }
+        else
+        {
+            await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Error",
+                Text = "Please try again",
+                Icon = SweetAlertIcon.Error,
+                ConfirmButtonText = "Ok",
+                ConfirmButtonColor = "#2C7A48"
+            }
+            );
+        }
+        WhichCategory = 0;
+        RecipesList = await recipeData.GetRecipes();
+        StateHasChanged();
+    }
+
+    public async Task SubmitNewRecipe()
+    {
+        var auth = await recipeData.AddRecipe(NewRecipe);
+        if (auth.IsSuccessStatusCode)
+        {
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "sucess",
+                    Text = "recipe created!",
+                    Icon = SweetAlertIcon.Success,
+                    ConfirmButtonText = "Ok",
+                    ConfirmButtonColor = "#2C7A48"
+                }
+            );
+            var newRecipeObject = new Recipe(NewRecipe);
+            RecipesList.Add(newRecipeObject);
+            NewRecipe = new Recipe();
+        }
+        else
+        {
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "Please try again",
+                    Icon = SweetAlertIcon.Error,
+                    ConfirmButtonText = "Ok",
+                    ConfirmButtonColor = "#2C7A48"
+                }
+            );
+            NewRecipe = new Recipe();
+        }
+    }
+
+    public async Task SubmitNewCategory()
+    {
+        var auth = await categoryData.AddCategory(NewCategory);
+        if (auth.IsSuccessStatusCode)
+        {
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "sucess",
+                    Text = "category created!",
+                    Icon = SweetAlertIcon.Success,
+                    ConfirmButtonText = "Ok",
+                    ConfirmButtonColor = "#2C7A48"
+                }
+            );
+            var newCategoryObject = new Category(NewCategory);
+            CategoriesList.Add(newCategoryObject);
+            NewCategory = new Category();
+        }
+        else
+        {
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "Please try again",
+                    Icon = SweetAlertIcon.Error,
+                    ConfirmButtonText = "Ok",
+                    ConfirmButtonColor = "#2C7A48"
+                }
+            );
+            NewCategory = new Category();
+        }
+        WhichCategory = 0;
+        this.StateHasChanged();
+    }
+
+    public void Increment(int i)
+    {
+        i++;
         StateHasChanged();
     }
 }

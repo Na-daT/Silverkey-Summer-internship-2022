@@ -20,4 +20,12 @@ public class Category
     {
         Name = name;
     }
+
+    public Category(Category category)
+    {
+        Id = Guid.NewGuid().GetHashCode();
+        Name = category.Name;
+        IsActive = category.IsActive;
+    }
 }
+

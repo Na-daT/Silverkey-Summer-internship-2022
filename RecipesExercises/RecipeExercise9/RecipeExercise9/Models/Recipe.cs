@@ -21,4 +21,14 @@ public class Recipe
         RecipeCategories = categories;
         IsActive = isActive;
     }
+
+    public Recipe(Recipe recipe)
+    {
+        Id = Guid.NewGuid().GetHashCode();
+        Title = recipe.Title;
+        Ingredients = recipe.Ingredients;
+        Instructions = recipe.Instructions;
+        RecipeCategories = recipe.RecipeCategories;
+        IsActive = true;
+    }
 }
