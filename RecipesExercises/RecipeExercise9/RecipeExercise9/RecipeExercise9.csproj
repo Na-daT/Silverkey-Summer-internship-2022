@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.9" PrivateAssets="all" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="20.2.0.50" />
   </ItemGroup>
 
 </Project>

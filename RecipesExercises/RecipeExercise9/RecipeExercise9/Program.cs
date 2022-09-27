@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using CurrieTechnologies.Razor.SweetAlert2;
+using Syncfusion.Blazor;
 using RecipeExercise9;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -14,5 +15,6 @@ builder.Services.AddSingleton<IRecipeService, RecipeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSweetAlert2();
+builder.Services.AddSyncfusionBlazor(options => { options.IgnoreScriptIsolation = true; });
 
 await builder.Build().RunAsync();

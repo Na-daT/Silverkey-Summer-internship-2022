@@ -10,11 +10,23 @@
     <link href="css/app.css" rel="stylesheet" />
     <link href="RecipeExercise9.styles.css" rel="stylesheet" />
     <link href="BlazorCarousel.Client.styles.css" rel="stylesheet" />
+    <link href="_content/Syncfusion.Blazor.Themes/bootstrap5.css" rel="stylesheet" />
+    <script src="_content/Syncfusion.Blazor.Core/scripts/syncfusion-blazor.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         function startCarousel(carouselId) {
             var myCarousel = document.getElementById(carouselId);
             var carousel = new bootstrap.Carousel(myCarousel);
             carousel.cycle();
+        }
+        function BlazorScrollToId(id) {
+            const element = document.getElementById(id);
+            if (element instanceof HTMLElement) {
+                element.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                    inline: "nearest"
+                });
+            }
         }
     </script>
 </head>
