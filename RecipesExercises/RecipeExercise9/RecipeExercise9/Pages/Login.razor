@@ -22,7 +22,7 @@
                         <div class="row mt-3">
                             <div class="col"></div>
                             <div class="col">
-                                <div id="@carouselName" class="carousel slide" data-bs-ride="carousel">
+                                <div id="@CarouselName" class="carousel slide" data-bs-ride="carousel">
                                     <div class="carousel-inner">
                                         <div class="carousel-item active">
                                             <p class="lead text-center">Save your favourite recipes in details.</p>
@@ -143,7 +143,7 @@
     </div>
 @code {
 
-    const string carouselName = "welcomeIndicator";
+    const string CarouselName = "welcomeIndicator";
     private bool IsLoggedIn { get; set; } = false;
     private bool NewUser { get; set; } = false;
     private LoginModel User { get; set; } = new LoginModel();
@@ -152,7 +152,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        object[] args = { carouselName };
+        object[] args = { CarouselName };
         await jsRuntime.InvokeVoidAsync("startCarousel", args);
     }
 
@@ -198,7 +198,6 @@
         }
         else
         {
-            Console.WriteLine("Failed to register");
              await Swal.FireAsync(new SweetAlertOptions
                 {
                     Title = "Error",
